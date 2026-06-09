@@ -1,8 +1,6 @@
 package com.farmily.user.controller;
 
-import com.farmily.user.dto.UserLoginRequest;
-import com.farmily.user.dto.UserProfileResponse;
-import com.farmily.user.dto.UserRegisterRequest;
+import com.farmily.user.dto.*;
 import com.farmily.user.model.User;
 import com.farmily.user.repository.UserRepository;
 import com.farmily.user.service.UserService;
@@ -22,65 +20,52 @@ public class UserController {
 
     // 一般會員註冊
     @PostMapping("/register")
-    public ResponseEntity<UserProfileResponse> register(@RequestBody @Valid UserRegisterRequest reg){
+    public ResponseEntity<UserProfileResponse> register(
+            @RequestBody @Valid UserRegisterRequest reg){
         UserProfileResponse response = userService.register(reg);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     // 一般會員登入
     @PostMapping("/login")
-    public UserProfileResponse login(@RequestBody @Valid UserLoginRequest req) {
-        return userService.login(req);
+    public ResponseEntity<UserProfileResponse> login(
+            @RequestBody @Valid UserLoginRequest req) {
+        return ResponseEntity.ok(userService.login(req));
     }
 
+    // 修改會員資料
     @PutMapping("/{userId}")
-    public ResponseEntity<UserProfileResponse> update(@PathVariable Integer userId,
-                                                      @RequestBody @Valid UserRegisterRequest reg){
-
-        User u = userRepository.findById(userId).orElse(null);
-
-        // 先檢查會員是否存在
-        if(u != null){
-            u.setEmail(user.getEmail());
-            u.setCityDistrict(user.getCityDistrict());
-            u.setUserAddress(user.getUserAddress());
-            u.setPassword(user.getPassword());
-            u.setUserName(user.getUserName());
-            u.setUserNickname(user.getUserNickname());
-            u.setBirthday(user.getBirthday());
-            u.setUserPhoneNum(user.getUserPhoneNum());
-
-            // 根據請求端判斷是否開啟修改功能
-//            u.setUserStatus(user.getUserStatus());
-//            u.setMonthlySpending(user.getMonthlySpending());
-//            u.setIsFarmer(user.getIsFarmer());
-
-            userService.save(u);      // save() 同時有新增和修改功能
-
-            return "會員資料修改成功";
-        } else {
-            return "修改失敗，會員數據不存在";
-        }
-
+    public ResponseEntity<UserProfileResponse> update(
+            @PathVariable Integer userId,
+            @RequestBody @Valid UserUpdateRequest update){
+        UserProfileResponse response = userService.updateMyProfile(userId, update);
+        return ResponseEntity.ok(response);
     }
+
+    // 修改密碼
+    @PutMapping("/{userId}/password")
+    public ResponseEntity<String> changePassword(
+            @PathVariable Integer userId,
+            @RequestBody @Valid ChangePasswordRequest pw) {
+        userService.changePassword(userId, pw);
+        return ResponseEntity.ok("密碼修改成功！請使用新密碼登入");
+    }
+
 
     // 刪除會員
     @DeleteMapping("/{userId}")
-    public String delete(@PathVariable Integer userId){
-
-        userRepository.deleteById(userId);
-
-        return "會員刪除成功";
+    public ResponseEntity<String> delete(
+            @PathVariable Integer userId){
+        userService.deleteUser(userId);
+        return ResponseEntity.ok("會員刪除成功");
     }
 
-    // 查詢會員
+    // 查會員個人資料
     @GetMapping("/{userId}")
-    public User read(@PathVariable Integer userId){
-
-        User user = userRepository.findById(userId)
-                .orElse(null);                  // 返回 Optional: orElse 如果資料庫找不到，user = null
-
-        return user;
+    public ResponseEntity<UserProfileResponse> read(
+            @PathVariable Integer userId){
+        UserProfileResponse response = userService.getMyProfile(userId);
+        return ResponseEntity.ok(response);
     }
 
 }

@@ -1,5 +1,7 @@
 package com.farmily.user.dto;
 
+import com.farmily.user.model.CityDistrict;
+
 import java.time.LocalDate;
 
 //會員端 dto (/api/users)
@@ -8,6 +10,7 @@ public class UserUpdateRequest {
     private String userName;
     private String userNickname;
     private String userPhoneNum;
+    private CityDistrict cityDistrict;
     private String userAddress;
     private Integer districtId;
     private LocalDate birthday;
@@ -34,6 +37,14 @@ public class UserUpdateRequest {
 
     public void setUserPhoneNum(String userPhoneNum) {
         this.userPhoneNum = userPhoneNum;
+    }
+
+    public CityDistrict getCityDistrict() {
+        return cityDistrict;
+    }
+
+    public void setCityDistrict(CityDistrict cityDistrict) {
+        this.cityDistrict = cityDistrict;
     }
 
     public String getUserAddress() {

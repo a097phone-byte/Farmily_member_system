@@ -8,6 +8,7 @@ import com.farmily.user.repository.UserRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,7 +17,7 @@ import java.time.LocalDateTime;
 
 @Service
 @Transactional
-public class UserServiceImpl implements UserService{
+public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final CityDistrictRepository cityDistrictRepository;
@@ -91,14 +92,14 @@ public class UserServiceImpl implements UserService{
         User user = userRepository.findByEmail(log.getEmail())
                 .orElseThrow(() -> new BadCredentialsException("帳號或密碼錯誤"));
 
+        // 純 Google 帳號沒有本地密碼，null 檢查必須在 matches() 之前
+        if (user.getPassword() == null) {
+            throw new IllegalStateException("此帳號為第三方登入，請改用 Google 登入");
+        }
+
         // 檢查 hash 密碼是否相等
         if (!passwordEncoder.matches(log.getPassword(), user.getPassword())) {
             throw new BadCredentialsException("帳號或密碼錯誤");
-        }
-
-        // 純 Google 帳號沒有本地密碼
-        if (user.getPassword() == null) {
-            throw new IllegalStateException("此帳號為第三方登入,請改用 Google 登入");
         }
 
         if (user.getUserStatus() == User.UserStatus.SUSPENDED
@@ -108,24 +109,77 @@ public class UserServiceImpl implements UserService{
         return UserProfileResponse.from(user);
     }
 
+
+    // 查資料
+    @Override
+    @Transactional(readOnly = true)
+    public UserProfileResponse getMyProfile(Integer userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("查無此用戶"));
+        return UserProfileResponse.from(user);
+    }
+
+    // 改資料
+    @Override
+    public UserProfileResponse updateMyProfile(Integer userId, UserUpdateRequest update) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("查無此用戶"));
+
+        if (update.getUserName() != null)
+            user.setUserName(update.getUserName());
+        if (update.getUserNickname() != null)
+            user.setUserNickname(update.getUserNickname());
+        if (update.getUserPhoneNum() != null)
+            user.setUserPhoneNum(update.getUserPhoneNum());
+        if (update.getUserAddress() != null)
+            user.setUserAddress(update.getUserAddress());
+        if (update.getBirthday() != null)
+            user.setBirthday(update.getBirthday());
+
+        if (update.getDistrictId() != null) {
+            CityDistrict city = cityDistrictRepository.findById(update.getDistrictId())
+                    .orElseThrow(() -> new IllegalArgumentException("查無此區域"));
+            user.setCityDistrict(city);
+        }
+        //  repository 將修改資料存進 DB
+        return UserProfileResponse.from(userRepository.save(user));
+    }
+
+    // 改密碼
+    @Override
+    public void changePassword(Integer userId, ChangePasswordRequest pw) {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("查無此用戶"));
+
+        // 已有本地密碼，必須先驗證舊密碼正確
+        if (user.getPassword() != null) {
+            if (pw.getOldPassword() == null
+                    || !passwordEncoder.matches(pw.getOldPassword(), user.getPassword())) {
+                throw new BadCredentialsException("舊密碼錯誤");
+            }
+        }
+
+        // Google 帳號首次設定密碼：本來就沒有 oldPassword，直接 hash 新密碼存入
+        user.setPassword(passwordEncoder.encode(pw.getNewPassword()));
+        userRepository.save(user);
+    }
+
+
+    // 刪除資料
+    @Override
+    public void deleteUser(Integer userId) {
+        if(!userRepository.existsById(userId)){
+            throw new IllegalStateException("查無此用戶");
+        }
+        userRepository.deleteById(userId);
+    }
+
+    // 尚未實作
     @Override
     public UserProfileResponse loginOrRegisterOAuth(OAuthUserInfo info) {
         return null;
     }
 
-    @Override
-    @Transactional(readOnly = true)
-    public UserProfileResponse getMyProfile(Integer userId) {
-        return null;
-    }
-
-    @Override
-    public UserProfileResponse updateMyProfile(Integer userId, UserUpdateRequest update) {
-        return null;
-    }
-
-    @Override
-    public void changePassword(Integer userId, ChangePasswordRequest pw) {
-
-    }
 }
+
