@@ -175,7 +175,7 @@ public class UserServiceImpl implements UserService {
         userRepository.deleteById(userId);
     }
 
-    // 尚未實作
+    // OAuth 2.0 註冊登入
     @Override
     public UserProfileResponse loginOrRegisterOAuth(OAuthUserInfo info) {
         return null;

@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 
-// 根據使用者帳號查出會員資訊
+//  Spring Security 驗證身份
 @Component
 public class MyUserDetailsService implements UserDetailsService {
 

@@ -26,15 +26,15 @@ public class UserSecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .cors(Customizer.withDefaults())
                 .httpBasic(Customizer.withDefaults())
-                .formLogin(Customizer.withDefaults())       // 表單登入（使用帳號密碼登入）
+//                .formLogin(Customizer.withDefaults())      // 關掉預設 form 登入，自定義，避免背景監聽 login
 
                 // url 請求設定
                 .authorizeHttpRequests(request -> request
                         .requestMatchers("/general/users/register",
                                         "/general/users/login",
                                         "/general/users/oauth/**").permitAll()      // 允許所有人請求
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/farmer/**").hasAnyRole("FARMER", "ADMIN")
+//                        .requestMatchers("/admin/**").hasRole("ADMIN")
+//                        .requestMatchers("/farmer/**").hasAnyRole("FARMER", "ADMIN")
                         .anyRequest().authenticated()                                 // 剩餘所有 url 需登入才能請求
                 )
                 .build();
