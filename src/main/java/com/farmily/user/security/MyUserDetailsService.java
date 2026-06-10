@@ -2,7 +2,6 @@ package com.farmily.user.security;
 
 import com.farmily.user.model.User;
 import com.farmily.user.repository.UserRepository;
-import com.farmily.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
