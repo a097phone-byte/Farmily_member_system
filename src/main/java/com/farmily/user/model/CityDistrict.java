@@ -28,7 +28,7 @@ public class CityDistrict implements Serializable {
     private String  distEng;
 
     @Column(name = "zipcode")
-    private Integer zipcode;
+    private Short zipcode;
 
     @Column(name = "note")
     private String  note;
@@ -80,11 +80,11 @@ public class CityDistrict implements Serializable {
         this.distEng = distEng;
     }
 
-    public Integer getZipcode() {
+    public Short getZipcode() {
         return zipcode;
     }
 
-    public void setZipcode(Integer zipcode) {
+    public void setZipcode(Short zipcode) {
         this.zipcode = zipcode;
     }
 

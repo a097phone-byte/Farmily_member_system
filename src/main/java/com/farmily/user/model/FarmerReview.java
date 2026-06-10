@@ -24,7 +24,7 @@ public class FarmerReview implements Serializable {
     private Admin admin;
 
     @Column(name = "review_round", nullable = false)
-    private Integer reviewRound = 1;        // 預設初始值 = 1
+    private Byte reviewRound = 1;        // 預設初始值 = 1
 
     @Enumerated(EnumType.STRING)
     @Column(name = "review_status")
@@ -72,11 +72,11 @@ public class FarmerReview implements Serializable {
         this.admin = admin;
     }
 
-    public Integer getReviewRound() {
+    public Byte getReviewRound() {
         return reviewRound;
     }
 
-    public void setReviewRound(Integer reviewRound) {
+    public void setReviewRound(Byte reviewRound) {
         this.reviewRound = reviewRound;
     }
 
