@@ -17,6 +17,9 @@ public class AdminRole implements Serializable {
     @Column(name = "permission_name")
     private String permissionName;
 
+    @Column(name = "permission_code", unique = true, nullable = false)
+    private String permissionCode;
+
     @Column(name = "description")
     private String description;
 
@@ -38,6 +41,14 @@ public class AdminRole implements Serializable {
 
     public void setPermissionName(String permissionName) {
         this.permissionName = permissionName;
+    }
+
+    public String getPermissionCode() {
+        return permissionCode;
+    }
+
+    public void setPermissionCode(String permissionCode) {
+        this.permissionCode = permissionCode;
     }
 
     public String getDescription() {

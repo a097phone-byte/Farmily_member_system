@@ -1,7 +1,8 @@
 package com.farmily.user.controller;
 
 import com.farmily.user.dto.*;
-import com.farmily.user.security.MyUserDetailsService;
+import com.farmily.user.security.MemberUserDetails;
+import com.farmily.user.security.service.MemberUserDetailsService;
 import com.farmily.user.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -10,20 +11,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/general/users")
+@RequestMapping("/api/member")
 public class UserController {
 
     @Autowired
     private UserService userService;
 
     @Autowired
-    private MyUserDetailsService myUserDetailsService;
+    private MemberUserDetailsService memberUserDetailsService;
 
 
     // 一般會員註冊
@@ -43,8 +45,8 @@ public class UserController {
         // step1: 呼叫 Service，判斷帳號狀態、比對密碼，回傳 dto
         UserProfileResponse response = userService.login(req);
 
-        // step2: 成功後，通知 Spring Security「這個人已通過驗證(登入)」
-        UserDetails userDetails = myUserDetailsService.loadUserByUsername(req.getEmail());
+        // step2: 通知 Spring Security 此人已通過驗證
+        UserDetails userDetails = memberUserDetailsService.loadUserByUsername(req.getEmail());
         UsernamePasswordAuthenticationToken authToken =
                 new UsernamePasswordAuthenticationToken(
                         userDetails, null, userDetails.getAuthorities()
@@ -61,39 +63,38 @@ public class UserController {
     }
 
 
-
-    // 修改會員資料
-    @PutMapping("/{userId}")
-    public ResponseEntity<UserProfileResponse> update(
-            @PathVariable Integer userId,
+    // 修改資料
+    @PutMapping("/me")
+    public ResponseEntity<UserProfileResponse> updateMe(
+            @AuthenticationPrincipal MemberUserDetails me,
             @RequestBody @Valid UserUpdateRequest update){
-        UserProfileResponse response = userService.updateMyProfile(userId, update);
+        UserProfileResponse response = userService.updateMyProfile(me.getUserId(), update);
         return ResponseEntity.ok(response);
     }
 
     // 修改密碼
-    @PutMapping("/{userId}/password")
+    @PutMapping("/me/password")
     public ResponseEntity<String> changePassword(
-            @PathVariable Integer userId,
+            @AuthenticationPrincipal MemberUserDetails me,
             @RequestBody @Valid ChangePasswordRequest pw) {
-        userService.changePassword(userId, pw);
+        userService.changePassword(me.getUserId(), pw);
         return ResponseEntity.ok("密碼修改成功！請使用新密碼登入");
     }
 
 
-    // 刪除會員
-    @DeleteMapping("/{userId}")
-    public ResponseEntity<String> delete(
-            @PathVariable Integer userId){
-        userService.deleteUser(userId);
-        return ResponseEntity.ok("會員刪除成功");
+    // 註銷自己帳號
+    @DeleteMapping("/me")
+    public ResponseEntity<String> deleteMe(
+            @AuthenticationPrincipal MemberUserDetails me){
+        userService.deleteUser(me.getUserId());
+        return ResponseEntity.ok("註銷成功!");
     }
 
-    // 查會員個人資料
-    @GetMapping("/{userId}")
-    public ResponseEntity<UserProfileResponse> read(
-            @PathVariable Integer userId){
-        UserProfileResponse response = userService.getMyProfile(userId);
+    // 查個人資料
+    @GetMapping("/me")
+    public ResponseEntity<UserProfileResponse> getMe(
+            @AuthenticationPrincipal MemberUserDetails me){
+        UserProfileResponse response = userService.getMyProfile(me.getUserId());
         return ResponseEntity.ok(response);
     }
 

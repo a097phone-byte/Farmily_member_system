@@ -23,7 +23,6 @@ public class UserServiceImpl implements UserService {
     private final CityDistrictRepository cityDistrictRepository;
     private final PasswordEncoder passwordEncoder;
 
-    @Autowired
     public UserServiceImpl(UserRepository userRepository,
                            CityDistrictRepository cityDistrictRepository,
                            PasswordEncoder passwordEncoder) {

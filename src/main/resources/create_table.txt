@@ -84,21 +84,22 @@ VALUES
 CREATE TABLE ADMIN_ROLE (
     permission_id   INT         AUTO_INCREMENT PRIMARY KEY,
     permission_name VARCHAR(50),
+    permission_code VARCHAR(30) NOT NULL UNIQUE,
     description     VARCHAR(100)
 );
 
 -- 預存資料 --
-INSERT INTO ADMIN_ROLE (permission_name, description)
+INSERT INTO ADMIN_ROLE (permission_name, permission_code, description)
 VALUES
-('最新消息管理', '刊登/修改/刪除、即時資訊更新'),
-('專欄部落格內容管理', '檢舉處理、刪除違規文章'),
-('會員系統', '小農與消費者會員資料管理、權限控管'),
-('管理員管理', '管理員帳號新增/修改/刪除、權限控管'),
-('商城管理', '管理優惠券、資料統計、爭議處理'),
-('團購管理', '爭議處理'),
-('體驗活動管理', '活動審核、瀏覽、搜尋、狀態管理'),
-('市場數據管理', '數據更新'),
-('網頁流量分析', '用戶增加趨勢、訂單數量統計');
+('最新消息管理',       'NEWS',        '刊登/修改/刪除、即時資訊更新'),
+('專欄部落格內容管理', 'BLOG',        '檢舉處理、刪除違規文章'),
+('會員系統',           'MEMBER',      '小農與消費者會員資料管理、權限控管'),
+('管理員管理',         'ADMIN',       '管理員帳號新增/修改/刪除、權限控管'),
+('商城管理',           'SHOP',        '管理優惠券、資料統計、爭議處理'),
+('團購管理',           'GROUP_BUY',   '爭議處理'),
+('體驗活動管理',       'EVENT',       '活動審核、瀏覽、搜尋、狀態管理'),
+('市場數據管理',       'MARKET_DATA', '數據更新'),
+('網頁流量分析',       'ANALYTICS',   '用戶增加趨勢、訂單數量統計');
 
 
 -- 2-1 管理員 --
