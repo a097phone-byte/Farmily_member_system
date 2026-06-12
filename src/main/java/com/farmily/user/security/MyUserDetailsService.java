@@ -1,6 +1,8 @@
 package com.farmily.user.security;
 
 import com.farmily.user.model.User;
+import com.farmily.user.repository.AdminRepository;
+import com.farmily.user.repository.FarmerRepository;
 import com.farmily.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
@@ -16,10 +18,20 @@ import java.util.List;
 @Component
 public class MyUserDetailsService implements UserDetailsService {
 
-        @Autowired
-        private UserRepository userRepository;
+    private final UserRepository userRepository;
+    private final FarmerRepository farmerRepository;
+    private final AdminRepository adminRepository;
 
-        @Override
+    @Autowired
+    public MyUserDetailsService(UserRepository userRepository,
+                                FarmerRepository farmerRepository,
+                                AdminRepository adminRepository) {
+        this.userRepository = userRepository;
+        this.farmerRepository = farmerRepository;
+        this.adminRepository = adminRepository;
+    }
+
+    @Override
         public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
             // 從資料庫中查詢 User 數據

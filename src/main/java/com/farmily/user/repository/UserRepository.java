@@ -16,7 +16,7 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     Optional<User> findByAuthProviderAndProviderId(User.AuthProvider authProvider, String providerId);
     boolean existsByEmail(String email);
 
-
+    
     // -- 管理員端用:keyword 比對會員 email 或會員姓名; status 比對會員狀態,皆可為 null --
     @Query(value = "SELECT u FROM User u WHERE " +
             "(:keyword IS NULL OR u.email LIKE %:keyword% OR u.userName LIKE %:keyword%) AND " +

@@ -167,7 +167,7 @@ CREATE TABLE FARMER (
     auth_provider     ENUM('LOCAL','GOOGLE') NOT NULL DEFAULT 'LOCAL',
     provider_id       VARCHAR(255),
     access_token      TEXT NULL,
-    expires_at        TIMESTAMP NULL;
+    expires_at        TIMESTAMP NULL,
     FOREIGN KEY (district_id) REFERENCES CITY_DISTRICT(district_id),
     FOREIGN KEY (review_id)   REFERENCES FARMER_REVIEW(review_id)
 );
