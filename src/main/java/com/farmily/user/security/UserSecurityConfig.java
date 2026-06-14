@@ -33,12 +33,12 @@ public class UserSecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.ALWAYS))
 
                 // 關閉 csrf 保護，可以 call POST/PUT/DELETE API
-//                .csrf(csrf -> csrf.disable())
+                .csrf(csrf -> csrf.disable())
 
                 // 設定 CSRF 保護 (前端請求 POST/PUT/DELETE API 需帶上 X-XSRF-TOKEN )
-                .csrf(csrf -> csrf
-                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                        .csrfTokenRequestHandler(createCsrfHandler()))
+//                .csrf(csrf -> csrf
+//                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+//                        .csrfTokenRequestHandler(createCsrfHandler()))
 
                 .cors(Customizer.withDefaults())
 //                .formLogin(Customizer.withDefaults())    // 關掉預設 form 登入，自定義，避免背景監聽 login
