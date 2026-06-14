@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 
 import java.math.BigDecimal;
 
-// 小農申請請求端(api/farmer)
+// 小農註冊申請請求端(api/farmer)
 public class FarmerRegisterRequest {
 
     @Email @NotBlank
@@ -16,13 +16,10 @@ public class FarmerRegisterRequest {
 
     @NotBlank
     private String farmName;
-
-    @NotBlank
-    private Integer districtId;
-
     @NotBlank
     private String farmAddress;
 
+    private Integer districtId;
     private String farmerPhoneNum;
     private String farmDesc;
     private BigDecimal locLat;      // 前端自動抓取後送入
