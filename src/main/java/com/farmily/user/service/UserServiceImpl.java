@@ -22,21 +22,27 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final CityDistrictRepository cityDistrictRepository;
     private final PasswordEncoder passwordEncoder;
+    private final EmailUniquenessChecker emailUniquenessChecker;
 
     public UserServiceImpl(UserRepository userRepository,
                            CityDistrictRepository cityDistrictRepository,
-                           PasswordEncoder passwordEncoder) {
+                           PasswordEncoder passwordEncoder,
+                           EmailUniquenessChecker emailUniquenessChecker) {
         this.userRepository = userRepository;
         this.cityDistrictRepository = cityDistrictRepository;
         this.passwordEncoder = passwordEncoder;
+        this.emailUniquenessChecker = emailUniquenessChecker;
     }
 
     // 註冊流程
     @Override
     public UserProfileResponse register(UserRegisterRequest reg) {
-
+    
         // step1: 先檢查是否存在相同會員帳號 (email)
         User existingUser = userRepository.findByEmail(reg.getEmail()).orElse(null);    //回傳 Optional
+
+        // 跨三張表檢查 email 是否已被使用
+//        emailUniquenessChecker.emailAvailable(reg.getEmail());
 
         // 會員存在
         if (existingUser != null) {
