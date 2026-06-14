@@ -17,7 +17,7 @@ public interface FarmerService {
     FarmerProfileResponse updateContactInfo(Integer farmerId, FarmerProfileUpdateRequest req);
 
     // 修改需要重審資料
-    FarmerProfileResponse resubmitApplication(Integer farmerId, FarmerResubmitRequest req);
+    FarmerProfileResponse resubmit(Integer farmerId, FarmerResubmitRequest req);
 
     // 修改密碼
     void changePassword(Integer farmerId, ChangePasswordRequest pw);
