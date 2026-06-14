@@ -127,14 +127,15 @@ public class FarmerServiceImpl implements FarmerService{
     @Override
     public FarmerProfileResponse resubmit(Integer farmerId, FarmerResubmitRequest req) {
         Farmer farmer = findFarmer(farmerId);
-        FarmerReview latest = farmerReviewRepository.findLatestByFarmerReviewRound(farmerId);
+        FarmerReview latest =
+                farmerReviewRepository.findTopByFarmer_FarmerIdOrderByReviewRoundDesc(farmerId);
 
         // 計算重審次數
         int nextRound = (latest != null && latest.getReviewRound() != null)
                         ? latest.getReviewRound() + 1
                         : 1;
 
-        // (需解釋這段意義)
+        // 呼叫工廠方法 newReviewSnapshot()，做一個 FarmerReview 物件
         FarmerReview review = newReviewSnapshot(farmer, nextRound,
                 req.getFarmName(), req.getFarmAddress(),
                 findDistrict(req.getDistrictId()),
@@ -143,7 +144,7 @@ public class FarmerServiceImpl implements FarmerService{
                 req.getCertFileIdentity()
         );
 
-        // (需解釋這段意義)
+        // 把 FarmerReview 物件存進 DB，回傳帶上 farmerId 物件
         FarmerReview savedReview = farmerReviewRepository.save(review);
         return FarmerProfileResponse.from(farmer, savedReview);
     }
@@ -163,7 +164,7 @@ public class FarmerServiceImpl implements FarmerService{
         farmerRepository.save(farmer);
     }
 
-    // 工廠方法：建一筆審核並填「本輪提交快取」（register/resubmit 共用）
+    // 自訂工廠方法：組裝每次審核的資料，回傳一個物件（register/resubmit 共用）
     private FarmerReview newReviewSnapshot(
             Farmer farmer, int round,
             String farmName, String farmAddress, CityDistrict district,
@@ -188,7 +189,7 @@ public class FarmerServiceImpl implements FarmerService{
 
     // 查最新 review，連同 farmer 包成回應 DTO
     private FarmerProfileResponse toResponse(Farmer farmer) {
-        FarmerReview latest = farmerReviewRepository.findLatestByFarmerReviewRound(farmer.getFarmerId());
+        FarmerReview latest = farmerReviewRepository.findTopByFarmer_FarmerIdOrderByReviewRoundDesc(farmer.getFarmerId());
         return FarmerProfileResponse.from(farmer, latest);
     }
 

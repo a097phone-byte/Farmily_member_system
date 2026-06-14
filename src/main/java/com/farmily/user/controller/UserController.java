@@ -21,19 +21,22 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/member")
 public class UserController {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
+    private final MemberUserDetailsService memberUserDetailsService;
 
-    @Autowired
-    private MemberUserDetailsService memberUserDetailsService;
-
+    public UserController(UserService userService,
+                          MemberUserDetailsService memberUserDetailsService) {
+        this.userService = userService;
+        this.memberUserDetailsService = memberUserDetailsService;
+    }
 
     // 一般會員註冊
     @PostMapping("/register")
     public ResponseEntity<UserProfileResponse> register(
             @RequestBody @Valid UserRegisterRequest reg){
-        UserProfileResponse response = userService.register(reg);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(userService.register(reg));
     }
 
     // 一般會員登入
@@ -48,22 +51,19 @@ public class UserController {
         // step2: 通知 Spring Security 此人已通過驗證
         UserDetails userDetails = memberUserDetailsService.loadUserByUsername(log.getEmail());
         UsernamePasswordAuthenticationToken authToken =
-                new UsernamePasswordAuthenticationToken(
-                        userDetails, null, userDetails.getAuthorities()
-                );
+                new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authToken);
 
         // step3: 把 SecurityContext 存進 HttpSession，後續請求才能持續認得他
         HttpSession session = request.getSession(true);
         session.setAttribute(
                 HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
-                SecurityContextHolder.getContext()
-        );
+                SecurityContextHolder.getContext());
         return ResponseEntity.ok(response);
     }
 
 
-    // 修改資料
+    // 修改自己資料
     @PutMapping("/me")
     public ResponseEntity<UserProfileResponse> updateMe(
             @AuthenticationPrincipal MemberUserDetails me,
@@ -72,7 +72,7 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
-    // 修改密碼
+    // 修改自己密碼
     @PutMapping("/me/password")
     public ResponseEntity<String> changePassword(
             @AuthenticationPrincipal MemberUserDetails me,
@@ -90,7 +90,7 @@ public class UserController {
         return ResponseEntity.ok("註銷成功!");
     }
 
-    // 查個人資料
+    // 查自己資料
     @GetMapping("/me")
     public ResponseEntity<UserProfileResponse> getMe(
             @AuthenticationPrincipal MemberUserDetails me){

@@ -7,9 +7,9 @@ import java.util.List;
 
 public interface FarmerReviewRepository extends JpaRepository<FarmerReview, Integer> {
 
-    // 某小農所有審核紀錄（新到舊，管理員瀏覽歷史用）
-    List<FarmerReview> findByFarmerReviewRoundList (Integer farmerId);
+    // 查某小農「所有」審核，依輪數新到舊（新到舊，管理員瀏覽歷史用）
+    List<FarmerReview> findByFarmer_FarmerIdOrderByReviewRoundDesc (Integer farmerId);
 
-    // 某小農最新一筆審核（顯示目前審核狀態用）
-    FarmerReview findLatestByFarmerReviewRound (Integer farmerId);
+    // 查某小農「最新一筆」審核
+    FarmerReview findTopByFarmer_FarmerIdOrderByReviewRoundDesc (Integer farmerId);
 }
