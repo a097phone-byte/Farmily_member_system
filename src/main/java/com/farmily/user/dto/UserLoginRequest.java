@@ -3,7 +3,7 @@ package com.farmily.user.dto;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
-//會員請求端 dto (/api/users)
+//會員請求端 dto (/api/member)
 public class UserLoginRequest {
 
     @Email

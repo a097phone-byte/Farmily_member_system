@@ -108,7 +108,6 @@ public class UserServiceImpl implements UserService {
         return UserProfileResponse.from(user);
     }
 
-
     // 查資料
     @Override
     @Transactional(readOnly = true)

@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 
 import java.time.LocalDate;
 
-//會員請求端 dto (/api/users)
+//會員請求端 dto (/api/member)
 public class UserRegisterRequest {
 
     @Email

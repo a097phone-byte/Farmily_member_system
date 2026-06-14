@@ -14,7 +14,7 @@ public class AdminPermissionRoleId implements Serializable {
     private Integer adminId;
     private Integer permissionId;
 
-    // 必須覆寫 equals 和 hashCode
+    // 必須覆寫 equals/hashCode
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;

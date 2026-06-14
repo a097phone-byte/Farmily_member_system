@@ -8,4 +8,5 @@ import java.util.Optional;
 public interface AdminRepository extends JpaRepository<Admin, Integer> {
 
     Optional<Admin> findByAdminEmail (String adminEmail);
+    boolean existsByAdminEmail (String adminEmail);     // 檢查 email 全系統唯一
 }

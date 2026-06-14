@@ -8,5 +8,6 @@ import java.util.Optional;
 public interface FarmerRepository extends JpaRepository<Farmer, Integer> {
 
     Optional<Farmer> findByEmail(String email);
+    boolean existsByEmail (String email);       // 檢查 email 全系統唯一
 
 }

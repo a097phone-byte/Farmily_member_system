@@ -164,7 +164,7 @@ CREATE TABLE FARMER (
     farm_desc         TEXT,
     farmer_created_at DATETIME,
     farmer_phone_num  VARCHAR(15),
-    farmer_status     ENUM('ACTIVE', 'SUSPENDED'),
+    farmer_status     ENUM('PENDING', 'ACTIVE', 'SUSPENDED') DEFAULT 'PENDING',
     auth_provider     ENUM('LOCAL','GOOGLE') NOT NULL DEFAULT 'LOCAL',
     provider_id       VARCHAR(255),
     access_token      TEXT NULL,
@@ -180,7 +180,7 @@ VALUES
 ('farmer02@gmail.com', 2, 3, '2024-03-10 09:00:00', 'hashed_pw_2', '大同街200號', '綠野農場',   25.06321000, 121.51234000, '自然農法種植，提供當季新鮮蔬果',       '2024-03-22 15:00:00', '0922222222', 'ACTIVE'),
 ('farmer03@gmail.com', 3, 4, '2024-05-15 08:00:00', 'hashed_pw_3', '中山路333號', '山間農場',   24.98765000, 121.54321000, '山區有機農場，專售高山茶與蔬菜',       '2024-05-15 08:00:00', '0933333333', 'ACTIVE'),
 ('farmer04@gmail.com', 4, 2, '2024-03-10 09:00:00', 'hashed_pw_4', '仁愛路88號',  '海風農場',   25.12345000, 121.73456000, '靠海農場，專售海鹽與特色農產品',       '2024-03-10 09:00:00', '0944444444', 'SUSPENDED'),
-('farmer05@gmail.com', 5, 5, '2024-06-01 13:00:00', 'hashed_pw_5', '板橋路77號',  '稻香農場',   24.87654000, 121.45678000, '傳統水稻種植，提供在地新鮮稻米',       '2024-06-01 13:00:00', '0955555555', 'ACTIVE');
+('farmer05@gmail.com', 5, 5, '2024-06-01 13:00:00', 'hashed_pw_5', '板橋路77號',  '稻香農場',   24.87654000, 121.45678000, '傳統水稻種植，提供在地新鮮稻米',       '2024-06-01 13:00:00', '0955555555', 'PENDING');
 
 
 -- 2-2 管理功能對照 --

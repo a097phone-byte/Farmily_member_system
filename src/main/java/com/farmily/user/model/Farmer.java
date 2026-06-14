@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 public class Farmer implements Serializable {
 
     public enum FarmerStatus {
-        ACTIVE, SUSPENDED
+        PENDING, ACTIVE, SUSPENDED
     }
 
     @Id
