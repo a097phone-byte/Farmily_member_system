@@ -17,6 +17,14 @@ public class FarmerUserDetails implements UserDetails {
         this.farmer = farmer;
     }
 
+    // 給 Controller 取登入者 id
+    public Integer getFarmerId() {
+        return farmer.getFarmerId();
+    }
+
+    public Farmer getFarmer() {
+        return farmer;
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

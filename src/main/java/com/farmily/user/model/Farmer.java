@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "FARMER")
@@ -59,9 +60,8 @@ public class Farmer implements Serializable {
     @JoinColumn(name = "district_id", referencedColumnName = "district_id")
     private CityDistrict cityDistrict;
 
-    @ManyToOne
-    @JoinColumn(name = "review_id", referencedColumnName = "review_id")
-    private FarmerReview farmerReview;
+    @OneToMany(mappedBy = "farmer", cascade = CascadeType.ALL)
+    private List<FarmerReview> reviews;
 
 
     public Integer getFarmerId() {
@@ -168,11 +168,11 @@ public class Farmer implements Serializable {
         this.cityDistrict = cityDistrict;
     }
 
-    public FarmerReview getFarmerReview() {
-        return farmerReview;
+    public List<FarmerReview> getReviews() {
+        return reviews;
     }
 
-    public void setFarmerReview(FarmerReview farmerReview) {
-        this.farmerReview = farmerReview;
+    public void setReviews(List<FarmerReview> reviews) {
+        this.reviews = reviews;
     }
 }

@@ -3,8 +3,8 @@ package com.farmily.user.dto;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
-//會員請求端 dto (/api/member)
-public class UserLoginRequest {
+//三身分共用的登入請求 (email + password)
+public class LoginRequest  {
 
     @Email
     @NotBlank

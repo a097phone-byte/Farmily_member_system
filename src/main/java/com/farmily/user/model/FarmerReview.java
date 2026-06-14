@@ -3,6 +3,7 @@ package com.farmily.user.model;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Set;
 
@@ -18,6 +19,10 @@ public class FarmerReview implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "review_id", updatable = false)
     private Integer reviewId;
+
+    @ManyToOne
+    @JoinColumn(name="farmer_id", referencedColumnName = "farmer_id")
+    private Farmer farmer;
 
     @ManyToOne
     @JoinColumn(name = "admin_id", referencedColumnName = "admin_id")
@@ -51,8 +56,22 @@ public class FarmerReview implements Serializable {
     @Column(name = "cert_file_identity", columnDefinition = "longblob")
     private byte[] certFileIdentity;
 
-    @OneToMany(mappedBy = "farmerReview", cascade = CascadeType.ALL)
-    private Set<Farmer> farmers;
+    // 此輪提交的農場資料（每輪都存，含 round 1；通過後複製回 Farmer）
+    @Column(name = "submitted_farm_name")
+    private String submittedFarmName;
+
+    @Column(name = "submitted_farm_address")
+    private String submittedFarmAddress;
+
+    @ManyToOne
+    @JoinColumn(name = "submitted_district_id", referencedColumnName = "district_id")
+    private CityDistrict submittedDistrict;
+
+    @Column(name = "submitted_loc_lat", precision = 10, scale = 8)
+    private BigDecimal submittedLocLat;
+
+    @Column(name = "submitted_loc_long", precision = 11, scale = 8)
+    private BigDecimal submittedLocLong;
 
 
 
@@ -62,6 +81,14 @@ public class FarmerReview implements Serializable {
 
     public void setReviewId(Integer reviewId) {
         this.reviewId = reviewId;
+    }
+
+    public Farmer getFarmer() {
+        return farmer;
+    }
+
+    public void setFarmer(Farmer farmer) {
+        this.farmer = farmer;
     }
 
     public Admin getAdmin() {
@@ -144,11 +171,43 @@ public class FarmerReview implements Serializable {
         this.certFileIdentity = certFileIdentity;
     }
 
-    public Set<Farmer> getFarmers() {
-        return farmers;
+    public String getSubmittedFarmName() {
+        return submittedFarmName;
     }
 
-    public void setFarmers(Set<Farmer> farmers) {
-        this.farmers = farmers;
+    public void setSubmittedFarmName(String submittedFarmName) {
+        this.submittedFarmName = submittedFarmName;
+    }
+
+    public String getSubmittedFarmAddress() {
+        return submittedFarmAddress;
+    }
+
+    public void setSubmittedFarmAddress(String submittedFarmAddress) {
+        this.submittedFarmAddress = submittedFarmAddress;
+    }
+
+    public CityDistrict getSubmittedDistrict() {
+        return submittedDistrict;
+    }
+
+    public void setSubmittedDistrict(CityDistrict submittedDistrict) {
+        this.submittedDistrict = submittedDistrict;
+    }
+
+    public BigDecimal getSubmittedLocLat() {
+        return submittedLocLat;
+    }
+
+    public void setSubmittedLocLat(BigDecimal submittedLocLat) {
+        this.submittedLocLat = submittedLocLat;
+    }
+
+    public BigDecimal getSubmittedLocLong() {
+        return submittedLocLong;
+    }
+
+    public void setSubmittedLocLong(BigDecimal submittedLocLong) {
+        this.submittedLocLong = submittedLocLong;
     }
 }

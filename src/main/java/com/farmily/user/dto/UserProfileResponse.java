@@ -22,29 +22,6 @@ public class UserProfileResponse {
     private String authProvider;      // 讓前端知道這帳號是 LOCAL/GOOGLE
     private Boolean hasPassword;      // 前端可根據此決定顯示「修改密碼」還是「設定密碼」
 
-    // 自訂 from() 方法
-    public static UserProfileResponse from(User u) {
-
-        UserProfileResponse dto = new UserProfileResponse();
-        dto.userId = u.getUserId();
-        dto.email = u.getEmail();
-        dto.userName = u.getUserName();
-        dto.userNickname = u.getUserNickname();
-        dto.userPhoneNum = u.getUserPhoneNum();
-        dto.userAddress = u.getUserAddress();
-        if (u.getCityDistrict() != null) {
-            dto.cityName = u.getCityDistrict().getCityName();
-            dto.distName = u.getCityDistrict().getDistName();
-        }
-        dto.birthday = u.getBirthday();
-        dto.monthlySpending = u.getMonthlySpending();
-        dto.emailVerified = u.getEmailVerified();
-        dto.farmerIdentity = u.getFarmerIdentity();
-        dto.authProvider = u.getAuthProvider() != null ? u.getAuthProvider().name() : null;
-        dto.hasPassword = u.getPassword() != null;
-        return dto;
-    }
-
     public Integer getUserId() {
         return userId;
     }
@@ -88,5 +65,28 @@ public class UserProfileResponse {
         return hasPassword;
     }
 
+
+    // 自訂 from() 方法
+    public static UserProfileResponse from(User u) {
+
+        UserProfileResponse dto = new UserProfileResponse();
+        dto.userId = u.getUserId();
+        dto.email = u.getEmail();
+        dto.userName = u.getUserName();
+        dto.userNickname = u.getUserNickname();
+        dto.userPhoneNum = u.getUserPhoneNum();
+        dto.userAddress = u.getUserAddress();
+        if (u.getCityDistrict() != null) {
+            dto.cityName = u.getCityDistrict().getCityName();
+            dto.distName = u.getCityDistrict().getDistName();
+        }
+        dto.birthday = u.getBirthday();
+        dto.monthlySpending = u.getMonthlySpending();
+        dto.emailVerified = u.getEmailVerified();
+        dto.farmerIdentity = u.getFarmerIdentity();
+        dto.authProvider = u.getAuthProvider() != null ? u.getAuthProvider().name() : null;
+        dto.hasPassword = u.getPassword() != null;
+        return dto;
+    }
 
 }

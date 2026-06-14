@@ -6,9 +6,7 @@ import com.farmily.user.model.User;
 import com.farmily.user.repository.CityDistrictRepository;
 import com.farmily.user.repository.UserRepository;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,7 +35,7 @@ public class UserServiceImpl implements UserService {
     // 註冊流程
     @Override
     public UserProfileResponse register(UserRegisterRequest reg) {
-    
+
         // step1: 先檢查是否存在相同會員帳號 (email)
         User existingUser = userRepository.findByEmail(reg.getEmail()).orElse(null);    //回傳 Optional
 
@@ -92,7 +90,7 @@ public class UserServiceImpl implements UserService {
     // 登入流程
     @Override
     @Transactional(readOnly = true)
-    public UserProfileResponse login(UserLoginRequest log) {
+    public UserProfileResponse login(LoginRequest log) {
 
         User user = userRepository.findByEmail(log.getEmail())
                 .orElseThrow(() -> new BadCredentialsException("帳號或密碼錯誤"));

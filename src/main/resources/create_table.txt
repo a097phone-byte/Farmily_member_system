@@ -1,7 +1,27 @@
-CREATE DATABASE IF NOT EXISTS myproject;
 USE myproject;
 
--- 8.地址參照--
+-- 關閉外鍵檢查，才能無視相依方向強制 DROP
+SET FOREIGN_KEY_CHECKS = 0;
+
+-- ====================================================================
+-- DROP（反向相依順序：先刪子表、再刪父表）
+-- ====================================================================
+DROP TABLE IF EXISTS NEWS;
+DROP TABLE IF EXISTS ADMIN_PERMISSION_ROLE;
+DROP TABLE IF EXISTS FARMER_REVIEW;   -- 參照 FARMER、ADMIN
+DROP TABLE IF EXISTS FARMER;          -- 參照 CITY_DISTRICT
+DROP TABLE IF EXISTS ADMIN;
+DROP TABLE IF EXISTS ADMIN_ROLE;
+DROP TABLE IF EXISTS SPENDING_TIER;
+DROP TABLE IF EXISTS USER;            -- 參照 CITY_DISTRICT
+DROP TABLE IF EXISTS CITY_DISTRICT;
+
+-- 重新開啟外鍵檢查
+SET FOREIGN_KEY_CHECKS = 1;
+
+-- ====================================================================
+-- 8. 地址參照
+-- ====================================================================
 CREATE TABLE CITY_DISTRICT (
     district_id  INT         PRIMARY KEY AUTO_INCREMENT,
     city_name    VARCHAR(50) NOT NULL,
@@ -12,15 +32,9 @@ CREATE TABLE CITY_DISTRICT (
     note         VARCHAR(50)
 );
 
--- 假資料 (預存資料 300 多筆) --
--- INSERT INTO CITY_DISTRICT (city_name, city_eng, dist_name, dist_eng, zipcode, note)
--- VALUES ('臺北市', 'Taipei City', '中正區', 'Zhongzheng Dist.', 100, NULL),
---		('臺北市', 'Taipei City', '大同區', 'Datong Dist.', 103, NULL),
---		('臺北市', 'Taipei City', '中山區', 'Zhongshan Dist.', 104, NULL),
---		('基隆市', 'Keelung City', '仁愛區', 'Renai Dist.', 200, NULL),
---		('新北市', 'New Taipei City', '板橋區', 'Banqiao Dist.', 220, NULL);
-
--- 1-1 一般會員--
+-- ====================================================================
+-- 1-1 一般會員
+-- ====================================================================
 CREATE TABLE USER (
     user_id          INT          PRIMARY KEY AUTO_INCREMENT,
     email            VARCHAR(255)  UNIQUE,
@@ -43,26 +57,21 @@ CREATE TABLE USER (
     FOREIGN KEY (district_id) REFERENCES CITY_DISTRICT(district_id)
 );
 
--- 假資料 --
 INSERT INTO USER
 (email, district_id, user_address, email_verified, password, user_created_at,
  user_name, user_nickname, birthday, user_phone_num, user_status,
  monthly_spending, farmer_identity, auth_provider, provider_id, access_token, expires_at)
 VALUES
--- ===== 本地帳號 (LOCAL):有密碼,provider 相關欄位為 NULL =====
-('chen.weiting@example.com', 5,   '羅斯福路三段100號5樓',   TRUE,  '$2a$10$N9qo8uLOickgx2ZMRZoMyeIj8VeXr3.GfHJ1OqWb2cYkZ7Lh1Kd6e', '2024-01-15 09:23:11', '陳偉廷', '阿廷', '1995-03-12', '0912345678', 'ACTIVE',    520,  FALSE, 'LOCAL', NULL, NULL, NULL),
-('lin.shuhui@example.com',   88,  '桃園區中正路50號',       TRUE,  '$2a$10$kQ8vM2pLxN7Rd3sWfYbZ4uTjH6cKmA9nGpE1oI5lQwXvB2yC8dRf2', '2024-02-03 14:05:47', '林淑惠', '惠惠', '1988-07-22', '0922333444', 'WARNED',    2150, FALSE, 'LOCAL', NULL, NULL, NULL),
-
--- ===== Google 帳號 (GOOGLE):無密碼,email 已驗證,有存 token =====
-('alex.tsai@gmail.com',      7,   '信義區松高路11號',       TRUE,  NULL, '2024-06-01 13:22:09', 'Alex Tsai',   '小蔡', '1993-04-08', '0977888999', 'ACTIVE', 4200, TRUE,  'GOOGLE', '108426751093847562910', 'ya29.a0AfH6SMxK9pLmN2qR7tY3uVwXzB8cD1eF4gH', '2024-06-01 14:22:09'),
-('jessica.wu@gmail.com',     119, '臺中市西屯區臺灣大道300號', TRUE, NULL, '2024-06-14 10:11:44', 'Jessica Wu',  'Jess', '1996-12-14', '0911222333', 'ACTIVE', 760,  FALSE, 'GOOGLE', '113985620174639205841', 'ya29.a0AfH6SMyL0qNrO3sP8uZ4wXcD2eF5gH6iJ7k', '2024-06-14 11:11:44'),
-
--- ===== Google 帳號:純登入,沒存 token(token 留 NULL)=====
-('kevin.lin@gmail.com',      283, '高雄市鳳山區青年路200號',  TRUE, NULL, '2024-07-08 16:38:27', 'Kevin Lin',   NULL,   '1990-08-19', '0922888777', 'ACTIVE', 0,    FALSE, 'GOOGLE', '102758493016283749561', NULL, NULL);
+('chen.weiting@example.com', 5,   '羅斯福路三段100號5樓',     TRUE, '$2a$10$N9qo8uLOickgx2ZMRZoMyeIj8VeXr3.GfHJ1OqWb2cYkZ7Lh1Kd6e', '2024-01-15 09:23:11', '陳偉廷', '阿廷', '1995-03-12', '0912345678', 'ACTIVE', 520,  FALSE, 'LOCAL', NULL, NULL, NULL),
+('lin.shuhui@example.com',   2,   '桃園區中正路50號',         TRUE, '$2a$10$kQ8vM2pLxN7Rd3sWfYbZ4uTjH6cKmA9nGpE1oI5lQwXvB2yC8dRf2', '2024-02-03 14:05:47', '林淑惠', '惠惠', '1988-07-22', '0922333444', 'WARNED', 2150, FALSE, 'LOCAL', NULL, NULL, NULL),
+('alex.tsai@gmail.com',      3,   '信義區松高路11號',         TRUE, NULL, '2024-06-01 13:22:09', 'Alex Tsai',  '小蔡', '1993-04-08', '0977888999', 'ACTIVE', 4200, TRUE,  'GOOGLE', '108426751093847562910', 'ya29.a0AfH6SMxK9pLmN2qR7tY3uVwXzB8cD1eF4gH', '2024-06-01 14:22:09'),
+('jessica.wu@gmail.com',     4,   '臺中市西屯區臺灣大道300號', TRUE, NULL, '2024-06-14 10:11:44', 'Jessica Wu', 'Jess', '1996-12-14', '0911222333', 'ACTIVE', 760,  FALSE, 'GOOGLE', '113985620174639205841', 'ya29.a0AfH6SMyL0qNrO3sP8uZ4wXcD2eF5gH6iJ7k', '2024-06-14 11:11:44'),
+('kevin.lin@gmail.com',      5,   '高雄市鳳山區青年路200號',  TRUE, NULL, '2024-07-08 16:38:27', 'Kevin Lin',  NULL,   '1990-08-19', '0922888777', 'ACTIVE', 0,    FALSE, 'GOOGLE', '102758493016283749561', NULL, NULL);
 
 
-
--- 1-2 消費級距--
+-- ====================================================================
+-- 1-2 消費級距
+-- ====================================================================
 CREATE TABLE SPENDING_TIER (
     tier_id     INT         PRIMARY KEY,
     tier_name   VARCHAR(20),
@@ -71,7 +80,6 @@ CREATE TABLE SPENDING_TIER (
     description VARCHAR(100)
 );
 
--- 預存資料 --
 INSERT INTO SPENDING_TIER (tier_id, tier_name, min_amount, max_amount, description)
 VALUES
 (1, '一般會員', 0,    0,    '尚無消費紀錄'),
@@ -80,7 +88,9 @@ VALUES
 (4, '金級會員', 3001, NULL, '每月消費 $3,001 以上');
 
 
--- 2-3 功能權限 --
+-- ====================================================================
+-- 2-3 功能權限
+-- ====================================================================
 CREATE TABLE ADMIN_ROLE (
     permission_id   INT         AUTO_INCREMENT PRIMARY KEY,
     permission_name VARCHAR(50),
@@ -88,7 +98,6 @@ CREATE TABLE ADMIN_ROLE (
     description     VARCHAR(100)
 );
 
--- 預存資料 --
 INSERT INTO ADMIN_ROLE (permission_name, permission_code, description)
 VALUES
 ('最新消息管理',       'NEWS',        '刊登/修改/刪除、即時資訊更新'),
@@ -102,7 +111,9 @@ VALUES
 ('網頁流量分析',       'ANALYTICS',   '用戶增加趨勢、訂單數量統計');
 
 
--- 2-1 管理員 --
+-- ====================================================================
+-- 2-1 管理員
+-- ====================================================================
 CREATE TABLE ADMIN (
     admin_id       INT          AUTO_INCREMENT PRIMARY KEY,
     admin_email    VARCHAR(100) NOT NULL UNIQUE,
@@ -113,48 +124,23 @@ CREATE TABLE ADMIN (
     updated_at     DATETIME
 );
 
--- 假資料 --
+-- 注意：ENUM 值統一用大寫，避免與定義不一致
 INSERT INTO ADMIN (admin_email, admin_password, admin_name, admin_status, created_at, updated_at) VALUES
-('admin01@farm.com', 'hashed_pw_1', '王管理', 'active',    '2024-01-01 09:00:00', '2024-06-15 10:30:00'),
-('admin02@farm.com', 'hashed_pw_2', '林管理', 'active',    '2024-01-02 09:00:00', '2024-07-20 14:00:00'),
-('admin03@farm.com', 'hashed_pw_3', '陳管理', 'active',    '2024-02-10 09:00:00', NULL),
-('admin04@farm.com', 'hashed_pw_4', '張管理', 'suspended', '2024-03-05 09:00:00', '2024-09-01 08:00:00'),
-('admin05@farm.com', 'hashed_pw_5', '黃管理', 'deleted',   '2024-04-20 09:00:00', '2025-01-10 17:00:00');
+('admin01@farm.com', 'hashed_pw_1', '王管理', 'ACTIVE',    '2024-01-01 09:00:00', '2024-06-15 10:30:00'),
+('admin02@farm.com', 'hashed_pw_2', '林管理', 'ACTIVE',    '2024-01-02 09:00:00', '2024-07-20 14:00:00'),
+('admin03@farm.com', 'hashed_pw_3', '陳管理', 'ACTIVE',    '2024-02-10 09:00:00', NULL),
+('admin04@farm.com', 'hashed_pw_4', '張管理', 'SUSPENDED', '2024-03-05 09:00:00', '2024-09-01 08:00:00'),
+('admin05@farm.com', 'hashed_pw_5', '黃管理', 'DELETED',   '2024-04-20 09:00:00', '2025-01-10 17:00:00');
 
 
--- 2-4 小農申請案件 --
-CREATE TABLE FARMER_REVIEW (
-    review_id          INT          AUTO_INCREMENT PRIMARY KEY,
-    admin_id           INT,
-    review_round       TINYINT      NOT NULL DEFAULT 1,
-    review_status      ENUM('PENDING', 'REVIEWING', 'APPROVED', 'REJECTED') NOT NULL,
-    submitted_at       DATETIME     NOT NULL,
-    reviewed_at        DATETIME,
-    reject_reason      VARCHAR(255),
-    notes              TEXT,
-    cert_file_land     LONGBLOB,
-    cert_file_product  LONGBLOB,
-    cert_file_identity LONGBLOB,
-    FOREIGN KEY (admin_id) REFERENCES ADMIN(admin_id)
-);
-
--- 假資料 --
-INSERT INTO FARMER_REVIEW (admin_id, review_round, review_status, submitted_at, reviewed_at, reject_reason, notes, cert_file_land, cert_file_product, cert_file_identity)
-VALUES
-(1, 1, 'approved',  '2024-02-01 10:00:00', '2024-02-03 14:00:00', NULL,             '資料齊全，審核通過',     NULL, NULL, NULL),
-(2, 1, 'rejected',  '2024-03-10 09:00:00', '2024-03-12 11:00:00', '土地文件不清晰', '請重新上傳土地證明',     NULL, NULL, NULL),
-(1, 2, 'approved',  '2024-03-20 10:00:00', '2024-03-22 15:00:00', NULL,             '補件後審核通過',         NULL, NULL, NULL),
-(2, 1, 'reviewing', '2024-05-15 08:00:00', NULL,                  NULL,             '審核中',                 NULL, NULL, NULL),
-(3, 1, 'pending',   '2024-06-01 13:00:00', NULL,                  NULL,             NULL,                     NULL, NULL, NULL);
-
-
--- 1-2 小農會員 --
+-- ====================================================================
+-- 1-2 小農會員（先建；已移除 review_id）
+-- ====================================================================
 CREATE TABLE FARMER (
     farmer_id         INT           AUTO_INCREMENT PRIMARY KEY,
-    email             VARCHAR(255)   UNIQUE,
+    email             VARCHAR(255)  UNIQUE,
     email_verified    BOOLEAN,
     district_id       INT,
-    review_id         INT,
     uploaded_at       DATETIME,
     password          VARCHAR(255),
     farm_address      VARCHAR(100),
@@ -165,25 +151,79 @@ CREATE TABLE FARMER (
     farmer_created_at DATETIME,
     farmer_phone_num  VARCHAR(15),
     farmer_status     ENUM('PENDING', 'ACTIVE', 'SUSPENDED') DEFAULT 'PENDING',
-    auth_provider     ENUM('LOCAL','GOOGLE') NOT NULL DEFAULT 'LOCAL',
-    provider_id       VARCHAR(255),
-    access_token      TEXT NULL,
-    expires_at        TIMESTAMP NULL,
-    FOREIGN KEY (district_id) REFERENCES CITY_DISTRICT(district_id),
-    FOREIGN KEY (review_id)   REFERENCES FARMER_REVIEW(review_id)
+    FOREIGN KEY (district_id) REFERENCES CITY_DISTRICT(district_id)
 );
 
--- 假資料 --
-INSERT INTO FARMER (email, district_id, review_id, uploaded_at, password, farm_address, farm_name, loc_lat, loc_long, farm_desc, farmer_created_at, farmer_phone_num, farmer_status)
+-- farmer_status 已依「最新審核結果」對應好：
+--  farmer01 審核 APPROVED  -> ACTIVE
+--  farmer02 最新 APPROVED  -> ACTIVE
+--  farmer03 審核 REVIEWING -> PENDING（管理員審核中，但小農端只看到待審）
+--  farmer04 管理員停權     -> SUSPENDED
+--  farmer05 審核 PENDING   -> PENDING
+INSERT INTO FARMER (email, email_verified, district_id, uploaded_at, password, farm_address, farm_name, loc_lat, loc_long, farm_desc, farmer_created_at, farmer_phone_num, farmer_status)
 VALUES
-('farmer01@gmail.com', 1, 1, '2024-02-01 10:00:00', 'hashed_pw_1', '中正路500號', '陽光農場',   25.04776000, 121.53185000, '專注有機蔬菜栽培，堅持無農藥',         '2024-02-03 14:00:00', '0911111111', 'ACTIVE'),
-('farmer02@gmail.com', 2, 3, '2024-03-10 09:00:00', 'hashed_pw_2', '大同街200號', '綠野農場',   25.06321000, 121.51234000, '自然農法種植，提供當季新鮮蔬果',       '2024-03-22 15:00:00', '0922222222', 'ACTIVE'),
-('farmer03@gmail.com', 3, 4, '2024-05-15 08:00:00', 'hashed_pw_3', '中山路333號', '山間農場',   24.98765000, 121.54321000, '山區有機農場，專售高山茶與蔬菜',       '2024-05-15 08:00:00', '0933333333', 'ACTIVE'),
-('farmer04@gmail.com', 4, 2, '2024-03-10 09:00:00', 'hashed_pw_4', '仁愛路88號',  '海風農場',   25.12345000, 121.73456000, '靠海農場，專售海鹽與特色農產品',       '2024-03-10 09:00:00', '0944444444', 'SUSPENDED'),
-('farmer05@gmail.com', 5, 5, '2024-06-01 13:00:00', 'hashed_pw_5', '板橋路77號',  '稻香農場',   24.87654000, 121.45678000, '傳統水稻種植，提供在地新鮮稻米',       '2024-06-01 13:00:00', '0955555555', 'PENDING');
+('farmer01@gmail.com', TRUE, 1, '2024-02-01 10:00:00', 'hashed_pw_1', '中正路500號', '陽光農場', 25.04776000, 121.53185000, '專注有機蔬菜栽培，堅持無農藥',   '2024-02-03 14:00:00', '0911111111', 'ACTIVE'),
+('farmer02@gmail.com', TRUE, 2, '2024-03-10 09:00:00', 'hashed_pw_2', '大同街200號', '綠野農場', 25.06321000, 121.51234000, '自然農法種植，提供當季新鮮蔬果', '2024-03-22 15:00:00', '0922222222', 'ACTIVE'),
+('farmer03@gmail.com', TRUE, 3, '2024-05-15 08:00:00', 'hashed_pw_3', '中山路333號', '山間農場', 24.98765000, 121.54321000, '山區有機農場，專售高山茶與蔬菜', '2024-05-15 08:00:00', '0933333333', 'PENDING'),
+('farmer04@gmail.com', TRUE, 4, '2024-03-10 09:00:00', 'hashed_pw_4', '仁愛路88號',  '海風農場', 25.12345000, 121.73456000, '靠海農場，專售海鹽與特色農產品', '2024-03-10 09:00:00', '0944444444', 'SUSPENDED'),
+('farmer05@gmail.com', TRUE, 5, '2024-06-01 13:00:00', 'hashed_pw_5', '板橋路77號',  '稻香農場', 24.87654000, 121.45678000, '傳統水稻種植，提供在地新鮮稻米', '2024-06-01 13:00:00', '0955555555', 'PENDING');
 
 
--- 2-2 管理功能對照 --
+-- ====================================================================
+-- 2-4 小農申請案件（後建；farmer_id 指向 FARMER，含重審暫存欄位）
+-- ====================================================================
+CREATE TABLE FARMER_REVIEW (
+    review_id             INT           AUTO_INCREMENT PRIMARY KEY,
+    farmer_id             INT           NULL,
+    admin_id              INT,
+    review_round          TINYINT       NOT NULL DEFAULT 1,
+    review_status         ENUM('PENDING', 'REVIEWING', 'APPROVED', 'REJECTED') NOT NULL,  -- 管理員視角
+    submitted_at          DATETIME      NOT NULL,
+    reviewed_at           DATETIME,
+    reject_reason         VARCHAR(255),
+    notes                 TEXT,
+    cert_file_land        LONGBLOB,
+    cert_file_product     LONGBLOB,
+    cert_file_identity    LONGBLOB,
+    -- 重審暫存欄位：小農申請變更的內容，審核通過後才寫回 FARMER --
+    submitted_farm_name    VARCHAR(50)   NULL,
+    submitted_farm_address VARCHAR(100)  NULL,
+    submitted_district_id  INT           NULL,
+    submitted_loc_lat      DECIMAL(10,8) NULL,
+    submitted_loc_long     DECIMAL(11,8) NULL,
+    FOREIGN KEY (farmer_id)            REFERENCES FARMER(farmer_id),
+    FOREIGN KEY (admin_id)             REFERENCES ADMIN(admin_id),
+    CONSTRAINT fk_review_submitted_district
+        FOREIGN KEY (submitted_district_id) REFERENCES CITY_DISTRICT(district_id)
+);
+
+-- 第 2、3 筆同屬 farmer_id = 2，示範「一個 farmer 多筆審核」
+-- proposed_* 僅在「申請變更農場資料」時填值；首次申請留 NULL
+INSERT INTO FARMER_REVIEW
+(farmer_id, admin_id, review_round, review_status, submitted_at, reviewed_at, reject_reason, notes,
+ cert_file_land, cert_file_product, cert_file_identity,
+ submitted_farm_name, submitted_farm_address, submitted_district_id, submitted_loc_lat, submitted_loc_long)
+VALUES
+(1, 1, 1, 'APPROVED',  '2024-02-01 10:00:00', '2024-02-03 14:00:00', NULL,             '資料齊全，審核通過',
+ NULL, NULL, NULL,
+ NULL, NULL, NULL, NULL, NULL),
+(2, 2, 1, 'REJECTED',  '2024-03-10 09:00:00', '2024-03-12 11:00:00', '土地文件不清晰', '請重新上傳土地證明',
+ NULL, NULL, NULL,
+ '綠野有機農場', '大同街250號', 2, 25.06400000, 121.51300000),
+(2, 1, 2, 'APPROVED',  '2024-03-20 10:00:00', '2024-03-22 15:00:00', NULL,             '補件後審核通過，已更新農場資料',
+ NULL, NULL, NULL,
+ '綠野有機農場', '大同街250號', 2, 25.06400000, 121.51300000),
+(3, 3, 1, 'REVIEWING', '2024-05-15 08:00:00', NULL,                  NULL,             '農場遷址審核中',
+ NULL, NULL, NULL,
+ '山間農場',     '中山路888號', 4, 25.13000000, 121.74000000),
+(5, 3, 1, 'PENDING',   '2024-06-01 13:00:00', NULL,                  NULL,             NULL,
+ NULL, NULL, NULL,
+ NULL, NULL, NULL, NULL, NULL);
+
+
+-- ====================================================================
+-- 2-2 管理功能對照
+-- ====================================================================
 CREATE TABLE ADMIN_PERMISSION_ROLE (
     admin_id      INT,
     permission_id INT,
@@ -192,7 +232,6 @@ CREATE TABLE ADMIN_PERMISSION_ROLE (
     FOREIGN KEY (permission_id) REFERENCES ADMIN_ROLE(permission_id)
 );
 
--- 假資料 --
 INSERT INTO ADMIN_PERMISSION_ROLE (admin_id, permission_id)
 VALUES
 (1, 1), (1, 2), (1, 3), (1, 4), (1, 5), (1, 6), (1, 7), (1, 8), (1, 9),
@@ -201,7 +240,10 @@ VALUES
 (4, 7), (4, 8),
 (5, 9);
 
--- 7-1 通知 --
+
+-- ====================================================================
+-- 7-1 通知
+-- ====================================================================
 CREATE TABLE NEWS (
     news_id      INT          AUTO_INCREMENT PRIMARY KEY,
     admin_id     INT          NOT NULL,
@@ -214,11 +256,10 @@ CREATE TABLE NEWS (
     FOREIGN KEY (admin_id) REFERENCES ADMIN(admin_id)
 );
 
--- 假資料 --
 INSERT INTO NEWS (admin_id, title, content, cover_image, publish_time, news_status, created_at)
 VALUES
-(1, '平台正式上線公告',     '你儂我農平台正式上線，歡迎小農與消費者加入我們的大家庭！',                       NULL, '2024-01-15 09:00:00', 'VISIBLE', '2024-01-14 18:00:00'),
-(2, '春季蔬果產季開始',     '春季蔬果陸續上架，歡迎選購當季新鮮農產品。',                                   NULL, '2024-03-01 09:00:00', 'VISIBLE', '2024-02-28 17:00:00'),
-(1, '系統維護通知',         '平台將於 2024/04/10 凌晨 2:00 – 4:00 進行系統維護，期間暫停服務。',           NULL, '2024-04-08 12:00:00', 'VISIBLE', '2024-04-08 10:00:00'),
-(3, '小農申請流程更新說明', '即日起小農申請流程新增第二階段審核，請備妥相關證明文件再行送件。',               NULL, '2024-05-20 10:00:00', 'HIDDEN',  '2024-05-19 16:00:00'),
-(2, '端午節限定農產品上架', '多款端午節限定農產品即將上架，敬請期待！',                                       NULL, '2024-06-05 09:00:00', 'VISIBLE', '2024-06-04 15:00:00');
+(1, '平台正式上線公告',     '你儂我農平台正式上線，歡迎小農與消費者加入我們的大家庭！',         NULL, '2024-01-15 09:00:00', 'VISIBLE', '2024-01-14 18:00:00'),
+(2, '春季蔬果產季開始',     '春季蔬果陸續上架，歡迎選購當季新鮮農產品。',                       NULL, '2024-03-01 09:00:00', 'VISIBLE', '2024-02-28 17:00:00'),
+(1, '系統維護通知',         '平台將於 2024/04/10 凌晨 2:00 – 4:00 進行系統維護，期間暫停服務。', NULL, '2024-04-08 12:00:00', 'VISIBLE', '2024-04-08 10:00:00'),
+(3, '小農申請流程更新說明', '即日起小農申請流程新增第二階段審核，請備妥相關證明文件再行送件。', NULL, '2024-05-20 10:00:00', 'HIDDEN',  '2024-05-19 16:00:00'),
+(2, '端午節限定農產品上架', '多款端午節限定農產品即將上架，敬請期待！',                         NULL, '2024-06-05 09:00:00', 'VISIBLE', '2024-06-04 15:00:00');
