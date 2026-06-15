@@ -22,7 +22,6 @@ public class UserSecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();     // Hash - Bcrypt 加密
-
     }
 
     // 三個身分共用的 session / csrf / cors / httpBasic 設定
@@ -66,8 +65,7 @@ public class UserSecurityConfig {
         return commonSetup(http)
                 .securityMatcher("/api/farmer/**")
                 .authorizeHttpRequests(request -> request
-                        .requestMatchers("/api/farmer/register",
-                                "/api/farmer/login").permitAll()
+                        .requestMatchers("/api/farmer/register", "/api/farmer/login").permitAll()
                         .anyRequest().hasRole("FARMER")
                 )
                 .build();
@@ -81,8 +79,8 @@ public class UserSecurityConfig {
                 .securityMatcher("/api/member/**")
                 .authorizeHttpRequests(request -> request
                         .requestMatchers("/api/member/register",
-                                "/api/member/login",
-                                "/api/member/oauth/**").permitAll()
+                                        "/api/member/login",
+                                        "/api/member/oauth/**").permitAll()
                         .anyRequest().hasRole("USER")
                 )
                 .build();

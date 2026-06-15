@@ -39,23 +39,22 @@ public class UserServiceImpl implements UserService {
         // step1: 先檢查是否存在相同會員帳號 (email)
         User existingUser = userRepository.findByEmail(reg.getEmail()).orElse(null);    //回傳 Optional
 
-        // 跨三張表檢查 email 是否已被使用
-//        emailUniquenessChecker.emailAvailable(reg.getEmail());
-
-        // 會員存在
+        // 會員帳號 (email) 存在
         if (existingUser != null) {
 
-            // 狀況 A: 帳號「沒有本地密碼」，代表他只有第三方登入資訊
-            if (existingUser.getPassword() == null) {
-                User.AuthProvider provider = existingUser.getAuthProvider();
-                if (provider == User.AuthProvider.GOOGLE) {
-                    throw new IllegalStateException("此帳號已使用 Google 登入，請改用 Google 登入");
-                }
+            // 狀況 A: 帳號「沒有本地密碼」，代表他只有第三方登入資訊 (需補上跳轉)
+            if (existingUser.getPassword() == null
+                    && existingUser.getAuthProvider() == User.AuthProvider.GOOGLE) {
+                throw new IllegalStateException("此帳號已使用 Google 登入，請改用 Google 登入");
             }
-            // 狀況 B: 帳號有本地密碼，或者不屬於上述第三方登入，就是一般重複註冊
+            // 狀況 B: 剩餘(已有本地密碼)就是一般重複註冊
             throw new IllegalStateException("帳號已註冊，請直接登入");
         }
-        // step2: 會員不存在，走本地註冊流程
+
+        // step2: 跨表(小農/管理員)檢查 email 全域唯一
+        emailUniquenessChecker.emailAvailable(reg.getEmail());
+
+        // step3: 會員帳號(email)不存在，走本地註冊流程
         User newUser = new User();
         newUser.setEmail(reg.getEmail());
 
@@ -171,7 +170,7 @@ public class UserServiceImpl implements UserService {
     // 刪除資料
     @Override
     public void deleteUser(Integer userId) {
-        if(!userRepository.existsById(userId)){
+        if (!userRepository.existsById(userId)) {
             throw new IllegalStateException("查無此用戶");
         }
         userRepository.deleteById(userId);

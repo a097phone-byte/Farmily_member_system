@@ -22,6 +22,7 @@ public class UserProfileResponse {
     private String authProvider;      // 讓前端知道這帳號是 LOCAL/GOOGLE
     private Boolean hasPassword;      // 前端可根據此決定顯示「修改密碼」還是「設定密碼」
 
+    // getter
     public Integer getUserId() {
         return userId;
     }

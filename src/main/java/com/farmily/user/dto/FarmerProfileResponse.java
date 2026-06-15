@@ -23,6 +23,7 @@ public class FarmerProfileResponse {
     private Integer reviewRound;
     private Boolean hasPassword;
 
+    // getter
     public Integer getFarmerId() {
         return farmerId;
     }

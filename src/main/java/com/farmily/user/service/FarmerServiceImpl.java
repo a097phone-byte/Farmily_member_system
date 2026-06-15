@@ -26,10 +26,8 @@ public class FarmerServiceImpl implements FarmerService{
     private final PasswordEncoder passwordEncoder;
 
 
-    public FarmerServiceImpl(FarmerRepository farmerRepository,
-                             FarmerReviewRepository farmerReviewRepository,
-                             CityDistrictRepository cityDistrictRepository,
-                             EmailUniquenessChecker emailUniquenessChecker,
+    public FarmerServiceImpl(FarmerRepository farmerRepository, FarmerReviewRepository farmerReviewRepository,
+                             CityDistrictRepository cityDistrictRepository, EmailUniquenessChecker emailUniquenessChecker,
                              PasswordEncoder passwordEncoder) {
         this.farmerRepository = farmerRepository;
         this.farmerReviewRepository = farmerReviewRepository;
@@ -120,6 +118,7 @@ public class FarmerServiceImpl implements FarmerService{
         if(req.getFarmDesc() != null){
             farmer.setFarmDesc(req.getFarmDesc());
         }
+        // repository 將修改資料存進 DB
         return toResponse(farmerRepository.save(farmer));
     }
 
@@ -192,7 +191,6 @@ public class FarmerServiceImpl implements FarmerService{
         FarmerReview latest = farmerReviewRepository.findTopByFarmer_FarmerIdOrderByReviewRoundDesc(farmer.getFarmerId());
         return FarmerProfileResponse.from(farmer, latest);
     }
-
 
     // 依 id 撈小農，撈不到丟例外
     private Farmer findFarmer(Integer farmerId) {

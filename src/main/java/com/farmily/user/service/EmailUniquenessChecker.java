@@ -29,7 +29,7 @@ public class EmailUniquenessChecker {
                 || adminRepository.existsByAdminEmail(email);
 
         if(used){
-            throw new IllegalArgumentException("此 Email 已被註冊，請改用其他 Email");     // 409 資源衝突
+            throw new IllegalStateException("此 Email 已被註冊，請改用其他 Email");     // 409 資源衝突
         }
     }
 }
