@@ -112,7 +112,7 @@ VALUES
 
 
 -- ====================================================================
--- 2-1 管理員
+-- 2-1 管理員（密碼明文皆為 admin1234，已 BCrypt 雜湊）
 -- ====================================================================
 CREATE TABLE ADMIN (
     admin_id       INT          AUTO_INCREMENT PRIMARY KEY,
@@ -124,14 +124,12 @@ CREATE TABLE ADMIN (
     updated_at     DATETIME
 );
 
--- 注意：ENUM 值統一用大寫，避免與定義不一致
 INSERT INTO ADMIN (admin_email, admin_password, admin_name, admin_status, created_at, updated_at) VALUES
-('admin01@farm.com', 'hashed_pw_1', '王管理', 'ACTIVE',    '2024-01-01 09:00:00', '2024-06-15 10:30:00'),
-('admin02@farm.com', 'hashed_pw_2', '林管理', 'ACTIVE',    '2024-01-02 09:00:00', '2024-07-20 14:00:00'),
-('admin03@farm.com', 'hashed_pw_3', '陳管理', 'ACTIVE',    '2024-02-10 09:00:00', NULL),
-('admin04@farm.com', 'hashed_pw_4', '張管理', 'SUSPENDED', '2024-03-05 09:00:00', '2024-09-01 08:00:00'),
-('admin05@farm.com', 'hashed_pw_5', '黃管理', 'DELETED',   '2024-04-20 09:00:00', '2025-01-10 17:00:00');
-
+('admin01@farm.com', '$2a$10$dSXb.5E1CktD650efBJsR.PGeVZ7C2Un5YNrx8kQEzn.maBi7nNmm', '王管理', 'ACTIVE',    '2024-01-01 09:00:00', '2024-06-15 10:30:00'),
+('admin02@farm.com', '$2a$10$dSXb.5E1CktD650efBJsR.PGeVZ7C2Un5YNrx8kQEzn.maBi7nNmm', '林管理', 'ACTIVE',    '2024-01-02 09:00:00', '2024-07-20 14:00:00'),
+('admin03@farm.com', '$2a$10$dSXb.5E1CktD650efBJsR.PGeVZ7C2Un5YNrx8kQEzn.maBi7nNmm', '陳管理', 'ACTIVE',    '2024-02-10 09:00:00', NULL),
+('admin04@farm.com', '$2a$10$dSXb.5E1CktD650efBJsR.PGeVZ7C2Un5YNrx8kQEzn.maBi7nNmm', '張管理', 'SUSPENDED', '2024-03-05 09:00:00', '2024-09-01 08:00:00'),
+('admin05@farm.com', '$2a$10$dSXb.5E1CktD650efBJsR.PGeVZ7C2Un5YNrx8kQEzn.maBi7nNmm', '黃管理', 'DELETED',   '2024-04-20 09:00:00', '2025-01-10 17:00:00');
 
 -- ====================================================================
 -- 1-2 小農會員（先建；已移除 review_id）
