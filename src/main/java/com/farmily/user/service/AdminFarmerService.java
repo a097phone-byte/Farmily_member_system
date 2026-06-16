@@ -12,6 +12,8 @@ public interface AdminFarmerService {
     // 查單一小農
     FarmerProfileResponse getById(Integer farmerId);
 
-    // 改小農狀態(警告/停權/恢復)
-//    FarmerProfileResponse updateStatus(Integer farmerId, String status);
+    // 改小農狀態
+    FarmerProfileResponse suspend(Integer farmerId);     // ACTIVE → SUSPENDED
+
+    FarmerProfileResponse reinstate(Integer farmerId);   // SUSPENDED → ACTIVE
 }

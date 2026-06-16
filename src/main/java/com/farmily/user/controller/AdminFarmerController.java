@@ -3,10 +3,7 @@ package com.farmily.user.controller;
 import com.farmily.user.dto.FarmerProfileResponse;
 import com.farmily.user.service.AdminFarmerService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -30,6 +27,18 @@ public class AdminFarmerController {
     @GetMapping("/{farmerId}")
     public ResponseEntity<FarmerProfileResponse> getOne(@PathVariable Integer farmerId) {
         return ResponseEntity.ok(adminFarmerService.getById(farmerId));
+    }
+
+    // 停權
+    @PutMapping("/{farmerId}/suspend")
+    public ResponseEntity<FarmerProfileResponse> suspend(@PathVariable Integer farmerId) {
+        return ResponseEntity.ok(adminFarmerService.suspend(farmerId));
+    }
+
+    // 恢復
+    @PutMapping("/{farmerId}/reinstate")
+    public ResponseEntity<FarmerProfileResponse> reinstate(@PathVariable Integer farmerId) {
+        return ResponseEntity.ok(adminFarmerService.reinstate(farmerId));
     }
 
 }

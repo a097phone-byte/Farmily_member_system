@@ -91,12 +91,12 @@ public class FarmerServiceImpl implements FarmerService {
         if(!passwordEncoder.matches(log.getPassword(), farmer.getPassword())){
             throw new BadCredentialsException("帳號或密碼錯誤");
         }
-
         if (farmer.getFarmerStatus() == Farmer.FarmerStatus.PENDING) {
             throw new IllegalStateException("您的小農申請審核中，通過後才能登入");
         }
+        // 由 Admin 管制 (非審核流程)
         if(farmer.getFarmerStatus() == Farmer.FarmerStatus.SUSPENDED){
-            throw new IllegalStateException("此帳號已停用");
+            throw new IllegalStateException("此帳號已遭停權，若有任何疑問請聯繫客服");
         }
         // 內含查最新 review
         return toResponse(farmer);
