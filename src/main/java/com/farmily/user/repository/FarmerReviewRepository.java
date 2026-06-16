@@ -12,4 +12,8 @@ public interface FarmerReviewRepository extends JpaRepository<FarmerReview, Inte
 
     // 查某小農「最新一筆」審核
     FarmerReview findTopByFarmer_FarmerIdOrderByReviewRoundDesc (Integer farmerId);
+
+    // 查某小農「最新一筆」+「通過審核」的資料
+//    FarmerReview findTopByFarmer_FarmerIdAndReviewStatusOrderByReviewRoundDesc(
+//            Integer farmerId, FarmerReview.ReviewStatus status); // 傳 APPROVED
 }

@@ -70,7 +70,7 @@ public class FarmerController {
         return ResponseEntity.ok(response);
     }
 
-    // 修改非審核欄位（電話、描述) -> 立即生效
+    // 修改非審核欄位（電話、描述) - 立即生效
     @PutMapping("/me")
     public ResponseEntity<FarmerProfileResponse> updateContactInfo(
             @AuthenticationPrincipal FarmerUserDetails me,
@@ -79,7 +79,7 @@ public class FarmerController {
         return ResponseEntity.ok(response);
     }
 
-    // 修改審核相關欄位 -> 重新送審
+    // 修改審核相關欄位 - 重新送審
     @PutMapping("/me/application")
     public ResponseEntity<FarmerProfileResponse> resubmit(
             @AuthenticationPrincipal FarmerUserDetails me,

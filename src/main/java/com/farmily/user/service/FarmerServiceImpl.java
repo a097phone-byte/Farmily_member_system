@@ -101,41 +101,42 @@ public class FarmerServiceImpl implements FarmerService{
         return toResponse(farmer);
     }
 
-    // 查個人資料
+    // 查資料
     @Override
     @Transactional(readOnly = true)
     public FarmerProfileResponse getMyProfile(Integer farmerId) {
         return toResponse(findFarmer(farmerId));
     }
 
-    // 修改資料 (不用重審)
+    // 修改資料 (非重審)
     @Override
     public FarmerProfileResponse updateContactInfo(Integer farmerId, FarmerProfileUpdateRequest req) {
         Farmer farmer = findFarmer(farmerId);
-        if(req.getFarmerPhoneNum() != null){
+
+        if(req.getFarmerPhoneNum() != null)
             farmer.setFarmerPhoneNum(req.getFarmerPhoneNum());
-        }
-        if(req.getFarmDesc() != null){
+        if(req.getFarmDesc() != null)
             farmer.setFarmDesc(req.getFarmDesc());
-        }
+
         // repository 將修改資料存進 DB
         return toResponse(farmerRepository.save(farmer));
     }
 
-    // 修改需要重審資料
+    // 修改資料 (需重審)
     @Override
     public FarmerProfileResponse resubmit(Integer farmerId, FarmerResubmitRequest req) {
+        // 撈出小農和審核物件
         Farmer farmer = findFarmer(farmerId);
-        FarmerReview latest =
-                farmerReviewRepository.findTopByFarmer_FarmerIdOrderByReviewRoundDesc(farmerId);
+        FarmerReview latest = farmerReviewRepository.findTopByFarmer_FarmerIdOrderByReviewRoundDesc(farmerId);
 
-        // 計算重審次數
+        // 重審次數
         int nextRound = (latest != null && latest.getReviewRound() != null)
                         ? latest.getReviewRound() + 1
                         : 1;
 
         // 呼叫工廠方法 newReviewSnapshot()，做一個 FarmerReview 物件
-        FarmerReview review = newReviewSnapshot(farmer, nextRound,
+        FarmerReview review = newReviewSnapshot(
+                farmer, nextRound,
                 req.getFarmName(), req.getFarmAddress(),
                 findDistrict(req.getDistrictId()),
                 req.getLocLat(), req.getLocLong(),
@@ -153,6 +154,7 @@ public class FarmerServiceImpl implements FarmerService{
     @Override
     public void changePassword(Integer farmerId, ChangePasswordRequest pw) {
         Farmer farmer = findFarmer(farmerId);
+
         if (farmer.getPassword() != null) {
             if (pw.getOldPassword() == null
                     || !passwordEncoder.matches(pw.getOldPassword(), farmer.getPassword())) {
@@ -163,7 +165,7 @@ public class FarmerServiceImpl implements FarmerService{
         farmerRepository.save(farmer);
     }
 
-    // 自訂工廠方法：組裝每次審核的資料，回傳一個物件（register/resubmit 共用）
+    // 自訂工廠方法：組裝每次審核 (n+1) 的資料，回傳一個物件（register/resubmit 共用）
     private FarmerReview newReviewSnapshot(
             Farmer farmer, int round,
             String farmName, String farmAddress, CityDistrict district,
@@ -192,7 +194,7 @@ public class FarmerServiceImpl implements FarmerService{
         return FarmerProfileResponse.from(farmer, latest);
     }
 
-    // 依 id 撈小農，撈不到丟例外
+    // 依 id 撈小農
     private Farmer findFarmer(Integer farmerId) {
         return farmerRepository.findById(farmerId)
                 .orElseThrow(() -> new IllegalArgumentException("查無此小農"));

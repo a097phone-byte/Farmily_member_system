@@ -120,7 +120,7 @@ public class UserServiceImpl implements UserService {
         return UserProfileResponse.from(user);
     }
 
-    // 改資料
+    // 修改資料
     @Override
     public UserProfileResponse updateMyProfile(Integer userId, UserUpdateRequest update) {
         User user = userRepository.findById(userId)
@@ -136,7 +136,6 @@ public class UserServiceImpl implements UserService {
             user.setUserAddress(update.getUserAddress());
         if (update.getBirthday() != null)
             user.setBirthday(update.getBirthday());
-
         if (update.getDistrictId() != null) {
             CityDistrict city = cityDistrictRepository.findById(update.getDistrictId())
                     .orElseThrow(() -> new IllegalArgumentException("查無此區域"));
@@ -146,10 +145,9 @@ public class UserServiceImpl implements UserService {
         return UserProfileResponse.from(userRepository.save(user));
     }
 
-    // 改密碼
+    // 修改密碼
     @Override
     public void changePassword(Integer userId, ChangePasswordRequest pw) {
-
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("查無此用戶"));
 

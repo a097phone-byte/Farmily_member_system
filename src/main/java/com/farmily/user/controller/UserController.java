@@ -62,6 +62,13 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
+    // 查自己資料
+    @GetMapping("/me")
+    public ResponseEntity<UserProfileResponse> getMe(
+            @AuthenticationPrincipal MemberUserDetails me){
+        UserProfileResponse response = userService.getMyProfile(me.getUserId());
+        return ResponseEntity.ok(response);
+    }
 
     // 修改自己資料
     @PutMapping("/me")
@@ -90,12 +97,5 @@ public class UserController {
         return ResponseEntity.ok("註銷成功!");
     }
 
-    // 查自己資料
-    @GetMapping("/me")
-    public ResponseEntity<UserProfileResponse> getMe(
-            @AuthenticationPrincipal MemberUserDetails me){
-        UserProfileResponse response = userService.getMyProfile(me.getUserId());
-        return ResponseEntity.ok(response);
-    }
 
 }
