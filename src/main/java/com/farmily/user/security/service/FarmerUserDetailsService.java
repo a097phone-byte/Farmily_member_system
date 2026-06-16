@@ -24,12 +24,7 @@ public class FarmerUserDetailsService implements UserDetailsService {
         Farmer farmer = farmerRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("查無此帳號: " + email));
 
-        // step2: 純第三方登入帳號沒有本地密碼，不能走帳密登入
-        if (farmer.getPassword() == null) {
-            throw new UsernameNotFoundException("此帳號為第三方登入，請改用第三方登入");
-        }
-
-        // step3: 包成自製的 FarmerUserDetails 回傳
+        // step2: 包成自製的 FarmerUserDetails 回傳
         return new FarmerUserDetails(farmer);
     }
 }

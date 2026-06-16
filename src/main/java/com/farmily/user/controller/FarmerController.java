@@ -66,8 +66,7 @@ public class FarmerController {
     @GetMapping("/me")
     public ResponseEntity<FarmerProfileResponse> getMe(
             @AuthenticationPrincipal FarmerUserDetails me) {
-        FarmerProfileResponse response = farmerService.getMyProfile(me.getFarmerId());
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(farmerService.getMyProfile(me.getFarmerId()));
     }
 
     // 修改非審核欄位（電話、描述) - 立即生效

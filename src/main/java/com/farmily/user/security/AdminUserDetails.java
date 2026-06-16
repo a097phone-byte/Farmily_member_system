@@ -8,7 +8,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.List;
 
-// 自訂 AdminUserDetailsService 回傳 User 格式
+// Security - 自訂 AdminUserDetailsService 回傳 User 格式
 public class AdminUserDetails implements UserDetails {
 
     private final Admin admin;
@@ -17,7 +17,15 @@ public class AdminUserDetails implements UserDetails {
         this.admin = admin;
     }
 
-    // 之後要做細粒度權限，可在這裡把 AdminPermissionRole 轉成多個 authority
+    // 給 Controller 取登入者 id
+    public Integer getAdminId() {
+        return admin.getAdminId();
+    }
+    public Admin getAdmin() {
+        return admin;
+    }
+
+    // 之後要做細粒度權限控管，可在這裡把 AdminPermissionRole 轉成多個 authority
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("ROLE_ADMIN"));

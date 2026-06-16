@@ -22,5 +22,4 @@ public interface FarmerService {
     // 修改密碼
     void changePassword(Integer farmerId, ChangePasswordRequest pw);
 
-
 }

@@ -1,4 +1,4 @@
-package com.farmily.user.service;
+package com.farmily.user.service.impl;
 
 import com.farmily.user.dto.*;
 import com.farmily.user.model.CityDistrict;
@@ -7,6 +7,8 @@ import com.farmily.user.model.FarmerReview;
 import com.farmily.user.repository.CityDistrictRepository;
 import com.farmily.user.repository.FarmerRepository;
 import com.farmily.user.repository.FarmerReviewRepository;
+import com.farmily.user.service.EmailUniquenessChecker;
+import com.farmily.user.service.FarmerService;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -17,7 +19,7 @@ import java.time.LocalDateTime;
 
 @Service
 @Transactional
-public class FarmerServiceImpl implements FarmerService{
+public class FarmerServiceImpl implements FarmerService {
 
     private final FarmerRepository farmerRepository;
     private final FarmerReviewRepository farmerReviewRepository;
@@ -77,7 +79,6 @@ public class FarmerServiceImpl implements FarmerService{
 
         return FarmerProfileResponse.from(savedFarmer, savedReview);
     }
-
 
     // 本地登入
     @Override

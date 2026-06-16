@@ -1,4 +1,4 @@
-package com.farmily.user.service;
+package com.farmily.user.service.impl;
 
 import com.farmily.user.dto.*;
 import com.farmily.user.model.CityDistrict;
@@ -6,6 +6,8 @@ import com.farmily.user.model.User;
 import com.farmily.user.repository.CityDistrictRepository;
 import com.farmily.user.repository.UserRepository;
 
+import com.farmily.user.service.EmailUniquenessChecker;
+import com.farmily.user.service.UserService;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;

@@ -66,8 +66,7 @@ public class UserController {
     @GetMapping("/me")
     public ResponseEntity<UserProfileResponse> getMe(
             @AuthenticationPrincipal MemberUserDetails me){
-        UserProfileResponse response = userService.getMyProfile(me.getUserId());
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(userService.getMyProfile(me.getUserId()));
     }
 
     // 修改自己資料

@@ -8,7 +8,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.List;
 
-// 自訂 MemberUserDetailsService 回傳 User 格式
+// Security - 自訂 MemberUserDetailsService 回傳 User 格式
 public class MemberUserDetails implements UserDetails {
 
     private final User user;
@@ -21,7 +21,6 @@ public class MemberUserDetails implements UserDetails {
     public Integer getUserId() {
         return user.getUserId();
     }
-
     public User getUser() {
         return user;
     }
