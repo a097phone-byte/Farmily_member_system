@@ -62,11 +62,11 @@ INSERT INTO USER
  user_name, user_nickname, birthday, user_phone_num, user_status,
  monthly_spending, farmer_identity, auth_provider, provider_id, access_token, expires_at)
 VALUES
-('chen.weiting@example.com', 5,   '羅斯福路三段100號5樓',     TRUE, '$2a$10$N9qo8uLOickgx2ZMRZoMyeIj8VeXr3.GfHJ1OqWb2cYkZ7Lh1Kd6e', '2024-01-15 09:23:11', '陳偉廷', '阿廷', '1995-03-12', '0912345678', 'ACTIVE', 520,  FALSE, 'LOCAL', NULL, NULL, NULL),
-('lin.shuhui@example.com',   2,   '桃園區中正路50號',         TRUE, '$2a$10$kQ8vM2pLxN7Rd3sWfYbZ4uTjH6cKmA9nGpE1oI5lQwXvB2yC8dRf2', '2024-02-03 14:05:47', '林淑惠', '惠惠', '1988-07-22', '0922333444', 'WARNED', 2150, FALSE, 'LOCAL', NULL, NULL, NULL),
-('alex.tsai@gmail.com',      3,   '信義區松高路11號',         TRUE, NULL, '2024-06-01 13:22:09', 'Alex Tsai',  '小蔡', '1993-04-08', '0977888999', 'ACTIVE', 4200, TRUE,  'GOOGLE', '108426751093847562910', 'ya29.a0AfH6SMxK9pLmN2qR7tY3uVwXzB8cD1eF4gH', '2024-06-01 14:22:09'),
-('jessica.wu@gmail.com',     4,   '臺中市西屯區臺灣大道300號', TRUE, NULL, '2024-06-14 10:11:44', 'Jessica Wu', 'Jess', '1996-12-14', '0911222333', 'ACTIVE', 760,  FALSE, 'GOOGLE', '113985620174639205841', 'ya29.a0AfH6SMyL0qNrO3sP8uZ4wXcD2eF5gH6iJ7k', '2024-06-14 11:11:44'),
-('kevin.lin@gmail.com',      5,   '高雄市鳳山區青年路200號',  TRUE, NULL, '2024-07-08 16:38:27', 'Kevin Lin',  NULL,   '1990-08-19', '0922888777', 'ACTIVE', 0,    FALSE, 'GOOGLE', '102758493016283749561', NULL, NULL);
+('user1@example.com', 5,   '羅斯福路三段100號5樓',     TRUE, '$2a$12$ATSBRE370auJk/5DiBy09eAsrAfItIUskuEl/Xdem/wd52xa1yVX.', '2024-01-15 09:23:11', '陳偉廷', '阿廷', '1995-03-12', '0912345678', 'ACTIVE', 520,  FALSE, 'LOCAL', NULL, NULL, NULL),
+('user2@example.com',   2,   '桃園區中正路50號',         TRUE, '$2a$12$ATSBRE370auJk/5DiBy09eAsrAfItIUskuEl/Xdem/wd52xa1yVX.', '2024-02-03 14:05:47', '林淑惠', '惠惠', '1988-07-22', '0922333444', 'WARNED', 2150, FALSE, 'LOCAL', NULL, NULL, NULL),
+('userg3@gmail.com',      3,   '信義區松高路11號',         TRUE, '$2a$12$ATSBRE370auJk/5DiBy09eAsrAfItIUskuEl/Xdem/wd52xa1yVX.', '2024-06-01 13:22:09', 'Alex Tsai',  '小蔡', '1993-04-08', '0977888999', 'ACTIVE', 4200, TRUE,  'LOCAL', '108426751093847562910', 'ya29.a0AfH6SMxK9pLmN2qR7tY3uVwXzB8cD1eF4gH', '2024-06-01 14:22:09'),
+('userg4@gmail.com',     4,   '臺中市西屯區臺灣大道300號', TRUE, NULL, '2024-06-14 10:11:44', 'Jessica Wu', 'Jess', '1996-12-14', '0911222333', 'ACTIVE', 760,  FALSE, 'GOOGLE', '113985620174639205841', 'ya29.a0AfH6SMyL0qNrO3sP8uZ4wXcD2eF5gH6iJ7k', '2024-06-14 11:11:44'),
+('userg5@gmail.com',      5,   '高雄市鳳山區青年路200號',  TRUE, NULL, '2024-07-08 16:38:27', 'Kevin Lin',  NULL,   '1990-08-19', '0922888777', 'ACTIVE', 0,    FALSE, 'GOOGLE', '102758493016283749561', NULL, NULL);
 
 
 -- ====================================================================
