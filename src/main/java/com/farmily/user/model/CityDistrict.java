@@ -9,6 +9,7 @@ import java.util.Set;
 @Entity
 @Table(name = "city_district")
 public class CityDistrict implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

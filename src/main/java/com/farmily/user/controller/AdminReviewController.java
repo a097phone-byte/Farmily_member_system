@@ -27,7 +27,7 @@ public class AdminReviewController {
         return ResponseEntity.ok(adminReviewService.listPending());
     }
 
-    // 查某小農審核歷史
+    // 查某小農所有審核紀錄
     @GetMapping("/farmer/{farmerId}")
     public ResponseEntity<List<FarmerReviewResponse>> listByFarmer(
             @PathVariable Integer farmerId) {

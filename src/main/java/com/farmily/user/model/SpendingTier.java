@@ -8,6 +8,7 @@ import java.io.Serializable;
 @Entity
 @Table(name = "spending_tier")
 public class SpendingTier implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     @Id
     @Column(name = "tier_id", updatable = false)

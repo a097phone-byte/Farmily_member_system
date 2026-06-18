@@ -174,7 +174,7 @@ CREATE TABLE FARMER_REVIEW (
     review_id             INT           AUTO_INCREMENT PRIMARY KEY,
     farmer_id             INT           NULL,
     admin_id              INT,
-    review_round          TINYINT       NOT NULL DEFAULT 1,
+    review_round          INT           NOT NULL DEFAULT 1,
     review_status         ENUM('PENDING', 'REVIEWING', 'APPROVED', 'REJECTED') NOT NULL,  -- 管理員視角
     submitted_at          DATETIME      NOT NULL,
     reviewed_at           DATETIME,

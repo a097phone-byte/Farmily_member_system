@@ -10,6 +10,7 @@ import java.util.Set;
 @Entity
 @Table(name = "farmer_review")
 public class FarmerReview implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     public enum ReviewStatus{
         PENDING, REVIEWING, APPROVED, REJECTED

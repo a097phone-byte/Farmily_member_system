@@ -45,7 +45,7 @@ public class AdminReviewServiceImpl implements AdminReviewService {
         return result;
     }
 
-    // 某小農的審核歷史
+    // 某小農的審核紀錄
     @Override
     public List<FarmerReviewResponse> listByFarmer(Integer farmerId) {
 

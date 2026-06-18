@@ -50,7 +50,7 @@ public class UserServiceImpl implements UserService {
                 throw new IllegalStateException("此帳號已使用 Google 登入，請改用 Google 登入");
             }
             // 狀況 B: 剩餘(已有本地密碼)就是一般重複註冊
-            throw new IllegalStateException("帳號已註冊，請直接登入");
+            throw new IllegalStateException("帳號已註冊使用");
         }
 
         // step2: 跨表(小農/管理員)檢查 email 全域唯一
@@ -108,7 +108,7 @@ public class UserServiceImpl implements UserService {
 
         if (user.getUserStatus() == User.UserStatus.SUSPENDED
                 || user.getUserStatus() == User.UserStatus.DELETED) {
-            throw new IllegalStateException("此帳號已停用");
+            throw new IllegalStateException("此帳號已遭停權或終止，有任何疑問請聯繫客服");
         }
         return UserProfileResponse.from(user);
     }

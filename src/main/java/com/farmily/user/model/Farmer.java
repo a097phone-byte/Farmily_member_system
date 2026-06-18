@@ -12,6 +12,7 @@ import java.util.List;
 @Entity
 @Table(name = "FARMER")
 public class Farmer implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     public enum FarmerStatus {
         PENDING, ACTIVE, SUSPENDED

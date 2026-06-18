@@ -9,7 +9,7 @@ public interface AdminReviewService {
     // 待審清單
     List<FarmerReviewResponse> listPending();
 
-    // 某小農審核歷史
+    // 某小農所有審核紀錄
     List<FarmerReviewResponse> listByFarmer(Integer farmerId);
 
     // 核准

@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "`user`")
 public class User implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     public enum UserStatus {
         ACTIVE, WARNED, SUSPENDED, DELETED

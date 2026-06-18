@@ -1,5 +1,6 @@
 package com.farmily.user.dto;
 
+import com.farmily.user.model.Admin;
 import com.farmily.user.model.Farmer;
 import com.farmily.user.model.FarmerReview;
 
@@ -11,8 +12,10 @@ public class FarmerReviewResponse {
 
     private Integer reviewId;
     private Integer farmerId;
-    private String email;
+    private String farmerEmail;
     private Integer reviewRound;
+    private String adminName;
+    private String adminEmail;
     private String reviewStatus;          // PENDING / REVIEWING / APPROVED / REJECTED
     private LocalDateTime submittedAt;
     private LocalDateTime reviewedAt;
@@ -34,11 +37,17 @@ public class FarmerReviewResponse {
     public Integer getFarmerId() {
         return farmerId;
     }
-    public String getEmail() {
-        return email;
+    public String getFarmerEmail() {
+        return farmerEmail;
     }
     public Integer getReviewRound() {
         return reviewRound;
+    }
+    public String getAdminName() {
+        return adminName;
+    }
+    public String getAdminEmail() {
+        return adminEmail;
     }
     public String getReviewStatus() {
         return reviewStatus;
@@ -84,12 +93,20 @@ public class FarmerReviewResponse {
         FarmerReviewResponse dto = new FarmerReviewResponse();
         dto.reviewId = r.getReviewId();
 
-        Farmer f = r.getFarmer();
-        if (f != null) {
-            dto.farmerId = f.getFarmerId();
-            dto.email = f.getEmail();
+        Farmer farmer = r.getFarmer();
+        if (farmer != null) {
+            dto.farmerId = farmer.getFarmerId();
+            dto.farmerEmail = farmer.getEmail();
         }
+
         dto.reviewRound = r.getReviewRound();
+
+        Admin admin = r.getAdmin();
+        if(admin != null){
+            dto.adminName = admin.getAdminName();
+            dto.adminEmail = admin.getAdminEmail();
+        }
+
         dto.reviewStatus = r.getReviewStatus() != null ? r.getReviewStatus().name() : null;
         dto.submittedAt = r.getSubmittedAt();
         dto.reviewedAt = r.getReviewedAt();

@@ -3,6 +3,7 @@ package com.farmily.user.dto;
 import com.farmily.user.model.User;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 // 將 Repository 回傳數據包裝成 dto
 public class UserProfileResponse {
@@ -21,6 +22,8 @@ public class UserProfileResponse {
     private Boolean farmerIdentity;
     private String authProvider;      // 讓前端知道這帳號是 LOCAL/GOOGLE
     private Boolean hasPassword;      // 前端可根據此決定顯示「修改密碼」還是「設定密碼」
+    private LocalDateTime userCreatedAt;
+    private User.UserStatus userStatus;
 
     // getter
     public Integer getUserId() {
@@ -65,7 +68,12 @@ public class UserProfileResponse {
     public Boolean getHasPassword() {
         return hasPassword;
     }
-
+    public LocalDateTime getUserCreatedAt() {
+        return userCreatedAt;
+    }
+    public User.UserStatus getUserStatus() {
+        return userStatus;
+    }
 
     // 自訂 from() 方法
     public static UserProfileResponse from(User u) {
@@ -87,6 +95,8 @@ public class UserProfileResponse {
         dto.farmerIdentity = u.getFarmerIdentity();
         dto.authProvider = u.getAuthProvider() != null ? u.getAuthProvider().name() : null;
         dto.hasPassword = u.getPassword() != null;
+        dto.userCreatedAt = u.getUserCreatedAt();
+        dto.userStatus = u.getUserStatus();
         return dto;
     }
 

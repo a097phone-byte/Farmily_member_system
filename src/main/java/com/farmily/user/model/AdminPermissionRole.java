@@ -8,6 +8,7 @@ import java.io.Serializable;
 @Entity
 @Table(name = "admin_permission_role")
 public class AdminPermissionRole implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     // 複合主鍵
     @EmbeddedId
