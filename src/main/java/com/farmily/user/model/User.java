@@ -74,6 +74,9 @@ public class User implements Serializable {
     @Column(name = "access_token", columnDefinition = "longtext")
     private String accessToken;
 
+    @Column(name = "refresh_token", columnDefinition = "longtext")
+    private String refreshToken ;
+
     @Column(name = "expires_at")
     private LocalDateTime expiresAt;
 
@@ -213,6 +216,14 @@ public class User implements Serializable {
 
     public void setAccessToken(String accessToken) {
         this.accessToken = accessToken;
+    }
+
+    public String getRefreshToken() {
+        return refreshToken;
+    }
+
+    public void setRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
     }
 
     public LocalDateTime getExpiresAt() {

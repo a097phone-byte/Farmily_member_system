@@ -40,7 +40,7 @@ public class UserSecurityConfig {
 //                        .csrfTokenRequestHandler(createCsrfHandler()))
 
                 .cors(Customizer.withDefaults())
-//                .formLogin(Customizer.withDefaults())    // 關掉預設 form 登入，自定義，避免背景監聽 login
+                .formLogin(Customizer.withDefaults())    // 關掉預設 form 登入，自定義，避免背景監聽 login
                 .httpBasic(Customizer.withDefaults());     // API call: Authorization Basic XXX
     }
 
@@ -85,6 +85,13 @@ public class UserSecurityConfig {
                                         "/api/member/oauth/**").permitAll()
                         .anyRequest().hasRole("USER")
                 )
+                // OAuth 2.0 社交登入
+//                .oauth2Login(oauth2 -> oauth2
+//                        .userInfoEndpoint(infoEndpoint -> infoEndpoint
+//                                .oidcUserService(myOidcUserService)
+//                        )
+//                )
+
                 .build();
     }
 
