@@ -1,3 +1,5 @@
+CREATE DATABASE IF NOT EXISTS myproject;
+
 USE myproject;
 
 -- 關閉外鍵檢查，才能無視相依方向強制 DROP
