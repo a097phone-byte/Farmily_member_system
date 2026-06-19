@@ -10,7 +10,7 @@ public class LogoutController {
     @PostMapping("/api/logout")
     public ResponseEntity<String> logout(){
 
-        return ResponseEntity.ok("已登出");
+        return ResponseEntity.ok("Hello World");
     }
 
 }
