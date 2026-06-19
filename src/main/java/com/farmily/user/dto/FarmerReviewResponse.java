@@ -7,7 +7,7 @@ import com.farmily.user.model.FarmerReview;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-// 給管理員看的審核資料包成 dto
+// 回傳給管理員看的審核資料包成 dto
 public class FarmerReviewResponse {
 
     private Integer reviewId;

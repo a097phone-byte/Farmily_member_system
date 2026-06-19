@@ -7,7 +7,6 @@ import com.farmily.user.service.FarmerService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -50,8 +49,7 @@ public class FarmerController {
 
         // step2: 通知 Spring Security 此人已通過驗證
         UserDetails userDetails = farmerUserDetailsService.loadUserByUsername(req.getEmail());
-        UsernamePasswordAuthenticationToken authToken =
-                new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authToken);
 
         // step3: 把 SecurityContext 存進 HttpSession，後續請求才能持續認得他
@@ -62,7 +60,7 @@ public class FarmerController {
         return ResponseEntity.ok(response);
     }
 
-    // 查自己資料（含最新審核進度）；@AuthenticationPrincipal 取出登入者本人
+    // 查自己資料 - @AuthenticationPrincipal 取出登入者本人
     @GetMapping("/me")
     public ResponseEntity<FarmerProfileResponse> getMe(
             @AuthenticationPrincipal FarmerUserDetails me) {
@@ -80,10 +78,10 @@ public class FarmerController {
 
     // 修改審核相關欄位 - 重新送審
     @PutMapping("/me/application")
-    public ResponseEntity<FarmerProfileResponse> resubmit(
+    public ResponseEntity<FarmerProfileResponse> updateReviewRequiredInfo(
             @AuthenticationPrincipal FarmerUserDetails me,
             @RequestBody @Valid FarmerResubmitRequest req) {
-        FarmerProfileResponse response = farmerService.resubmit(me.getFarmerId(), req);
+        FarmerProfileResponse response = farmerService.updateReviewRequiredInfo(me.getFarmerId(), req);
         return ResponseEntity.ok(response);
     }
 

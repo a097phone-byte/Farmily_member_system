@@ -3,7 +3,7 @@ package com.farmily.user.service;
 import com.farmily.user.dto.FarmerReviewResponse;
 import java.util.List;
 
-// 審核邏輯
+// 管理員對小農審核操作
 public interface AdminReviewService {
 
     // 待審清單

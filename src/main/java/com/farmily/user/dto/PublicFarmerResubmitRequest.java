@@ -1,18 +1,45 @@
 package com.farmily.user.dto;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+
 import java.math.BigDecimal;
 
-// 重新送審用（暫存，通過才生效） - 適用於已通過初審
-public class FarmerResubmitRequest {
+// 小農免登入重送申請：申請者(PENDING)還不能登入，改用 email + password 驗證身分
+public class PublicFarmerResubmitRequest {
+
+    @Email
+    @NotBlank
+    private String email;
+
+    @NotBlank
+    private String password;
 
     private String farmName;
-    private Integer districtId;
     private String farmAddress;
+    private Integer districtId;
     private BigDecimal locLat;
     private BigDecimal locLong;
     private byte[] certFileLand;
     private byte[] certFileProduct;
     private byte[] certFileIdentity;
+
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
 
     public String getFarmName() {
         return farmName;
@@ -22,20 +49,20 @@ public class FarmerResubmitRequest {
         this.farmName = farmName;
     }
 
-    public Integer getDistrictId() {
-        return districtId;
-    }
-
-    public void setDistrictId(Integer districtId) {
-        this.districtId = districtId;
-    }
-
     public String getFarmAddress() {
         return farmAddress;
     }
 
     public void setFarmAddress(String farmAddress) {
         this.farmAddress = farmAddress;
+    }
+
+    public Integer getDistrictId() {
+        return districtId;
+    }
+
+    public void setDistrictId(Integer districtId) {
+        this.districtId = districtId;
     }
 
     public BigDecimal getLocLat() {

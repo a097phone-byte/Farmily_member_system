@@ -65,7 +65,9 @@ public class UserSecurityConfig {
         return commonSetup(http)
                 .securityMatcher("/api/farmer/**")
                 .authorizeHttpRequests(request -> request
-                        .requestMatchers("/api/farmer/register", "/api/farmer/login").permitAll()
+                        .requestMatchers("/api/farmer/register",
+                                         "/api/farmer/login",
+                                         "/api/farmer/application/**").permitAll()
                         .anyRequest().hasRole("FARMER")
                 )
                 .build();

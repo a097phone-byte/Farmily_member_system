@@ -4,6 +4,7 @@ import com.farmily.user.dto.UserProfileResponse;
 
 import java.util.List;
 
+// 管理員對會員操作
 public interface AdminMemberService {
 
     // 列出所有會員

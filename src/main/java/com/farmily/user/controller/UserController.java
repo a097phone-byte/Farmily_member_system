@@ -7,7 +7,6 @@ import com.farmily.user.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -50,8 +49,7 @@ public class UserController {
 
         // step2: 通知 Spring Security 此人已通過驗證
         UserDetails userDetails = memberUserDetailsService.loadUserByUsername(log.getEmail());
-        UsernamePasswordAuthenticationToken authToken =
-                new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authToken);
 
         // step3: 把 SecurityContext 存進 HttpSession，後續請求才能持續認得他

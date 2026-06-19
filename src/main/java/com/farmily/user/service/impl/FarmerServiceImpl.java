@@ -125,12 +125,12 @@ public class FarmerServiceImpl implements FarmerService {
 
     // 修改資料 (需重審)
     @Override
-    public FarmerProfileResponse resubmit(Integer farmerId, FarmerResubmitRequest req) {
+    public FarmerProfileResponse updateReviewRequiredInfo(Integer farmerId, FarmerResubmitRequest req) {
         // 撈出小農和審核物件
         Farmer farmer = findFarmer(farmerId);
         FarmerReview latest = farmerReviewRepository.findTopByFarmer_FarmerIdOrderByReviewRoundDesc(farmerId);
 
-        // 重審次數
+        // 計算重審次數
         int nextRound = (latest != null && latest.getReviewRound() != null)
                         ? latest.getReviewRound() + 1
                         : 1;
@@ -145,7 +145,7 @@ public class FarmerServiceImpl implements FarmerService {
                 req.getCertFileIdentity()
         );
 
-        // 把 FarmerReview 物件存進 DB，回傳帶上 farmerId 物件
+        // 把 FarmerReview 物件存進 DB，回傳帶上 farmerId 的 FarmerReview 物件
         FarmerReview savedReview = farmerReviewRepository.save(review);
         return FarmerProfileResponse.from(farmer, savedReview);
     }
@@ -189,19 +189,19 @@ public class FarmerServiceImpl implements FarmerService {
         return review;
     }
 
-    // 查最新 review，連同 farmer 包成回應 DTO
+    // 自定義方法: 查最新 review，連同 farmer 包成回應 DTO
     private FarmerProfileResponse toResponse(Farmer farmer) {
         FarmerReview latest = farmerReviewRepository.findTopByFarmer_FarmerIdOrderByReviewRoundDesc(farmer.getFarmerId());
         return FarmerProfileResponse.from(farmer, latest);
     }
 
-    // 依 id 撈小農
+    // 自定義方法: 依 id 撈小農
     private Farmer findFarmer(Integer farmerId) {
         return farmerRepository.findById(farmerId)
                 .orElseThrow(() -> new IllegalArgumentException("查無此小農"));
     }
 
-    // 依 id 撈區域
+    // 自定義方法: 依 id 撈區域
     private CityDistrict findDistrict(Integer districtId) {
         if (districtId == null) {
             return null;
