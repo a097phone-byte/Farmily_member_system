@@ -52,22 +52,20 @@ CREATE TABLE USER (
     farmer_identity  BOOLEAN      DEFAULT FALSE,
     auth_provider    ENUM('LOCAL', 'GOOGLE') NOT NULL DEFAULT 'LOCAL',
     provider_id      VARCHAR(255),
-    access_token     TEXT         NULL,
-    refresh_token    TEXT         NULL,
-    expires_at       TIMESTAMP    NULL,
     FOREIGN KEY (district_id) REFERENCES CITY_DISTRICT(district_id)
 );
 
 INSERT INTO USER
 (email, district_id, user_address, email_verified, password, user_created_at,
  user_name, user_nickname, birthday, user_phone_num, user_status,
- monthly_spending, farmer_identity, auth_provider, provider_id, access_token, refresh_token, expires_at)
+ monthly_spending, farmer_identity, auth_provider, provider_id)
 VALUES
-('user1@example.com', 5,   '羅斯福路三段100號5樓',     TRUE, '$2a$12$ATSBRE370auJk/5DiBy09eAsrAfItIUskuEl/Xdem/wd52xa1yVX.', '2024-01-15 09:23:11', '陳偉廷', '阿廷', '1995-03-12', '0912345678', 'ACTIVE', 520,  FALSE, 'LOCAL', NULL, NULL, NULL, NULL),
-('user2@example.com',   2,   '桃園區中正路50號',         TRUE, '$2a$12$ATSBRE370auJk/5DiBy09eAsrAfItIUskuEl/Xdem/wd52xa1yVX.', '2024-02-03 14:05:47', '林淑惠', '惠惠', '1988-07-22', '0922333444', 'WARNED', 2150, FALSE, 'LOCAL', NULL, NULL, NULL, NULL),
-('userg3@gmail.com',      3,   '信義區松高路11號',         TRUE, '$2a$12$ATSBRE370auJk/5DiBy09eAsrAfItIUskuEl/Xdem/wd52xa1yVX.', '2024-06-01 13:22:09', 'Alex Tsai',  '小蔡', '1993-04-08', '0977888999', 'ACTIVE', 4200, TRUE,  'LOCAL', '108426751093847562910', 'ya29.a0AfH6SMxK9pLmN2qR7tY3uVwXzB8cD1eF4gH', '1//0gQ8vN3kLpR7sCgYIARAAGBASNwF-L9Ir2mXpQ4tW', '2024-06-01 14:22:09'),
-('userg4@gmail.com',     4,   '臺中市西屯區臺灣大道300號', TRUE, NULL, '2024-06-14 10:11:44', 'Jessica Wu', 'Jess', '1996-12-14', '0911222333', 'ACTIVE', 760,  FALSE, 'GOOGLE', '113985620174639205841', 'ya29.a0AfH6SMyL0qNrO3sP8uZ4wXcD2eF5gH6iJ7k', '1//0hT5wM2jKnQ6rBfXHARAAGBASNwF-M8Hs1nYoP3vU', '2024-06-14 11:11:44'),
-('userg5@gmail.com',      5,   '高雄市鳳山區青年路200號',  TRUE, NULL, '2024-07-08 16:38:27', 'Kevin Lin',  NULL,   '1990-08-19', '0922888777', 'ACTIVE', 0,    FALSE, 'GOOGLE', '102758493016283749561', NULL, NULL, NULL);
+('user1@example.com',  5, '羅斯福路三段100號5樓',      TRUE, '$2b$12$Jk7hoDabWKa0HGCpDiHVhux0glMgZodgdbZJyTnnYL0k12jBieP0C', '2024-01-15 09:23:11', '陳偉廷',     '阿廷', '1995-03-12', '0912345678', 'ACTIVE',  520,  FALSE, 'LOCAL',  NULL),
+('user2@example.com',  2, '桃園區中正路50號',          TRUE, '$2b$12$Husx6NWgvI7KFkVszwGPD.p2FiEv1hdScVX.NDZKu9WyUS2l1/oXG', '2024-02-03 14:05:47', '林淑惠',     '惠惠', '1988-07-22', '0922333444', 'WARNED',  2150, FALSE, 'LOCAL',  NULL),
+('userg3@gmail.com',   3, '信義區松高路11號',          TRUE, '$2b$12$9v39B9kiotoUje71Cn2luO5cNyU0BixHrOTkJxl8j03pzHKns1XCq', '2024-06-01 13:22:09', 'Alex Tsai', '小蔡', '1993-04-08', '0977888999', 'ACTIVE',  4200, TRUE,  'LOCAL',  NULL),
+('userg4@gmail.com',   4, '臺中市西屯區臺灣大道300號',  TRUE, NULL, '2024-06-14 10:11:44', 'Jessica Wu', 'Jess', '1996-12-14', '0911222333', 'ACTIVE',  760,  FALSE, 'GOOGLE', '113985620174639205841'),
+('userg5@gmail.com',   5, '高雄市鳳山區青年路200號',    TRUE, NULL, '2024-07-08 16:38:27', 'Kevin Lin',  NULL,   '1990-08-19', '0922888777', 'ACTIVE',  0,    FALSE, 'GOOGLE', '102758493016283749561');
+
 
 -- ====================================================================
 -- 1-2 消費級距
