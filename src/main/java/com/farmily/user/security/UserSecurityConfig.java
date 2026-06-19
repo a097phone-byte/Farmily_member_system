@@ -40,7 +40,7 @@ public class UserSecurityConfig {
 //                        .csrfTokenRequestHandler(createCsrfHandler()))
 
                 .cors(Customizer.withDefaults())
-                .formLogin(Customizer.withDefaults())    // 關掉預設 form 登入，自定義，避免背景監聽 login
+//                .formLogin(Customizer.withDefaults())    // 關掉預設 form 登入，改自定義登入，避免背景監聽 login
                 .httpBasic(Customizer.withDefaults());     // API call: Authorization Basic XXX
     }
 
