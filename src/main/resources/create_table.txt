@@ -233,11 +233,16 @@ CREATE TABLE ADMIN_PERMISSION_ROLE (
 
 INSERT INTO ADMIN_PERMISSION_ROLE (admin_id, permission_id)
 VALUES
-(1, 1), (1, 2), (1, 3), (1, 4), (1, 5), (1, 6), (1, 7), (1, 8), (1, 9),
+-- admin1（王管理）：全權限
+(1, 1), (1, 2), (1, 3), (1, 4), (1, 5), (1, 6), (1, 7), (1, 8), (1, 9), (1, 10),
+-- admin2（林管理）：NEWS, BLOG, MEMBER —— 故意不給 FARMER，當「對比帳號」
 (2, 1), (2, 2), (2, 3),
-(3, 3), (3, 5), (3, 6),
-(4, 7), (4, 8),
-(5, 9);
+-- admin3（陳管理）：MEMBER, FARMER, SHOP, GROUP_BUY
+(3, 3), (3, 4), (3, 6), (3, 7),
+-- admin4（張管理，已停權）：EVENT, MARKET_DATA
+(4, 8), (4, 9),
+-- admin5（黃管理，已刪除）：ANALYTICS
+(5, 10);
 
 
 -- ====================================================================
