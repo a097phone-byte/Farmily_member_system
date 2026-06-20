@@ -40,5 +40,4 @@ public class AdminFarmerController {
     public ResponseEntity<FarmerProfileResponse> reinstate(@PathVariable Integer farmerId) {
         return ResponseEntity.ok(adminFarmerService.reinstate(farmerId));
     }
-
 }

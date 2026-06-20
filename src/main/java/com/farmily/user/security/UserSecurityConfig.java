@@ -55,14 +55,15 @@ public class UserSecurityConfig {
                         .requestMatchers("/api/admin/login").permitAll()
 
                         // 細部權限管理 (ADMIN_ROLE)                               # 需補上其他組員的 API
-                        .requestMatchers("/api/admin/farmers/**",
-                                         "/api/admin/reviews/**")
+                        .requestMatchers("/api/admin/admins/**").hasAuthority("PERM_ADMIN")
+
+                        .requestMatchers("/api/admin/farmers/**","/api/admin/reviews/**")
                         .hasAnyAuthority("PERM_ADMIN", "PERM_FARMER")
 
                         .requestMatchers("/api/admin/members/**")
                         .hasAnyAuthority("PERM_ADMIN", "PERM_MEMBER")
 
-//                        .requestMatchers("").hasAuthority("PERM_XXX")
+
 
                         // 其餘 ("/api/admin/me")，登入的管理員都能用
                         .anyRequest().hasRole("ADMIN")
@@ -78,8 +79,8 @@ public class UserSecurityConfig {
                 .securityMatcher("/api/farmer/**")
                 .authorizeHttpRequests(request -> request
                         .requestMatchers("/api/farmer/register",
-                                         "/api/farmer/login",
-                                         "/api/farmer/application/**").permitAll()
+                                "/api/farmer/login",
+                                "/api/farmer/application/**").permitAll()
                         .anyRequest().hasRole("FARMER")
                 )
                 .build();
@@ -93,8 +94,8 @@ public class UserSecurityConfig {
                 .securityMatcher("/api/member/**")
                 .authorizeHttpRequests(request -> request
                         .requestMatchers("/api/member/register",
-                                        "/api/member/login",
-                                        "/api/member/oauth/**").permitAll()
+                                "/api/member/login",
+                                "/api/member/oauth/**").permitAll()
                         .anyRequest().hasRole("USER")
                 )
                 // OAuth 2.0 社交登入 - 交給 Spring Security 處理
@@ -119,7 +120,7 @@ public class UserSecurityConfig {
     }
 
     // CSRF 保護
-    private CsrfTokenRequestAttributeHandler createCsrfHandler(){
+    private CsrfTokenRequestAttributeHandler createCsrfHandler() {
         CsrfTokenRequestAttributeHandler csrfHandler = new CsrfTokenRequestAttributeHandler();
         csrfHandler.setCsrfRequestAttributeName(null);
 
