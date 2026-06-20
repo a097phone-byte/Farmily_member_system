@@ -1,9 +1,6 @@
 package com.farmily.user.controller;
 
-import com.farmily.user.dto.AdminCreateRequest;
-import com.farmily.user.dto.AdminProfileResponse;
-import com.farmily.user.dto.AdminUpdateRequest;
-import com.farmily.user.dto.LoginRequest;
+import com.farmily.user.dto.*;
 import com.farmily.user.security.AdminUserDetails;
 import com.farmily.user.security.service.AdminUserDetailsService;
 import com.farmily.user.service.AdminService;
@@ -57,6 +54,14 @@ public class AdminController {
         return ResponseEntity.ok(response);
     }
 
+    // 管理員修改自己的資料（只改名字；登入的管理員都能改自己）
+    @PutMapping("/me")
+    public ResponseEntity<AdminProfileResponse> updateMe(
+            @AuthenticationPrincipal AdminUserDetails me,
+            @RequestBody @Valid AdminSelfUpdateRequest req) {
+        return ResponseEntity.ok(adminService.updateMyProfile(me.getAdminId(), req));
+    }
+
     // 查自己資料
     @GetMapping("/me")
     public ResponseEntity<AdminProfileResponse> getMe(
@@ -64,7 +69,7 @@ public class AdminController {
         return ResponseEntity.ok(adminService.getMyProfile(me.getAdminId()));
     }
 
-    // =========== 管理員管理 CRUD ===========
+    // ====================== 管理員對管理員 CRUD ======================
     // 新增管理員
     @PostMapping("/admins")
     public ResponseEntity<AdminProfileResponse> createAdmin(

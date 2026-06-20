@@ -2,7 +2,7 @@ package com.farmily.user.dto;
 
 import java.util.List;
 
-// 修改管理員時前端可送的資料（欄位都可不填，有填才改）
+// 修改其他管理員時前端可送的資料（欄位都可不填，有填才改）
 public class AdminUpdateRequest {
 
     private String updateName;

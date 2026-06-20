@@ -1,9 +1,6 @@
 package com.farmily.user.service.impl;
 
-import com.farmily.user.dto.AdminCreateRequest;
-import com.farmily.user.dto.AdminProfileResponse;
-import com.farmily.user.dto.AdminUpdateRequest;
-import com.farmily.user.dto.LoginRequest;
+import com.farmily.user.dto.*;
 import com.farmily.user.model.Admin;
 import com.farmily.user.repository.AdminRepository;
 import com.farmily.user.service.AdminService;
@@ -48,7 +45,23 @@ public class AdminServiceImpl implements AdminService {
         return AdminProfileResponse.from(admin);
     }
 
-    // 管理員查個人資料
+    // 管理員修改自己的資料（只能改名字，不能改狀態或權限）
+    @Override
+    public AdminProfileResponse updateMyProfile(Integer adminId, AdminSelfUpdateRequest req) {
+        Admin admin = adminRepository.findById(adminId)
+                .orElseThrow(() -> new IllegalArgumentException("查無此管理員"));
+
+        if (req.getName() != null) {
+            admin.setAdminName(req.getName());
+        }
+        admin.setUpdatedAt(LocalDateTime.now());
+        adminRepository.save(admin);
+
+        return AdminProfileResponse.from(admin);
+    }
+
+
+    // 管理員查自己資料
     @Override
     @Transactional(readOnly = true)
     public AdminProfileResponse getMyProfile(Integer adminId) {
@@ -57,6 +70,7 @@ public class AdminServiceImpl implements AdminService {
         return AdminProfileResponse.from(admin);
     }
 
+    // ================================= 管理員對管理員 CRUD =================================
     // 新增管理員（含權限指派）
     @Override
     public AdminProfileResponse createAdmin(AdminCreateRequest req) {
@@ -144,6 +158,7 @@ public class AdminServiceImpl implements AdminService {
         adminRepository.save(admin);
     }
 
+
     // 小工具：把一串權限代碼指派給某管理員
     private void assignPermissions(Integer adminId, List<String> codes) {
         if (codes == null) return;
@@ -154,6 +169,5 @@ public class AdminServiceImpl implements AdminService {
             }
             adminRepository.addPermission(adminId, permissionId);
         }
-
     }
 }

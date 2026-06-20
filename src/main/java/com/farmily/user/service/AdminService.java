@@ -1,20 +1,21 @@
 package com.farmily.user.service;
 
-import com.farmily.user.dto.AdminCreateRequest;
-import com.farmily.user.dto.AdminProfileResponse;
-import com.farmily.user.dto.AdminUpdateRequest;
-import com.farmily.user.dto.LoginRequest;
+import com.farmily.user.dto.*;
 
 import java.util.List;
 
 public interface AdminService {
 
-    // 後台登入
+    // 管理員後台登入
     AdminProfileResponse login (LoginRequest log);
 
-    // 查個人資料
+    // 管理員修改自己的資料（只改名字）
+    AdminProfileResponse updateMyProfile(Integer adminId, AdminSelfUpdateRequest req);
+
+    // 查管理員個人資料
     AdminProfileResponse getMyProfile(Integer adminId);
 
+    // ======== 管理員對其他管理員 CRUD
     // CRUD - 新增管理員
     AdminProfileResponse createAdmin(AdminCreateRequest req);
 

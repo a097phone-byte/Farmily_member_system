@@ -4,7 +4,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 
-// 新增管理員時，前端要送的資料
+// 新增其他管理員時，前端要送的資料
 public class AdminCreateRequest {
 
     @Email
