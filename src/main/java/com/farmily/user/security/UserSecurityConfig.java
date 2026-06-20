@@ -91,7 +91,6 @@ public class UserSecurityConfig {
 //                                .oidcUserService(myOidcUserService)
 //                        )
 //                )
-
                 .build();
     }
 
@@ -101,6 +100,7 @@ public class UserSecurityConfig {
     public SecurityFilterChain defaultChain(HttpSecurity http) throws Exception {
         return commonSetup(http)
                 .authorizeHttpRequests(request -> request
+                        .requestMatchers("/oauth-test.html").permitAll()        // OAuth2.0 測試用
                         .anyRequest().authenticated()
                 )
                 .build();

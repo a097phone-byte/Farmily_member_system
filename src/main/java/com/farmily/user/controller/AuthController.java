@@ -5,8 +5,10 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 // 認證用 (Authenticator)
+@RestController
 public class AuthController {
 
     // 三身分共用登出

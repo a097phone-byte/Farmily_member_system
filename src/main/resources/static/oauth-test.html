@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <title>Google 登入測試</title>
+    <!-- Google 官方登入函式庫 -->
+    <script src="https://accounts.google.com/gsi/client" async></script>
+</head>
+<body>
+<h2>Google 登入測試</h2>
+
+<!-- 「用 Google 登入」按鈕 -->
+<!-- data-client_id 必須跟後端 GoogleTokenVerifier 的 client id 一模一樣！ -->
+<div id="g_id_onload"
+     data-client_id="528090060943-mooi8topfu9g29umm7f67579vvsk553e.apps.googleusercontent.com"
+     data-callback="handleCredential">
+</div>
+<div class="g_id_signin" data-type="standard"></div>
+
+<h3>結果：</h3>
+<pre id="output">尚未登入</pre>
+
+<script>
+    // 使用者用 Google 登入成功後，Google 會自動呼叫這個函式
+    // response.credential 就是 id_token（那張「身分證明信」）
+    function handleCredential(response) {
+        const idToken = response.credential;
+        document.getElementById('output').textContent = '拿到 id_token，傳給後端中...';
+
+        // 把 id_token POST 給後端（相對路徑＝跟本網頁同一個網址，不會有 CORS 問題）
+        fetch('/api/member/oauth/google', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',                 // 讓瀏覽器收下後端發的登入 cookie
+            body: JSON.stringify({ idToken: idToken })
+        })
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('output').textContent =
+                    '登入成功！後端回傳的會員資料：\n' + JSON.stringify(data, null, 2);
+            })
+            .catch(err => {
+                document.getElementById('output').textContent = '登入失敗：' + err;
+            });
+    }
+</script>
+</body>
+</html>
