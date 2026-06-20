@@ -6,15 +6,13 @@ public class OAuthUserInfo {
     private String email;
     private String name;
     private String providerId;              // Google 的使用者唯一編號（JWT 的 "sub"）
-    private boolean emailVerified;
 
     public OAuthUserInfo(){}
 
-    public OAuthUserInfo(String email, String name, String providerId, boolean emailVerified) {
+    public OAuthUserInfo(String email, String name, String providerId) {
         this.email = email;
         this.name = name;
         this.providerId = providerId;
-        this.emailVerified = emailVerified;
     }
 
     public String getEmail() {
@@ -41,11 +39,4 @@ public class OAuthUserInfo {
         this.providerId = providerId;
     }
 
-    public boolean isEmailVerified() {
-        return emailVerified;
-    }
-
-    public void setEmailVerified(boolean emailVerified) {
-        this.emailVerified = emailVerified;
-    }
 }
