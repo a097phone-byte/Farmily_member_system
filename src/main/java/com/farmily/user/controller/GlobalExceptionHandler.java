@@ -3,6 +3,7 @@ package com.farmily.user.controller;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -10,7 +11,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    // 密碼錯誤、帳號不存在（故意給同一個訊息，避免帳號探測）
+    // 密碼錯誤、帳號不存在、Google token 無效
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<String> handleBadCredentials(BadCredentialsException e) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
@@ -30,8 +31,14 @@ public class GlobalExceptionHandler {
 
     // 驗證失敗
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<String> handleGeneral(MethodArgumentNotValidException e) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("驗證失敗");
+    public ResponseEntity<String> handleValidation(MethodArgumentNotValidException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("驗證失敗");
+    }
+
+    // 用錯 HTTP 方法
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<String> handleMethodNotSupported(HttpRequestMethodNotSupportedException e) {
+        return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body("不支援的請求方法");
     }
 
     // 其他未預期錯誤

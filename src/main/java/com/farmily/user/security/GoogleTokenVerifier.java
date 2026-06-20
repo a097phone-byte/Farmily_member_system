@@ -2,6 +2,7 @@ package com.farmily.user.security;
 
 import com.farmily.user.dto.GoogleTokenInfo;
 import com.farmily.user.dto.OAuthUserInfo;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
@@ -26,17 +27,17 @@ public class GoogleTokenVerifier {
         try {
             info = restTemplate.getForObject(tokenUrl, GoogleTokenInfo.class);
         } catch (Exception e) {
-            throw new RuntimeException("Google 登入失敗：token 無效或已過期");      // 錯誤或過期 id_token，Google 會回錯誤
+            throw new BadCredentialsException("Google 登入失敗：token 無效或已過期");      // 錯誤或過期 id_token，Google 會回錯誤
         }
 
         // 沒拿到資料 = 登入失敗
         if(info == null){
-            throw new RuntimeException("Google 登入失敗：拿不到資料");
+            throw new BadCredentialsException("Google 登入失敗：拿不到資料");
         }
 
         // step4. 檢查回傳資料是給我們 aud (JWT) = google client id
         if( !GOOGLE_CLIENT_ID.equals(info.getAud()) ){
-            throw new RuntimeException("Google 登入失敗：此 token 不是給本應用");
+            throw new BadCredentialsException("Google 登入失敗：此 token 不是給本應用");
         }
 
         // step5. 驗證通過，把使用者資料整理成 OAuthUserInfo 交出去
