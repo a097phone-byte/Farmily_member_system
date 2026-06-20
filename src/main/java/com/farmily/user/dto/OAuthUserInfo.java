@@ -1,17 +1,20 @@
 package com.farmily.user.dto;
 
+// 接住由 GoogleTokenVerifier 回傳 Google 已驗證後的資料 (處理過)，轉交給 Service 處理
 public class OAuthUserInfo {
 
     private String email;
     private String name;
-    private String providerId;
+    private String providerId;              // Google 的使用者唯一編號（JWT 的 "sub"）
+    private boolean emailVerified;
 
     public OAuthUserInfo(){}
 
-    public OAuthUserInfo(String email, String name, String providerId) {
+    public OAuthUserInfo(String email, String name, String providerId, boolean emailVerified) {
         this.email = email;
         this.name = name;
         this.providerId = providerId;
+        this.emailVerified = emailVerified;
     }
 
     public String getEmail() {
@@ -36,5 +39,13 @@ public class OAuthUserInfo {
 
     public void setProviderId(String providerId) {
         this.providerId = providerId;
+    }
+
+    public boolean isEmailVerified() {
+        return emailVerified;
+    }
+
+    public void setEmailVerified(boolean emailVerified) {
+        this.emailVerified = emailVerified;
     }
 }

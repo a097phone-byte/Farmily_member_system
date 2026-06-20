@@ -8,6 +8,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+// 把會員包成 Spring Security 認得的「身分物件」
 @Service
 public class MemberUserDetailsService implements UserDetailsService {
 
@@ -32,4 +33,12 @@ public class MemberUserDetailsService implements UserDetailsService {
         // step3: 包成自製的 MemberUserDetails 回傳
         return new MemberUserDetails(user);
     }
+
+    // OAuth2.0 用: 已經通過 token 驗證，直接把會員撈出來、包成登入身分
+    public UserDetails loadForOAuth(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("查無此帳號: " + email));
+        return new MemberUserDetails(user);
+    }
+
 }

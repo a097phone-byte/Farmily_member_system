@@ -34,7 +34,7 @@ public class UserServiceImpl implements UserService {
         this.emailUniquenessChecker = emailUniquenessChecker;
     }
 
-    // 註冊流程
+    // 本地註冊流程
     @Override
     public UserProfileResponse register(UserRegisterRequest reg) {
 
@@ -88,7 +88,7 @@ public class UserServiceImpl implements UserService {
         return UserProfileResponse.from(userRepository.save(newUser));
     }
 
-    // 登入流程
+    // 本地登入流程
     @Override
     @Transactional(readOnly = true)
     public UserProfileResponse login(LoginRequest log) {
@@ -166,7 +166,6 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
     }
 
-
     // 刪除資料
     @Override
     public void deleteUser(Integer userId) {
@@ -179,8 +178,46 @@ public class UserServiceImpl implements UserService {
     // OAuth 2.0 註冊登入
     @Override
     public UserProfileResponse loginOrRegisterOAuth(OAuthUserInfo info) {
-        return null;
-    }
+        // step1. 先用 Google 驗證可信 info 的 provider_id 找會員
+        User user = userRepository.findByProviderId(info.getProviderId()).orElse(null);
 
+        // step2. 用 id 找不到，改用 email 找
+        if(user == null){
+            user = userRepository.findByEmail(info.getEmail()).orElse(null);
+
+            // 若 email 存在
+            if(user != null){
+                // 則此會員有本地帳號+密碼，多榜定 Google 回傳的 provider_id
+                user.setProviderId(info.getProviderId());
+
+                if(user.getPassword() == null){
+                    user.setAuthProvider(User.AuthProvider.GOOGLE);
+                }
+            }
+        }
+        // step3. id、email 都找不到，進入註冊會員流程
+        if(user == null) {
+            user = new User();
+            user.setEmail(info.getEmail());
+            user.setUserName(info.getName());
+            user.setPassword(null);
+            user.setAuthProvider(User.AuthProvider.GOOGLE);
+            user.setProviderId(info.getProviderId());
+            user.setEmailVerified(true);
+            user.setUserCreatedAt(LocalDateTime.now());
+            user.setMonthlySpending(0);
+            user.setUserStatus(User.UserStatus.ACTIVE);
+            user.setFarmerIdentity(false);
+        }
+
+        // step4. 限制被停權、註銷帳號不能登入
+        if (user.getUserStatus() == User.UserStatus.SUSPENDED
+                || user.getUserStatus() == User.UserStatus.DELETED) {
+            throw new IllegalStateException("此帳號已遭停權或終止，有任何疑問請聯繫客服");
+        }
+
+        // 包裝會員資料成 dto 給 Controller
+        return UserProfileResponse.from(userRepository.save(user));
+    }
 }
 

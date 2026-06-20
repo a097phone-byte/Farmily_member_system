@@ -85,7 +85,7 @@ public class UserSecurityConfig {
                                         "/api/member/oauth/**").permitAll()
                         .anyRequest().hasRole("USER")
                 )
-                // OAuth 2.0 社交登入
+                // OAuth 2.0 社交登入 - 交給 Spring Security 處理
 //                .oauth2Login(oauth2 -> oauth2
 //                        .userInfoEndpoint(infoEndpoint -> infoEndpoint
 //                                .oidcUserService(myOidcUserService)

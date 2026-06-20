@@ -11,13 +11,18 @@ import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Integer> {
 
-    // -- 會員端用 --
     Optional<User> findByEmail(String email);
-
-    Optional<User> findByAuthProviderAndProviderId(User.AuthProvider authProvider, String providerId);
 
     // 檢查 email 全系統唯一
     boolean existsByEmail(String email);
+
+    // OAuth: 用 Google 的編號 (providerId) 找會員
+    Optional<User> findByProviderId(String providerId);
+
+
+
+
+
 
 
 //    // -- 管理員端用:keyword 比對會員 email 或會員姓名; status 比對會員狀態,皆可為 null --

@@ -1,6 +1,7 @@
 package com.farmily.user.controller;
 
 import com.farmily.user.dto.*;
+import com.farmily.user.security.GoogleTokenVerifier;
 import com.farmily.user.security.MemberUserDetails;
 import com.farmily.user.security.service.MemberUserDetailsService;
 import com.farmily.user.service.UserService;
@@ -22,11 +23,12 @@ public class UserController {
 
     private final UserService userService;
     private final MemberUserDetailsService memberUserDetailsService;
+    private final GoogleTokenVerifier googleTokenVerifier;
 
-    public UserController(UserService userService,
-                          MemberUserDetailsService memberUserDetailsService) {
+    public UserController(UserService userService, MemberUserDetailsService memberUserDetailsService, GoogleTokenVerifier googleTokenVerifier) {
         this.userService = userService;
         this.memberUserDetailsService = memberUserDetailsService;
+        this.googleTokenVerifier = googleTokenVerifier;
     }
 
     // 一般會員註冊
@@ -52,7 +54,7 @@ public class UserController {
         UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authToken);
 
-        // step3: 把 SecurityContext 存進 HttpSession，後續請求才能持續認得他
+        // step3: 把登入狀態存進 session，並回一個 cookie 給前端
         HttpSession session = request.getSession(true);
         session.setAttribute(
                 HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
@@ -94,5 +96,30 @@ public class UserController {
         return ResponseEntity.ok("註銷成功!");
     }
 
+    // OAuth2.0 註冊登入 (前端拿到 id_token 後 POST 到這裡進行驗證 - 同比對本地密碼邏輯)
+    @PostMapping("/oauth/google")
+    public ResponseEntity<UserProfileResponse> googleLogin(
+            @RequestBody @Valid GoogleLoginRequest req,
+            HttpServletRequest request){
+
+        // Google 驗證 token，拿使用者身分
+        OAuthUserInfo info = googleTokenVerifier.verify(req.getIdToken());
+
+        // 找會員，找不到就新增
+        UserProfileResponse response = userService.loginOrRegisterOAuth(info);
+
+        // 建立登入狀態（改用 loadForOAuth）
+        UserDetails userDetails = memberUserDetailsService.loadForOAuth(info.getEmail());
+        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(authToken);
+
+        // 把登入狀態存進 session，並回一個 cookie 給前端
+        HttpSession session = request.getSession(true);
+        session.setAttribute(
+                HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
+                SecurityContextHolder.getContext());
+
+        return ResponseEntity.ok(response);
+    }
 
 }
