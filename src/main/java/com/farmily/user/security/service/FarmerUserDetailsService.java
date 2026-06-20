@@ -8,6 +8,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+// "How" to find Farmer ?
 @Service
 public class FarmerUserDetailsService implements UserDetailsService {
 
@@ -24,7 +25,7 @@ public class FarmerUserDetailsService implements UserDetailsService {
         Farmer farmer = farmerRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("查無此帳號: " + email));
 
-        // step2: 包成自製的 FarmerUserDetails 回傳
+        // step2: 包成自製的 FarmerUserDetails 身分格式回傳
         return new FarmerUserDetails(farmer);
     }
 }
