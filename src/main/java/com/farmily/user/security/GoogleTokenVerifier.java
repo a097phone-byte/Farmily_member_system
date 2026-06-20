@@ -9,8 +9,8 @@ import org.springframework.web.client.RestTemplate;
 @Component
 public class GoogleTokenVerifier {
 
-    private String GOOGLE_CLIENT_ID = "528090060943-7sgcdr6p2efr41ej2vosotljcstbq1u1.apps.googleusercontent.com";
-    private String GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/tokeninfo?id_token=";
+    private final String GOOGLE_CLIENT_ID = "528090060943-mooi8topfu9g29umm7f67579vvsk553e.apps.googleusercontent.com";
+    private final String GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/tokeninfo?id_token=";
 
     // 由前端送進來的 id_token，向 Google 驗證，並回傳使用者資訊
     public OAuthUserInfo verify(String idToken){
