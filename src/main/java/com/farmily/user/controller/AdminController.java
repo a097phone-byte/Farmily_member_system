@@ -69,7 +69,7 @@ public class AdminController {
         return ResponseEntity.ok(adminService.getMyProfile(me.getAdminId()));
     }
 
-    // ====================== 管理員對管理員 CRUD ======================
+    // ====================== 管理員對其他管理員 CRUD ======================
     // 新增管理員
     @PostMapping("/admins")
     public ResponseEntity<AdminProfileResponse> createAdmin(

@@ -2,6 +2,7 @@ package com.farmily.user.service.impl;
 
 import com.farmily.user.dto.UserProfileResponse;
 import com.farmily.user.model.User;
+import com.farmily.user.repository.SpendingTierRepository;
 import com.farmily.user.repository.UserRepository;
 import com.farmily.user.service.AdminMemberService;
 import org.springframework.stereotype.Service;
@@ -16,11 +17,12 @@ import java.util.List;
 public class AdminMemberServiceImpl implements AdminMemberService {
 
     private final UserRepository userRepository;
+    private final SpendingTierRepository spendingTierRepository;
 
-    public AdminMemberServiceImpl(UserRepository userRepository) {
+    public AdminMemberServiceImpl(UserRepository userRepository, SpendingTierRepository spendingTierRepository) {
         this.userRepository = userRepository;
+        this.spendingTierRepository = spendingTierRepository;
     }
-
 
     // 列出所有會員：DB 撈出轉 DTO
     @Override
@@ -28,8 +30,13 @@ public class AdminMemberServiceImpl implements AdminMemberService {
     public List<UserProfileResponse> listAll() {
         List<User> users = userRepository.findAll();
         List<UserProfileResponse> result = new ArrayList<>();
+
         for (User u : users) {
-            result.add(UserProfileResponse.from(u));
+            // +消費級距
+            Integer amount = u.getMonthlySpending() != null ? u.getMonthlySpending() : 0;
+            String tierName = spendingTierRepository.findTierNameByAmount(amount);
+
+            result.add(UserProfileResponse.from(u, tierName));
         }
         return result;
     }
@@ -40,7 +47,12 @@ public class AdminMemberServiceImpl implements AdminMemberService {
     public UserProfileResponse getById(Integer userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("查無此會員"));
-        return UserProfileResponse.from(user);
+
+        // +消費級距
+        Integer amount = user.getMonthlySpending() != null ? user.getMonthlySpending() : 0;
+        String tierName = spendingTierRepository.findTierNameByAmount(amount);
+
+        return UserProfileResponse.from(user, tierName);
     }
 
     // 改狀態：字串轉 enum

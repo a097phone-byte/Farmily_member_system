@@ -18,6 +18,7 @@ public class UserProfileResponse {
     private String distName;
     private LocalDate birthday;
     private Integer monthlySpending;
+    private String spendingTier;
     private Boolean emailVerified;
     private Boolean farmerIdentity;
     private String authProvider;      // 讓前端知道這帳號是 LOCAL/GOOGLE
@@ -56,6 +57,9 @@ public class UserProfileResponse {
     public Integer getMonthlySpending() {
         return monthlySpending;
     }
+    public String getSpendingTier() {
+        return spendingTier;
+    }
     public Boolean getEmailVerified() {
         return emailVerified;
     }
@@ -76,7 +80,7 @@ public class UserProfileResponse {
     }
 
     // 自訂 from() 方法
-    public static UserProfileResponse from(User u) {
+    public static UserProfileResponse from(User u, String...spendingTier) {
 
         UserProfileResponse dto = new UserProfileResponse();
         dto.userId = u.getUserId();
@@ -91,12 +95,16 @@ public class UserProfileResponse {
         }
         dto.birthday = u.getBirthday();
         dto.monthlySpending = u.getMonthlySpending();
+        if (spendingTier.length > 0) {
+            dto.spendingTier = spendingTier[0];
+        }
         dto.emailVerified = u.getEmailVerified();
         dto.farmerIdentity = u.getFarmerIdentity();
         dto.authProvider = u.getAuthProvider() != null ? u.getAuthProvider().name() : null;
         dto.hasPassword = u.getPassword() != null;
         dto.userCreatedAt = u.getUserCreatedAt();
         dto.userStatus = u.getUserStatus();
+
         return dto;
     }
 

@@ -15,7 +15,7 @@ public interface AdminRepository extends JpaRepository<Admin, Integer> {
     Optional<Admin> findByAdminEmail (String adminEmail);
     boolean existsByAdminEmail (String adminEmail);     // 檢查 email 全系統唯一
 
-    // 從中介表 AdminPermissionRole 合併 AdminRole，取出 permissionCode
+    // 從中介表 AdminPermissionRole 合併 AdminRole，查權限代碼 permissionCode
     @Query(value =
             "SELECT admin_role.permission_code " +
                     "FROM admin_permission_role " +

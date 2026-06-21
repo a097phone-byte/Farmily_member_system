@@ -4,6 +4,7 @@ import com.farmily.user.dto.*;
 import com.farmily.user.model.CityDistrict;
 import com.farmily.user.model.User;
 import com.farmily.user.repository.CityDistrictRepository;
+import com.farmily.user.repository.SpendingTierRepository;
 import com.farmily.user.repository.UserRepository;
 
 import com.farmily.user.service.EmailUniquenessChecker;
@@ -23,15 +24,14 @@ public class UserServiceImpl implements UserService {
     private final CityDistrictRepository cityDistrictRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailUniquenessChecker emailUniquenessChecker;
+    private final SpendingTierRepository spendingTierRepository;
 
-    public UserServiceImpl(UserRepository userRepository,
-                           CityDistrictRepository cityDistrictRepository,
-                           PasswordEncoder passwordEncoder,
-                           EmailUniquenessChecker emailUniquenessChecker) {
+    public UserServiceImpl(UserRepository userRepository, CityDistrictRepository cityDistrictRepository, PasswordEncoder passwordEncoder, EmailUniquenessChecker emailUniquenessChecker, SpendingTierRepository spendingTierRepository) {
         this.userRepository = userRepository;
         this.cityDistrictRepository = cityDistrictRepository;
         this.passwordEncoder = passwordEncoder;
         this.emailUniquenessChecker = emailUniquenessChecker;
+        this.spendingTierRepository = spendingTierRepository;
     }
 
     // 本地註冊流程
@@ -119,7 +119,12 @@ public class UserServiceImpl implements UserService {
     public UserProfileResponse getMyProfile(Integer userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("查無此用戶"));
-        return UserProfileResponse.from(user);
+
+        // +消費級距 (不同表)
+        Integer amount = user.getMonthlySpending() != null ? user.getMonthlySpending() : 0;
+        String tierName = spendingTierRepository.findTierNameByAmount(amount);
+
+        return UserProfileResponse.from(user, tierName);
     }
 
     // 修改資料

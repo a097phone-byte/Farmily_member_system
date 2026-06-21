@@ -31,18 +31,16 @@ public class AdminProfileResponse {
     }
 
     // 自訂 from() 方法
-    public static AdminProfileResponse from(Admin a){
+    @SafeVarargs
+    public static AdminProfileResponse from(Admin a, List<String>...permissionCodes){
         AdminProfileResponse dto = new AdminProfileResponse();
         dto.adminId = a.getAdminId();
         dto.adminEmail = a.getAdminEmail();
         dto.adminName = a.getAdminName();
         dto.adminStatus = a.getAdminStatus() != null ? a.getAdminStatus().name() : null;
-        return dto;
-    }
-
-    public static AdminProfileResponse from(Admin a, List<String> codes){
-        AdminProfileResponse dto = from(a);   // 先用上面那個填基本欄位
-        dto.permissionCodes = codes;          // 再補上權限
+        if (permissionCodes.length > 0) {
+            dto.permissionCodes = permissionCodes[0];
+        }
         return dto;
     }
 

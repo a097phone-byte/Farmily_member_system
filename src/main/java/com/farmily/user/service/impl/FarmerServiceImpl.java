@@ -113,7 +113,6 @@ public class FarmerServiceImpl implements FarmerService {
     @Override
     public FarmerProfileResponse updateContactInfo(Integer farmerId, FarmerProfileUpdateRequest req) {
         Farmer farmer = findFarmer(farmerId);
-
         if(req.getFarmerPhoneNum() != null)
             farmer.setFarmerPhoneNum(req.getFarmerPhoneNum());
         if(req.getFarmDesc() != null)
