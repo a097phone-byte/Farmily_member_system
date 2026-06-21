@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Farmily 你儂我農</title>
+
+    <!-- 全站樣式 -->
+    <link rel="stylesheet" href="css/style.css" />
+
+    <!-- 【第 1 步】用 script 標籤載入 Vue 3（CDN 版）。
+         載入後，全域會多出一個叫 Vue 的變數，後面 js 就能用 Vue.createApp 等。
+         （想離線使用的話：把這個檔下載到 static/vendors/vue/ 再改成本機路徑） -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+
+    <!-- Google 官方登入函式庫（讓 window.google 可用） -->
+    <script src="https://accounts.google.com/gsi/client" async></script>
+
+</head>
+<body>
+<!-- Vue 會把整個畫面「掛載」到這個 div 裡 -->
+<div id="app"></div>
+
+<!-- 【第 2 步】載入我們自己的程式。
+     type="module" 是關鍵：有了它，js 檔之間才能用 import / export 互相引用
+     （這就是教學第 2 章教的 ESM 模組寫法）。 -->
+<script type="module" src="js/app.js"></script>
+</body>
+</html>

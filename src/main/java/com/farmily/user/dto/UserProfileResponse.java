@@ -14,6 +14,7 @@ public class UserProfileResponse {
     private String userNickname;
     private String userPhoneNum;
     private String userAddress;
+    private Integer districtId;
     private String cityName;
     private String distName;
     private LocalDate birthday;
@@ -44,6 +45,9 @@ public class UserProfileResponse {
     }
     public String getUserAddress() {
         return userAddress;
+    }
+    public Integer getDistrictId() {
+        return districtId;
     }
     public String getCityName() {
         return cityName;
@@ -90,6 +94,7 @@ public class UserProfileResponse {
         dto.userPhoneNum = u.getUserPhoneNum();
         dto.userAddress = u.getUserAddress();
         if (u.getCityDistrict() != null) {
+            dto.districtId = u.getCityDistrict().getDistrictId();
             dto.cityName = u.getCityDistrict().getCityName();
             dto.distName = u.getCityDistrict().getDistName();
         }

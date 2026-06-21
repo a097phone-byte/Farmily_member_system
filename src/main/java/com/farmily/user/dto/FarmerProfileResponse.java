@@ -12,6 +12,7 @@ public class FarmerProfileResponse {
     private String email;
     private String farmName;
     private String farmAddress;
+    private Integer districtId;
     private String cityName;
     private String distName;
     private String farmerPhoneNum;
@@ -35,6 +36,9 @@ public class FarmerProfileResponse {
     }
     public String getFarmAddress() {
         return farmAddress;
+    }
+    public Integer getDistrictId() {
+        return districtId;
     }
     public String getCityName() {
         return cityName;
@@ -75,6 +79,7 @@ public class FarmerProfileResponse {
         dto.farmName = f.getFarmName();
         dto.farmAddress = f.getFarmAddress();
         if (f.getCityDistrict() != null) {
+            dto.districtId = f.getCityDistrict().getDistrictId();
             dto.cityName = f.getCityDistrict().getCityName();
             dto.distName = f.getCityDistrict().getDistName();
         }

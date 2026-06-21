@@ -1,0 +1,143 @@
+/* ============ 主題變數（要調色改這裡就好）============ */
+:root {
+    --bg: #161b16;          /* 頁面底色 */
+    --surface: #1c221c;     /* 卡片底色 */
+    --surface-2: #222a22;   /* 輸入框底色 */
+    --border: #2a332a;
+    --border-strong: #3a453a;
+    --text: #e7efe4;
+    --text-muted: #9aab97;
+    --text-faint: #7f8d7c;
+    --brand: #5a9e2e;       /* 主綠 */
+    --brand-dark: #1e3a1e;  /* 導覽列深綠 */
+    --brand-light: #8fd167;
+    --danger: #ff8a80;
+    --gold: #f0cd7a;
+    --radius: 12px;
+}
+
+* { box-sizing: border-box; }
+body {
+    margin: 0; font-family: "Microsoft JhengHei", system-ui, sans-serif;
+    color: var(--text); background: var(--bg); line-height: 1.6;
+}
+h1, h2, h3 { color: var(--text); font-weight: 600; margin-top: 0; }
+a { color: var(--brand-light); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* ============ 導覽列 ============ */
+.navbar {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 12px 22px; background: var(--brand-dark); color: var(--text);
+    position: sticky; top: 0; z-index: 10;
+}
+.navbar .brand { font-weight: 700; font-size: 20px; cursor: pointer; color: var(--text); }
+.navbar nav { display: flex; gap: 10px; align-items: center; }
+.navbar nav a { color: #cfe0cb; }
+.navbar nav .hi { color: var(--text-muted); font-size: 14px; }
+.navbar nav button {
+    cursor: pointer; border: none; padding: 7px 14px; border-radius: 8px;
+    background: #2c452c; color: var(--text); font-size: 14px;
+}
+
+/* ============ 內容區 / 頁尾 ============ */
+.content { max-width: 920px; margin: 28px auto; padding: 0 18px; min-height: 60vh; }
+.footer {
+    text-align: center; padding: 24px; color: var(--text-faint); font-size: 13px;
+    border-top: 1px solid var(--border); margin-top: 40px;
+}
+.footer a { color: var(--text-faint); }
+
+/* ============ 按鈕 ============ */
+button, .btn {
+    padding: 10px 16px; background: var(--brand); color: #0f1a08;
+    border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600;
+    transition: filter .15s ease;
+}
+button:hover, .btn:hover { filter: brightness(1.08); }
+button:disabled { opacity: .55; cursor: default; filter: none; }
+.btn-ghost { background: transparent; color: var(--brand-light); border: 1px solid var(--brand); }
+.btn-block { width: 100%; }
+
+/* ============ 表單 ============ */
+label { display: flex; flex-direction: column; gap: 5px; font-size: 14px; color: var(--text-muted); }
+input, textarea, select {
+    padding: 10px; border: 1px solid var(--border-strong); border-radius: 8px;
+    font-size: 14px; background: var(--surface-2); color: var(--text); width: 100%;
+    transition: border-color .15s, box-shadow .15s;
+}
+input:focus, textarea:focus, select:focus {
+    outline: none; border-color: var(--brand);
+    box-shadow: 0 0 0 3px rgba(90,158,46,.25);   /* 聚焦光環 */
+}
+input::placeholder, textarea::placeholder { color: var(--text-faint); }
+
+/* ============ 卡片 / 區塊 ============ */
+.box, .card {
+    border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 18px; background: var(--surface);
+}
+.box { margin-bottom: 16px; }
+.err { color: var(--danger); font-size: 14px; }
+.ok  { color: var(--brand-light); font-size: 14px; }
+
+/* ============ 登入/註冊/申請：卡片 + 分頁 ============ */
+.auth { max-width: 420px; margin: 8px auto; }
+.auth-card { border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); padding: 22px; }
+.tabs { display: flex; gap: 6px; margin-bottom: 18px; background: var(--surface-2); padding: 5px; border-radius: 10px; }
+.tabs .tab {
+    flex: 1; text-align: center; padding: 9px; border-radius: 8px; cursor: pointer;
+    background: transparent; color: var(--text-muted); font-weight: 600; border: none;
+}
+.tabs .tab.active { background: var(--brand); color: #0f1a08; }
+.form-grid { display: flex; flex-direction: column; gap: 12px; }
+
+/* 分隔線（「或」） + Google 按鈕 */
+.divider { display: flex; align-items: center; gap: 10px; color: var(--text-faint); font-size: 12px; margin: 16px 0; }
+.divider::before, .divider::after { content: ""; flex: 1; height: 1px; background: var(--border); }
+.btn-google {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    width: 100%; height: 42px; cursor: pointer;
+    background: #fff; color: #3c4043; border: 1px solid #dadce0; border-radius: 8px;
+    font-size: 14px; font-weight: 600;
+}
+.btn-google:hover { filter: brightness(.98); }
+.btn-google svg { width: 18px; height: 18px; }
+.hint { font-size: 12px; color: var(--text-faint); text-align: center; margin-top: 10px; }
+
+/* ============ 首頁 ============ */
+.hero { text-align: center; padding: 54px 20px; background: var(--brand-dark); border-radius: 16px; }
+.hero h1 { font-size: 28px; }
+.hero p { color: #bcd1b6; font-size: 16px; }
+.entry-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; margin-top: 26px; }
+.entry-card { border: 1px solid var(--border); border-radius: var(--radius); padding: 26px; background: var(--surface); text-align: center; }
+.entry-card .ico { font-size: 42px; }
+.entry-card h3 { margin: 10px 0 6px; }
+.entry-card p { color: var(--text-muted); font-size: 14px; min-height: 40px; }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; margin-top: 28px; }
+.card { text-align: center; }
+.soon { color: var(--text-faint); font-size: 13px; }
+
+/* ============ 資料列 / 徽章 ============ */
+.rw { display: flex; justify-content: space-between; font-size: 14px; padding: 8px 0; border-bottom: 1px solid var(--border); }
+.rw .k { color: var(--text-muted); }
+.tier { background: #3a331c; color: var(--gold); padding: 2px 9px; border-radius: 6px; font-size: 13px; }
+.pill { display: inline-block; background: #26333b; color: #a9c6d4; padding: 3px 10px; border-radius: 999px; margin: 0 6px 6px 0; font-size: 13px; }
+.pill.super { background: #3a331c; color: var(--gold); }
+
+/* ============ 後台選單 ============ */
+.menu { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 14px; }
+.tile { border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; text-align: center; cursor: pointer; background: var(--surface); }
+.tile:hover { border-color: var(--brand); }
+.tile.off { opacity: .42; cursor: not-allowed; }
+.tile.off:hover { border-color: var(--border); }
+
+/* 密碼欄的「顯示/隱藏」眼睛 */
+.pw-wrap { position: relative; }
+.pw-wrap input { padding-right: 44px; }
+.pw-toggle {
+    position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
+    background: transparent; border: none; padding: 6px; color: var(--text-muted);
+    cursor: pointer; display: flex; align-items: center;
+}
+.pw-toggle:hover { color: var(--text); filter: none; }

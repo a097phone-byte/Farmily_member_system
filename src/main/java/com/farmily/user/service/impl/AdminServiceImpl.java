@@ -43,7 +43,10 @@ public class AdminServiceImpl implements AdminService {
                 admin.getAdminStatus() == Admin.AdminStatus.DELETED) {
             throw new IllegalStateException("此帳號已被停權或終止");
         }
-        return AdminProfileResponse.from(admin);
+        // 登入也查權限
+        List<String> codes = adminRepository.findPermissionCodesByAdminId(admin.getAdminId());
+
+        return AdminProfileResponse.from(admin, codes);
     }
 
     // 管理員修改自己的資料（只能改名字，不能改狀態或權限）

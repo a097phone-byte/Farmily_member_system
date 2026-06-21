@@ -41,7 +41,12 @@ public class UserSecurityConfig {
 
                 .cors(Customizer.withDefaults())
 //                .formLogin(Customizer.withDefaults())    // 關掉預設 form 登入，改自定義登入，避免背景監聽 login
-                .httpBasic(Customizer.withDefaults());     // API call: Authorization Basic XXX
+//                .httpBasic(Customizer.withDefaults());     // API call: Authorization Basic XXX
+
+                .httpBasic(basic -> basic.disable())
+                // 未登入時只回 401 狀態碼（不跳原生視窗），讓前端自己導去我們自訂的登入頁
+                .exceptionHandling(ex -> ex.authenticationEntryPoint(
+                        (request, response, authEx) -> response.sendError(401)));
     }
 
 
@@ -57,12 +62,11 @@ public class UserSecurityConfig {
                         // 細部權限管理 (ADMIN_ROLE) 注意有順序                        # 需補上其他組員的 API
                         .requestMatchers("/api/admin/admins/**").hasAuthority("PERM_ADMIN")
 
-                        .requestMatchers("/api/admin/farmers/**","/api/admin/reviews/**")
+                        .requestMatchers("/api/admin/farmers/**", "/api/admin/reviews/**")
                         .hasAnyAuthority("PERM_ADMIN", "PERM_FARMER")
 
                         .requestMatchers("/api/admin/members/**")
                         .hasAnyAuthority("PERM_ADMIN", "PERM_MEMBER")
-
 
 
                         // 其餘 ("/api/admin/me")，登入的管理員都能用
@@ -113,7 +117,12 @@ public class UserSecurityConfig {
     public SecurityFilterChain defaultChain(HttpSecurity http) throws Exception {
         return commonSetup(http)
                 .authorizeHttpRequests(request -> request
+                        // 前端靜態檔
+                        .requestMatchers("/", "/index.html", "/admin.html", "/css/**", "/js/**", "/vendors/**", "/favicon.ico").permitAll()
                         .requestMatchers("/oauth-test.html").permitAll()        // OAuth2.0 測試用
+
+                        // 公開：註冊/申請表單的縣市與行政區下拉要用
+                        .requestMatchers("/api/city-districts", "/api/city-districts/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .build();
