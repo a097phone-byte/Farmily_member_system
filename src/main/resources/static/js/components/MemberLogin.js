@@ -96,8 +96,9 @@ export default {
     updated() { if (this.mode === 'login') this.setupGoogle(); },
 
     template: `
-    <div class="auth">
+    <div class="auth-wrap">
       <div class="auth-card">
+        <h2>會員</h2>
         <div class="tabs">
           <button class="tab" :class="{active: mode==='login'}" @click="switchMode('login')">登入</button>
           <button class="tab" :class="{active: mode==='register'}" @click="switchMode('register')">註冊</button>
@@ -108,9 +109,9 @@ export default {
 
         <!-- 登入分頁 -->
         <form v-if="mode==='login'" class="form-grid" @submit.prevent="onLogin">
-          <label>Email <input v-model="login.email" type="email" required /></label>
-          <label>密碼 <password-field v-model="login.password" placeholder="密碼"></password-field></label>
-          <button class="btn-block" type="submit" :disabled="loading">{{ loading ? '登入中…' : '登入' }}</button>
+          <div class="field"><label>Email</label><input v-model="login.email" type="email" required /></div>
+          <div class="field"><label>密碼</label><password-field v-model="login.password" placeholder="密碼"></password-field></div>
+          <button class="btn block" type="submit" :disabled="loading">{{ loading ? '登入中…' : '登入' }}</button>
 
           <div class="divider">或</div>
           <div ref="gbtn" style="display:flex;justify-content:center"></div>
@@ -119,15 +120,15 @@ export default {
 
         <!-- 註冊分頁 -->
         <form v-else class="form-grid" @submit.prevent="onRegister">
-          <label>Email* <input v-model="reg.email" type="email" required /></label>
-          <label>密碼* <password-field v-model="reg.password" placeholder="至少 8 碼"></password-field></label>
-          <label>姓名* <input v-model="reg.userName" required /></label>
-          <label>暱稱 <input v-model="reg.userNickname" /></label>
-          <label>手機 <input v-model="reg.userPhoneNum" /></label>
-          <label>地址 <input v-model="reg.userAddress" /></label>
-          <label>所在地區 <district-picker v-model="reg.districtId"></district-picker></label>
-          <label>生日 <input v-model="reg.birthday" type="date" /></label>
-          <button class="btn-block" type="submit" :disabled="loading">{{ loading ? '送出中…' : '註冊' }}</button>
+          <div class="field"><label>Email *</label><input v-model="reg.email" type="email" required /></div>
+          <div class="field"><label>密碼 *</label><password-field v-model="reg.password" placeholder="至少 8 碼"></password-field></div>
+          <div class="field"><label>姓名 *</label><input v-model="reg.userName" required /></div>
+          <div class="field"><label>暱稱</label><input v-model="reg.userNickname" /></div>
+          <div class="field"><label>手機</label><input v-model="reg.userPhoneNum" /></div>
+          <div class="field"><label>地址</label><input v-model="reg.userAddress" /></div>
+          <div class="field"><label>所在地區</label><district-picker v-model="reg.districtId"></district-picker></div>
+          <div class="field"><label>生日</label><input v-model="reg.birthday" type="date" /></div>
+          <button class="btn block" type="submit" :disabled="loading">{{ loading ? '送出中…' : '註冊' }}</button>
         </form>
       </div>
     </div>

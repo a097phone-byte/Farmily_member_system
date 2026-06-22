@@ -12,6 +12,7 @@ public class FarmerReviewResponse {
 
     private Integer reviewId;
     private Integer farmerId;
+    private String farmName;
     private String farmerEmail;
     private Integer reviewRound;
     private String adminName;
@@ -36,6 +37,9 @@ public class FarmerReviewResponse {
     }
     public Integer getFarmerId() {
         return farmerId;
+    }
+    public String getFarmName() {
+        return farmName;
     }
     public String getFarmerEmail() {
         return farmerEmail;
@@ -97,6 +101,7 @@ public class FarmerReviewResponse {
         if (farmer != null) {
             dto.farmerId = farmer.getFarmerId();
             dto.farmerEmail = farmer.getEmail();
+            dto.farmName = farmer.getFarmName();
         }
 
         dto.reviewRound = r.getReviewRound();

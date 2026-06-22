@@ -17,14 +17,15 @@ export default {
         },
     },
     template: `
-    <div class="auth">
+    <div class="auth-wrap">
       <div class="auth-card">
-        <h2 style="text-align:center">管理員登入</h2>
+        <h2>管理後台</h2>
+        <p class="lead">請以管理員帳號登入</p>
         <form class="form-grid" @submit.prevent="onSubmit">
-          <label>Email <input v-model="email" type="email" required /></label>
-          <label>密碼 <password-field v-model="password" placeholder="密碼"></password-field></label>
+          <div class="field"><label>Email</label><input v-model="email" type="email" required /></div>
+          <div class="field"><label>密碼</label><password-field v-model="password" placeholder="密碼"></password-field></div>
           <p v-if="errorMsg" class="err">{{ errorMsg }}</p>
-          <button class="btn-block" type="submit" :disabled="loading">{{ loading ? '登入中…' : '登入' }}</button>
+          <button class="btn block" type="submit" :disabled="loading">{{ loading ? '登入中…' : '登入' }}</button>
         </form>
         <p class="hint">測試帳號：admin01@farm.com / admin1234（全權限）</p>
       </div>

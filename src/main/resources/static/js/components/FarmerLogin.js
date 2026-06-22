@@ -1,7 +1,10 @@
 import { store } from '../store.js';
 import { api } from '../api.js';
 import { navigate } from '../router.js';
+import { toast } from '../ui.js';
 import PasswordField from './PasswordField.js';
+import DistrictPicker from './DistrictPicker.js';
+import FileDrop from './FileDrop.js';
 
 function fileToBase64(file) {
     return new Promise((resolve, reject) => {
@@ -14,7 +17,7 @@ function fileToBase64(file) {
 
 export default {
     name: 'FarmerLogin',
-    components: { PasswordField },          // 註冊密碼元件
+    components: { PasswordField, DistrictPicker, FileDrop },
     data() {
         return {
             mode: 'login',
@@ -42,10 +45,8 @@ export default {
             } finally { this.loading = false; }
         },
 
-        onFile(event, key) { this.files[key] = event.target.files[0] || null; },
-
         grabLocation() {
-            if (!navigator.geolocation) { window.alert('此瀏覽器不支援定位'); return; }
+            if (!navigator.geolocation) { toast('此瀏覽器不支援定位', 'warn'); return; }
             navigator.geolocation.getCurrentPosition((pos) => {
                 this.apply.locLat = pos.coords.latitude.toFixed(8);
                 this.apply.locLong = pos.coords.longitude.toFixed(8);
@@ -71,8 +72,8 @@ export default {
 
                 await api.post('/farmer/register', payload);
 
-                // ✅ 成功：先彈窗告知，再清空表單、切到成功畫面
-                window.alert('申請已送出！請等待管理員審核，通過後才能登入。');
+                // ✅ 成功：toast 告知，再清空表單、切到成功畫面
+                toast('申請已送出！請等待管理員審核');
                 this.resetApplyForm();
                 this.submitted = true;
             } catch (e) {
@@ -83,20 +84,20 @@ export default {
         },
     },
     template: `
-    <div class="auth">
+    <div class="auth-wrap">
       <div class="auth-card">
 
         <!-- 申請成功畫面：取代表單，明確告知要等審核 -->
         <div v-if="submitted" style="text-align:center">
-          <div style="font-size:46px">✅</div>
           <h2>申請已送出</h2>
-          <p style="color:var(--text-muted)">你的小農申請已送出，請等待管理員審核。<br>審核通過後就能用 Email 與密碼登入。</p>
-          <button class="btn-block" @click="submitted=false; switchMode('login')">回到登入</button>
-          <p style="margin-top:10px"><a href="#/">回首頁</a></p>
+          <p class="muted">你的小農申請已送出，請等待管理員審核。<br>審核通過後就能用 Email 與密碼登入。</p>
+          <button class="btn block" @click="submitted=false; switchMode('login')">回到登入</button>
+          <p class="hint" style="margin-top:12px"><a href="#/">回首頁</a></p>
         </div>
 
         <!-- 正常的 登入 / 申請 分頁 -->
         <div v-else>
+          <h2>小農</h2>
           <div class="tabs">
             <button class="tab" :class="{active: mode==='login'}" @click="switchMode('login')">登入</button>
             <button class="tab" :class="{active: mode==='apply'}" @click="switchMode('apply')">申請加入</button>
@@ -106,31 +107,31 @@ export default {
           <p v-if="okMsg" class="ok">{{ okMsg }}</p>
 
           <form v-if="mode==='login'" class="form-grid" @submit.prevent="onLogin">
-            <label>Email <input v-model="login.email" type="email" required /></label>
-            <label>密碼 <password-field v-model="login.password" placeholder="密碼"></password-field></label>
-            <button class="btn-block" type="submit" :disabled="loading">{{ loading ? '登入中…' : '登入' }}</button>
+            <div class="field"><label>Email</label><input v-model="login.email" type="email" required /></div>
+            <div class="field"><label>密碼</label><password-field v-model="login.password" placeholder="密碼"></password-field></div>
+            <button class="btn block" type="submit" :disabled="loading">{{ loading ? '登入中…' : '登入' }}</button>
             <p class="hint">尚未通過審核或被退件無法登入</p>
           </form>
 
           <form v-else class="form-grid" @submit.prevent="onApply">
-            <label>Email* <input v-model="apply.email" type="email" required /></label>
-            <label>密碼* <password-field v-model="apply.password" placeholder="至少 8 碼"></password-field></label>
-            <label>農場名稱* <input v-model="apply.farmName" required /></label>
-            <label>農場地址* <input v-model="apply.farmAddress" required /></label>
-            <label>行政區 ID <input v-model.number="apply.districtId" type="number" placeholder="暫填數字" /></label>
-            <label>聯絡電話 <input v-model="apply.farmerPhoneNum" /></label>
-            <label>農場介紹 <textarea v-model="apply.farmDesc" rows="3"></textarea></label>
-            <label>緯度 / 經度
-              <div style="display:flex; gap:8px; align-items:center">
+            <div class="field"><label>Email *</label><input v-model="apply.email" type="email" required /></div>
+            <div class="field"><label>密碼 *</label><password-field v-model="apply.password" placeholder="至少 8 碼"></password-field></div>
+            <div class="field"><label>農場名稱 *</label><input v-model="apply.farmName" required /></div>
+            <div class="field"><label>農場地址 *</label><input v-model="apply.farmAddress" required /></div>
+            <div class="field"><label>所在地區</label><district-picker v-model="apply.districtId"></district-picker></div>
+            <div class="field"><label>聯絡電話</label><input v-model="apply.farmerPhoneNum" /></div>
+            <div class="field"><label>農場介紹</label><textarea v-model="apply.farmDesc" rows="3"></textarea></div>
+            <div class="field"><label>緯度 / 經度</label>
+              <div class="inline-fields">
                 <input v-model="apply.locLat" placeholder="緯度" />
                 <input v-model="apply.locLong" placeholder="經度" />
-                <button type="button" class="btn-ghost" @click="grabLocation" style="white-space:nowrap">自動抓取</button>
+                <button type="button" class="btn outline sm" @click="grabLocation">自動抓取</button>
               </div>
-            </label>
-            <label>土地證明 <input type="file" @change="onFile($event,'certFileLand')" /></label>
-            <label>產品證明 <input type="file" @change="onFile($event,'certFileProduct')" /></label>
-            <label>身分證明 <input type="file" @change="onFile($event,'certFileIdentity')" /></label>
-            <button class="btn-block" type="submit" :disabled="loading">{{ loading ? '送出中…' : '送出申請' }}</button>
+            </div>
+            <div class="field"><label>土地證明</label><file-drop v-model="files.certFileLand" label="土地證明"></file-drop></div>
+            <div class="field"><label>產品證明</label><file-drop v-model="files.certFileProduct" label="產品證明"></file-drop></div>
+            <div class="field"><label>身分證明</label><file-drop v-model="files.certFileIdentity" label="身分證明"></file-drop></div>
+            <button class="btn block" type="submit" :disabled="loading">{{ loading ? '送出中…' : '送出申請' }}</button>
           </form>
         </div>
 

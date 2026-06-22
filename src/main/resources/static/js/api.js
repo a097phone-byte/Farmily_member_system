@@ -9,16 +9,22 @@ async function apiFetch(path, options = {}) {
         ...options,
     });
 
-    // 後端用 HTTP 狀態碼表示成敗：不是 2xx 就視為錯誤丟出去
+    // 先把 body 讀出來：有些 API 回 JSON（資料），有些回純文字（例如登出回「已登出」）
+    const text = await res.text();
+    let data;
+    try { data = text ? JSON.parse(text) : null; } catch (e) { data = text; }
+
+    // 後端用 HTTP 狀態碼表示成敗：不是 2xx 就視為錯誤丟出去。
+    // 這裡保留後端傳回的訊息（純文字或 JSON），呼叫端才能顯示更精準的原因。
     if (!res.ok) {
-        const err = new Error('API 錯誤');
+        const msg = (typeof data === 'string' && data) ? data : 'API 錯誤';
+        const err = new Error(msg);
         err.status = res.status;                // 把狀態碼帶著，呼叫端可判斷 401/403/409…
+        err.body = data;                        // 後端原始回應（字串或物件），需要時可細看
         throw err;
     }
 
-    // 有些 API 回 JSON（資料），有些回純文字（例如登出回「已登出」）
-    const text = await res.text();
-    try { return JSON.parse(text); } catch (e) { return text; }
+    return data;
 }
 
 // 對外提供四個常用捷徑：get / post / put / del
