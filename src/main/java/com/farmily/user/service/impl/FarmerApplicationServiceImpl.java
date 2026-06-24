@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
+// 讓狀態尚未啟用小農 (狀態 PENDING) 可以查進度
 @Service
 @Transactional
 public class FarmerApplicationServiceImpl implements FarmerApplicationService {
@@ -45,7 +46,7 @@ public class FarmerApplicationServiceImpl implements FarmerApplicationService {
         return FarmerReviewResponse.from(latest);
     }
 
-    // 重新送審（只允許 PENDING；已通過初審需 call: /me/application）
+    // 重新送審（只允許小農狀態 PENDING + 審核狀態為 REJECTED 才能重新送審
     @Override
     public FarmerReviewResponse resubmit(PublicFarmerResubmitRequest req) {
 
@@ -55,7 +56,13 @@ public class FarmerApplicationServiceImpl implements FarmerApplicationService {
             throw new IllegalStateException("此帳號已通過審核，請登入後操作");
         }
 
+        // 查最新審核
         FarmerReview latest = farmerReviewRepository.findTopByFarmer_FarmerIdOrderByReviewRoundDesc(farmer.getFarmerId());
+
+        // 僅最新一輪審核狀態為 REJECTED 才能重新送審；審核中 PENDING/REVIEWING 一律擋下
+        if (latest == null || latest.getReviewStatus() != FarmerReview.ReviewStatus.REJECTED) {
+            throw new IllegalStateException("尚在審核中，需待退件後才能重新送審");
+        }
 
         // 計算重審次數
         int nextRound = (latest != null && latest.getReviewRound() != null)
@@ -78,7 +85,6 @@ public class FarmerApplicationServiceImpl implements FarmerApplicationService {
         review.setCertFileIdentity(req.getCertFileIdentity());
 
         return FarmerReviewResponse.from(farmerReviewRepository.save(review));
-
     }
 
 

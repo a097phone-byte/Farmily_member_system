@@ -2,26 +2,36 @@ package com.farmily.user.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 import java.math.BigDecimal;
 
 // 小農註冊申請請求端(api/farmer)
 public class FarmerRegisterRequest {
 
-    @Email @NotBlank
+    @Email
+    @NotBlank
     private String email;
 
     @NotBlank
+    @Size(min = 8)
     private String password;
 
     @NotBlank
     private String farmName;
+
     @NotBlank
     private String farmAddress;
 
     private Integer districtId;
+
+    @NotBlank
     private String farmerPhoneNum;
+
+    @NotBlank
     private String farmDesc;
+
     private BigDecimal locLat;      // 前端自動抓取後送入
     private BigDecimal locLong;
     private byte[] certFileLand;

@@ -71,7 +71,7 @@ public class FarmerProfileResponse {
         return hasPassword;
     }
 
-    // 自訂 from() 方法
+    // 自訂 from() 方法: Farmer + FarmerReview 聯表
     public static FarmerProfileResponse from(Farmer f, FarmerReview latestReview) {
         FarmerProfileResponse dto = new FarmerProfileResponse();
         dto.farmerId = f.getFarmerId();

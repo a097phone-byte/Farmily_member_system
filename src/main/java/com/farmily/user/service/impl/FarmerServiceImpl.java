@@ -42,12 +42,18 @@ public class FarmerServiceImpl implements FarmerService {
     @Override
     public FarmerProfileResponse register(FarmerRegisterRequest reg) {
 
-        CityDistrict district = findDistrict(reg.getDistrictId());
+        // step1: 先檢查是否存在相同小農帳號 (email)
+        Farmer existingFarmer = farmerRepository.findByEmail(reg.getEmail()).orElse(null);
 
-        // step1: 跨三張表檢查 email 是否已被使用
+        // 帳號不為 null = 重複註冊
+        if(existingFarmer != null){
+            throw new IllegalStateException("帳號已註冊使用");
+        }
+
+        // step2: 若 email = null，跨表檢查 email 全域唯一
         emailUniquenessChecker.emailAvailable(reg.getEmail());
 
-        // step2: email 不存在，走本地註冊流程
+        // step3: 小農帳號 (email) 不存在，走本地註冊流程
         Farmer newFarmer = new Farmer();
         newFarmer.setEmail(reg.getEmail());
 
@@ -61,17 +67,20 @@ public class FarmerServiceImpl implements FarmerService {
         newFarmer.setFarmerPhoneNum(reg.getFarmerPhoneNum());
         newFarmer.setLocLat(reg.getLocLat());
         newFarmer.setLocLong(reg.getLocLong());
+
+        CityDistrict district = findDistrict(reg.getDistrictId());
         newFarmer.setCityDistrict(district);
+
         newFarmer.setFarmerStatus(Farmer.FarmerStatus.PENDING);
         newFarmer.setFarmerCreatedAt(LocalDateTime.now());
         newFarmer.setUploadedAt(LocalDateTime.now());
 
-        // 必須先存 farmer 拿到 id，review 的 farmer_id 外鍵才有對象可指
+        // 必須先存 farmer 拿到 farmer_id，review 的 farmer_id 外鍵才有對象可指
         Farmer savedFarmer = farmerRepository.save(newFarmer);
 
-        // round 1 也存快取
+        // step4: 為剛申請的小農，建立第一筆審核快照
         FarmerReview review = newReviewSnapshot(
-                savedFarmer, 1,
+                savedFarmer, 1,                 // round 1
                 reg.getFarmName(), reg.getFarmAddress(),
                 district, reg.getLocLat(), reg.getLocLong(),
                 reg.getCertFileLand(), reg.getCertFileProduct(), reg.getCertFileIdentity());
@@ -98,7 +107,7 @@ public class FarmerServiceImpl implements FarmerService {
         if(farmer.getFarmerStatus() == Farmer.FarmerStatus.SUSPENDED){
             throw new IllegalStateException("此帳號已遭停權，若有任何疑問請聯繫客服");
         }
-        // 內含查最新 review
+        // 內含 farmer + 查最新 review
         return toResponse(farmer);
     }
 
@@ -134,7 +143,7 @@ public class FarmerServiceImpl implements FarmerService {
                         ? latest.getReviewRound() + 1
                         : 1;
 
-        // 呼叫工廠方法 newReviewSnapshot()，做一個 FarmerReview 物件
+        // 呼叫方法 newReviewSnapshot()，組裝一個審核快照物件
         FarmerReview review = newReviewSnapshot(
                 farmer, nextRound,
                 req.getFarmName(), req.getFarmAddress(),
@@ -149,12 +158,12 @@ public class FarmerServiceImpl implements FarmerService {
         return FarmerProfileResponse.from(farmer, savedReview);
     }
 
-
     // 修改密碼
     @Override
     public void changePassword(Integer farmerId, ChangePasswordRequest pw) {
         Farmer farmer = findFarmer(farmerId);
 
+        // 已有本地密碼，必須先驗證舊密碼正確
         if (farmer.getPassword() != null) {
             if (pw.getOldPassword() == null
                     || !passwordEncoder.matches(pw.getOldPassword(), farmer.getPassword())) {
@@ -165,7 +174,8 @@ public class FarmerServiceImpl implements FarmerService {
         farmerRepository.save(farmer);
     }
 
-    // 自訂工廠方法：組裝每次審核 (n+1) 的資料，回傳一個物件（register/resubmit 共用）
+
+    // 自定義方法：組裝每次審核 (n+1) 的資料，回傳一個物件（register/resubmit 共用）
     private FarmerReview newReviewSnapshot(
             Farmer farmer, int round,
             String farmName, String farmAddress, CityDistrict district,

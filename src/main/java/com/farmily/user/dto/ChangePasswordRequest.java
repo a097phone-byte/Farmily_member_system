@@ -1,6 +1,7 @@
 package com.farmily.user.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 public class ChangePasswordRequest {
 
@@ -8,6 +9,7 @@ public class ChangePasswordRequest {
     private String oldPassword;
 
     @NotBlank
+    @Size(min = 8)
     private String newPassword;
 
     public String getOldPassword() {

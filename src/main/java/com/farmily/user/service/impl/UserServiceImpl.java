@@ -60,7 +60,7 @@ public class UserServiceImpl implements UserService {
         // step2: 若 email = null，跨表檢查 email 全域唯一
         emailUniquenessChecker.emailAvailable(reg.getEmail());
 
-        // step3: 會員帳號(email)不存在，走本地註冊流程
+        // step3: 會員帳號 (email) 不存在，走本地註冊流程
         User newUser = new User();
         newUser.setEmail(reg.getEmail());
 

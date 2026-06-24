@@ -2,6 +2,7 @@ package com.farmily.user.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 import java.time.LocalDate;
 
@@ -13,6 +14,7 @@ public class UserRegisterRequest {
     private String email;
 
     @NotBlank
+    @Size(min = 8)
     private String password;        // 本地註冊一定要填
 
     @NotBlank
