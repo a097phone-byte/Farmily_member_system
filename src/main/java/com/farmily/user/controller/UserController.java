@@ -54,7 +54,7 @@ public class UserController {
         UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authToken);
 
-        // step3: 把登入狀態存進 session，並回一個 cookie 給前端
+        // step3: 把登入狀態存進 session，並回一個 session cookie 給前端
         HttpSession session = request.getSession(true);
         session.setAttribute(
                 HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
@@ -102,10 +102,10 @@ public class UserController {
             @RequestBody @Valid GoogleLoginRequest req,
             HttpServletRequest request){
 
-        // Google 驗證 token，拿使用者身分
+        // Google 驗證 token，拿使用者身分後清洗
         OAuthUserInfo info = googleTokenVerifier.verify(req.getIdToken());
 
-        // 找會員，找不到就新增
+        // 交由 loginOrRegisterOAuth 驗證登入或註冊
         UserProfileResponse response = userService.loginOrRegisterOAuth(info);
 
         // 建立登入狀態（改用 loadForOAuth）
@@ -113,7 +113,7 @@ public class UserController {
         UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authToken);
 
-        // 把登入狀態存進 session，並回一個 cookie 給前端
+        // 把登入狀態存進 session，並回一個 session cookie 給前端
         HttpSession session = request.getSession(true);
         session.setAttribute(
                 HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,

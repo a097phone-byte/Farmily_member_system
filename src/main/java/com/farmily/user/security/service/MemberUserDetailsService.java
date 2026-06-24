@@ -25,7 +25,7 @@ public class MemberUserDetailsService implements UserDetailsService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("查無此帳號: " + email));
 
-        // step2: 純第三方登入帳號沒有本地密碼，不能走帳密登入
+        // step2: Google OAuth 用 loadForOAuth() 驗證
         if (user.getPassword() == null) {
             throw new UsernameNotFoundException("此帳號為第三方登入，請改用第三方登入");
         }

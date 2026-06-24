@@ -26,7 +26,11 @@ public class UserServiceImpl implements UserService {
     private final EmailUniquenessChecker emailUniquenessChecker;
     private final SpendingTierRepository spendingTierRepository;
 
-    public UserServiceImpl(UserRepository userRepository, CityDistrictRepository cityDistrictRepository, PasswordEncoder passwordEncoder, EmailUniquenessChecker emailUniquenessChecker, SpendingTierRepository spendingTierRepository) {
+    public UserServiceImpl(UserRepository userRepository,
+                           CityDistrictRepository cityDistrictRepository,
+                           PasswordEncoder passwordEncoder,
+                           EmailUniquenessChecker emailUniquenessChecker,
+                           SpendingTierRepository spendingTierRepository) {
         this.userRepository = userRepository;
         this.cityDistrictRepository = cityDistrictRepository;
         this.passwordEncoder = passwordEncoder;
@@ -44,7 +48,7 @@ public class UserServiceImpl implements UserService {
         // 會員帳號 (email) 存在
         if (existingUser != null) {
 
-            // 狀況 A: 帳號「沒有本地密碼」，代表他只有第三方登入資訊 (需補上跳轉)
+            // 狀況 A: 帳號「沒有本地密碼」，代表他只有第三方登入資訊
             if (existingUser.getPassword() == null
                     && existingUser.getAuthProvider() == User.AuthProvider.GOOGLE) {
                 throw new IllegalStateException("此帳號已使用 Google 登入，請改用 Google 登入");
