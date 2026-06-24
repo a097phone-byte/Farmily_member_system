@@ -1,6 +1,6 @@
 package com.farmily.user.dto;
 
-// 接住由 GoogleTokenVerifier 回傳 Google 已驗證後的資料 (處理過)，轉交給 Service 處理
+// phase4. 接住由 GoogleTokenVerifier 回傳 Google 已驗證後的資料 (處理過)，轉交給 Service 處理
 public class OAuthUserInfo {
 
     private String email;

@@ -49,7 +49,7 @@ public class UserController {
         // step1: 呼叫 Service，判斷帳號狀態、比對密碼，回傳 dto
         UserProfileResponse response = userService.login(log);
 
-        // step2: 通知 Spring Security 此人已通過驗證
+        // step2: 呼叫 MemberUserDetailsService 查出 + 驗證身分
         UserDetails userDetails = memberUserDetailsService.loadUserByUsername(log.getEmail());
         UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authToken);

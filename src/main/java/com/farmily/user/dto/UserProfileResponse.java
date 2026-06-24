@@ -13,10 +13,10 @@ public class UserProfileResponse {
     private String userName;
     private String userNickname;
     private String userPhoneNum;
-    private String userAddress;
     private Integer districtId;
     private String cityName;
     private String distName;
+    private String userAddress;
     private LocalDate birthday;
     private Integer monthlySpending;
     private String spendingTier;
@@ -83,7 +83,7 @@ public class UserProfileResponse {
         return userStatus;
     }
 
-    // 自訂 from() 方法
+    // 自訂 from() 方法: User + Spending Tier 聯表資料回傳
     public static UserProfileResponse from(User u, String...spendingTier) {
 
         UserProfileResponse dto = new UserProfileResponse();
@@ -92,12 +92,12 @@ public class UserProfileResponse {
         dto.userName = u.getUserName();
         dto.userNickname = u.getUserNickname();
         dto.userPhoneNum = u.getUserPhoneNum();
-        dto.userAddress = u.getUserAddress();
         if (u.getCityDistrict() != null) {
             dto.districtId = u.getCityDistrict().getDistrictId();
             dto.cityName = u.getCityDistrict().getCityName();
             dto.distName = u.getCityDistrict().getDistName();
         }
+        dto.userAddress = u.getUserAddress();
         dto.birthday = u.getBirthday();
         dto.monthlySpending = u.getMonthlySpending();
         if (spendingTier.length > 0) {

@@ -8,7 +8,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.List;
 
-// 自訂 Member 身分識別格式
+// Security - 自訂 Member 身分識別格式
 public class MemberUserDetails implements UserDetails {
 
     private final User user;
@@ -21,6 +21,7 @@ public class MemberUserDetails implements UserDetails {
     public Integer getUserId() {
         return user.getUserId();
     }
+
     public User getUser() {
         return user;
     }
@@ -30,10 +31,6 @@ public class MemberUserDetails implements UserDetails {
         return List.of(new SimpleGrantedAuthority("ROLE_USER"));
     }
 
-    @Override
-    public String getPassword() {
-        return user.getPassword();
-    }
 
     // 帳號 = email
     @Override
@@ -41,16 +38,28 @@ public class MemberUserDetails implements UserDetails {
         return user.getEmail();
     }
 
-    // true: 沒過期，正常
+    @Override
+    public String getPassword() {
+        return user.getPassword();
+    }
+
+    // true: 帳號沒過期，正常
     @Override
     public boolean isAccountNonExpired() {
         return true;
     }
 
-    // true: 沒被鎖，正常
+    // true: 帳號沒被鎖，正常
     @Override
     public boolean isAccountNonLocked() {
         return true;
+    }
+
+    // 帳號是否啟用: ACTIVE、WARNED 狀態仍可登入
+    @Override
+    public boolean isEnabled() {
+        return user.getUserStatus() == User.UserStatus.ACTIVE
+                || user.getUserStatus() == User.UserStatus.WARNED;
     }
 
     // true: 密碼仍有效
@@ -59,10 +68,4 @@ public class MemberUserDetails implements UserDetails {
         return true;
     }
 
-    // 帳號是否啟用
-    @Override
-    public boolean isEnabled() {
-        return user.getUserStatus() == User.UserStatus.ACTIVE
-                || user.getUserStatus() == User.UserStatus.WARNED;
-    }
 }

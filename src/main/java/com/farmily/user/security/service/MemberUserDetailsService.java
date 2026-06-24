@@ -8,7 +8,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-// "How" to find Member ?
+// Security - "How" to find Member ?
 @Service
 public class MemberUserDetailsService implements UserDetailsService {
 
@@ -21,7 +21,7 @@ public class MemberUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 
-        // step1: 用 email 去 user 表撈帳號，撈不到就丟例外
+        // step1: 去 user 表用 email 撈帳號，撈不到就丟例外
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("查無此帳號: " + email));
 

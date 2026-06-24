@@ -53,7 +53,7 @@ public class UserServiceImpl implements UserService {
             throw new IllegalStateException("帳號已註冊使用");
         }
 
-        // step2: 跨表(小農/管理員)檢查 email 全域唯一
+        // step2: 若 email = null，跨表檢查 email 全域唯一
         emailUniquenessChecker.emailAvailable(reg.getEmail());
 
         // step3: 會員帳號(email)不存在，走本地註冊流程
@@ -84,7 +84,7 @@ public class UserServiceImpl implements UserService {
         newUser.setUserStatus(User.UserStatus.ACTIVE);
         newUser.setFarmerIdentity(false);
 
-        // 包裝會員資料成 dto 給 Controller
+        // 存進 DB 後，包裝會員資料成 dto 給 Controller
         return UserProfileResponse.from(userRepository.save(newUser));
     }
 
@@ -92,14 +92,14 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(readOnly = true)
     public UserProfileResponse login(LoginRequest log) {
-
         User user = userRepository.findByEmail(log.getEmail())
                 .orElseThrow(() -> new BadCredentialsException("帳號或密碼錯誤"));
 
         // 純 Google 帳號沒有本地密碼，null 檢查必須在 matches() 之前
-        if (user.getPassword() == null) {
-            throw new IllegalStateException("此帳號為第三方登入，請改用 Google 登入");
-        }
+        // LoginRequest 有密碼非空值驗證，可移除
+//        if (user.getPassword() == null) {
+//            throw new IllegalStateException("此帳號為第三方登入，請改用 Google 登入");
+//        }
 
         // 檢查 hash 密碼是否相等
         if (!passwordEncoder.matches(log.getPassword(), user.getPassword())) {
@@ -148,7 +148,7 @@ public class UserServiceImpl implements UserService {
                     .orElseThrow(() -> new IllegalArgumentException("查無此區域"));
             user.setCityDistrict(city);
         }
-        //  repository 將修改資料存進 DB
+        //  將修改資料存進 DB
         return UserProfileResponse.from(userRepository.save(user));
     }
 
@@ -166,7 +166,7 @@ public class UserServiceImpl implements UserService {
             }
         }
 
-        // Google 帳號首次設定密碼：本來就沒有 oldPassword，直接 hash 新密碼存入
+        // Google 帳號首次設定本地密碼和本地帳號新密碼一樣：本來就沒有 oldPassword，直接 hash 新密碼存入
         user.setPassword(passwordEncoder.encode(pw.getNewPassword()));
         userRepository.save(user);
     }
@@ -183,10 +183,10 @@ public class UserServiceImpl implements UserService {
     // OAuth 2.0 註冊登入
     @Override
     public UserProfileResponse loginOrRegisterOAuth(OAuthUserInfo info) {
-        // step1. 先用 Google 驗證可信 info 的 provider_id 找會員
+        // step1. 先用 Google 驗證可信 info 的 providerId 找會員
         User user = userRepository.findByProviderId(info.getProviderId()).orElse(null);
 
-        // step2. 用 id 找不到，改用 email 找
+        // step2. 用 providerId 找不到，改用 email 找
         if(user == null){
             user = userRepository.findByEmail(info.getEmail()).orElse(null);
 
@@ -195,9 +195,10 @@ public class UserServiceImpl implements UserService {
                 // 則此會員有本地帳號+密碼，多榜定 Google 回傳的 provider_id
                 user.setProviderId(info.getProviderId());
 
-                if(user.getPassword() == null){
-                    user.setAuthProvider(User.AuthProvider.GOOGLE);
-                }
+                // 有本地帳號一定有密碼
+//                if(user.getPassword() == null){
+//                    user.setAuthProvider(User.AuthProvider.GOOGLE);
+//                }
             }
         }
         // step3. id、email 都找不到，進入註冊會員流程

@@ -1,11 +1,11 @@
 package com.farmily.user.dto;
 
-// 接住 Google 回傳驗證 id_token 的身份資料 (Raw)
+// phase2. 接住 Google 回傳驗證 JWT 的身份資料 (Raw)
 public class GoogleTokenInfo {
 
     // JWT
     private String aud;         // 我們的 client id
-    private String sub;         // Google 的使用者固定編號
+    private String sub;         // Google 的使用者固定編號 = providerId
     private String email;
     private String name;
 
