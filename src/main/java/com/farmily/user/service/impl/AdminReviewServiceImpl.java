@@ -8,10 +8,10 @@ import com.farmily.user.repository.AdminRepository;
 import com.farmily.user.repository.FarmerRepository;
 import com.farmily.user.repository.FarmerReviewRepository;
 import com.farmily.user.service.AdminReviewService;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.nio.file.AccessDeniedException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -89,11 +89,7 @@ public class AdminReviewServiceImpl implements AdminReviewService {
         ensureReviewing(review);       // 若 APPROVED/REJECTED 就擋下
 
         if (review.getAdmin() == null || !review.getAdmin().getAdminId().equals(adminId)) {
-            try {
-                throw new AccessDeniedException("此案件由其他管理員認領，您無法審核");
-            } catch (AccessDeniedException e) {
-                throw new RuntimeException(e);
-            }
+            throw new AccessDeniedException("此案件由其他管理員認領，您無法審核");
         }
 
         // 更新到 Farmer 核准的資料
@@ -120,11 +116,7 @@ public class AdminReviewServiceImpl implements AdminReviewService {
         FarmerReview review = findReview(reviewId);
         ensureReviewing(review);
         if (review.getAdmin() == null || !review.getAdmin().getAdminId().equals(adminId)) {
-            try {
-                throw new AccessDeniedException("此案件由其他管理員認領，您無法審核");
-            } catch (AccessDeniedException e) {
-                throw new RuntimeException(e);
-            }
+            throw new AccessDeniedException("此案件由其他管理員認領，您無法審核");
         }
 
         // 同步更新 FarmerReview 拒絕的資料
