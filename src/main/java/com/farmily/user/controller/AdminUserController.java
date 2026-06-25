@@ -18,10 +18,13 @@ public class AdminUserController {
         this.adminMemberService = adminMemberService;
     }
 
-    // 會員列表
+    // 會員列表（可依消費級距、會員狀態複選篩選；不帶參數＝全部）
+    // 例：/api/admin/members?tierName=黃金會員&tierName=白金會員&status=WARNED&status=SUSPENDED
     @GetMapping
-    public ResponseEntity<List<UserProfileResponse>> list() {
-        return ResponseEntity.ok(adminMemberService.listAll());
+    public ResponseEntity<List<UserProfileResponse>> list(
+            @RequestParam(required = false) List<String> tierName,
+            @RequestParam(required = false) List<String> status) {
+        return ResponseEntity.ok(adminMemberService.list(tierName, status));
     }
 
     // 查單一會員

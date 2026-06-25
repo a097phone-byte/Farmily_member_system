@@ -5,6 +5,8 @@ import com.farmily.user.dto.ReviewRejectRequest;
 import com.farmily.user.security.AdminUserDetails;
 import com.farmily.user.service.AdminReviewService;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -63,6 +65,21 @@ public class AdminReviewController {
             @RequestBody @Valid ReviewRejectRequest req,
             @AuthenticationPrincipal AdminUserDetails me) {
         return ResponseEntity.ok(adminReviewService.reject(reviewId, me.getAdminId(), req.getRejectReason()));
+    }
+
+    // 預覽 / 下載某輪審核的證明文件（type = land | product | identity）
+    // 證明文件一律為圖片（png/jpg），固定回傳 image 類型，瀏覽器即可內嵌顯示
+    @GetMapping("/{reviewId}/cert/{type}")
+    public ResponseEntity<byte[]> getCert(
+            @PathVariable Integer reviewId,
+            @PathVariable String type) {
+        byte[] bytes = adminReviewService.getCertFile(reviewId, type);
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.IMAGE_JPEG)
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        "inline; filename=\"cert-" + reviewId + "-" + type + ".jpg\"")
+                .body(bytes);
     }
 
 }

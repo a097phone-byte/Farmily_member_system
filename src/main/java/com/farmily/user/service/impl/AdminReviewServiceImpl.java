@@ -129,6 +129,31 @@ public class AdminReviewServiceImpl implements AdminReviewService {
     }
 
 
+    // 取某輪審核的證明文件 bytes（給管理員預覽 / 下載）
+    @Override
+    @Transactional(readOnly = true)
+    public byte[] getCertFile(Integer reviewId, String type) {
+        FarmerReview review = findReview(reviewId);
+
+        String t = (type == null) ? "" : type.toLowerCase();
+        byte[] bytes;
+        if (t.equals("land")) {
+            bytes = review.getCertFileLand();
+        } else if (t.equals("product")) {
+            bytes = review.getCertFileProduct();
+        } else if (t.equals("identity")) {
+            bytes = review.getCertFileIdentity();
+        } else {
+            throw new IllegalArgumentException("不支援的文件類型: " + type);
+        }
+
+        if (bytes == null || bytes.length == 0) {
+            throw new IllegalArgumentException("此文件未上傳");
+        }
+        return bytes;
+    }
+
+
     // ---- 自訂方法 ----
     private FarmerReview findReview(Integer reviewId) {
         return farmerReviewRepository.findById(reviewId)

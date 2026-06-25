@@ -162,7 +162,17 @@ export default {
 
         <!-- 正常的 登入 / 申請 分頁 -->
         <div v-else>
-          <h2>小農</h2>
+          <div class="auth-brand">
+            <span class="logo">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M7 20h10"/><path d="M10 20c5.5-2.5.8-6.4 3-10"/>
+                <path d="M9.5 9.4c1.1.8 1.8 2.2 2.3 3.7-2 .4-3.5.4-4.8-.3-1.2-.6-2.3-1.9-3-4.2 2.8-.5 4.4 0 5.5.8z"/>
+                <path d="M14.1 6a7 7 0 0 0-1.1 4c1.9-.1 3.3-.6 4.3-1.4 1-1 1.6-2.3 1.7-4.6-2.7.1-4 1-4.9 2z"/>
+              </svg>
+            </span>
+            <h2>小農專區</h2>
+            <p class="sub">登入、申請加入或查詢審核進度</p>
+          </div>
           <div class="tabs">
             <button class="tab" :class="{active: mode==='login'}" @click="switchMode('login')">登入</button>
             <button class="tab" :class="{active: mode==='apply'}" @click="switchMode('apply')">申請加入</button>

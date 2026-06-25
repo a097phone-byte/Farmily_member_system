@@ -55,6 +55,37 @@ public class AdminMemberServiceImpl implements AdminMemberService {
         return UserProfileResponse.from(user, tierName);
     }
 
+    // 依條件篩選會員：tierNames（消費級距，可複選）、statuses（會員狀態，可複選），皆可為 null 或空清單（＝不限）
+    @Override
+    @Transactional(readOnly = true)
+    public List<UserProfileResponse> list(List<String> tierNames, List<String> statuses) {
+        List<User> users = userRepository.findAll();
+        List<UserProfileResponse> result = new ArrayList<>();
+
+        for (User u : users) {
+            // 先算出這位會員的消費級距名稱
+            Integer amount = u.getMonthlySpending() != null ? u.getMonthlySpending() : 0;
+            String userTier = spendingTierRepository.findTierNameByAmount(amount);
+
+            // 條件 1：消費級距（有勾選才比對；級距不在勾選清單就跳過這筆）
+            if (tierNames != null && !tierNames.isEmpty() && !tierNames.contains(userTier)) {
+                continue;
+            }
+
+            // 條件 2：會員狀態（有勾選才比對）
+            if (statuses != null && !statuses.isEmpty()) {
+                String userStatus = u.getUserStatus() != null ? u.getUserStatus().name() : null;
+                if (!statuses.contains(userStatus)) {
+                    continue;
+                }
+            }
+
+            // 兩個條件都通過，才加進結果
+            result.add(UserProfileResponse.from(u, userTier));
+        }
+        return result;
+    }
+
     // 改狀態：字串轉 enum
     @Override
     public UserProfileResponse updateStatus(Integer userId, String status) {

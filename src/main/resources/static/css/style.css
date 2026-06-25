@@ -218,17 +218,43 @@ textarea { resize: vertical; min-height: 72px; }
 .soon { color: var(--faint); font-size: 12px; }
 
 /* ============ 登入 / 註冊 卡片 ============ */
-.auth-wrap { min-height: calc(100vh - var(--topbar-h)); display: flex; align-items: flex-start; justify-content: center; padding: 48px 16px; }
-.auth-card { width: 100%; max-width: 420px; min-width: 0; background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 28px; }
+.auth-wrap {
+    min-height: calc(100vh - var(--topbar-h));
+    display: flex; align-items: center; justify-content: center; padding: 40px 16px;
+    /* 頂部柔和的綠色光暈，乾淨但不單調 */
+    background: radial-gradient(900px 420px at 50% -8%, var(--accent-soft), transparent 70%), var(--bg);
+}
+.auth-card {
+    width: 100%; max-width: 412px; min-width: 0;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 14px; box-shadow: var(--shadow-md);
+    padding: 32px 28px; animation: auth-in .24s ease;
+}
+@keyframes auth-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+/* 品牌標頭：嫩芽 logo + 標題 + 一行說明，三身分共用 */
+.auth-brand { display: flex; flex-direction: column; align-items: center; text-align: center; margin-bottom: 22px; }
+.auth-brand .logo {
+    width: 46px; height: 46px; border-radius: 13px; margin-bottom: 13px;
+    display: inline-flex; align-items: center; justify-content: center;
+    background: var(--accent); color: #fff; box-shadow: 0 6px 16px rgba(63, 125, 63, .28);
+}
+.auth-brand .logo svg { width: 25px; height: 25px; }
+.auth-brand h2 { margin: 0; text-align: center; font-size: 19px; }
+.auth-brand .sub { margin: 5px 0 0; color: var(--muted); font-size: 13px; line-height: 1.45; }
+
 /* 一列多個輸入框（緯度/經度 + 按鈕）：讓輸入框可壓縮，避免撐破容器 */
 .inline-fields { display: flex; gap: 8px; align-items: center; }
 .inline-fields > input { flex: 1; min-width: 0; }
 .inline-fields > .btn { flex: none; white-space: nowrap; }
 .auth-card h2 { text-align: center; }
 .auth-card .lead { text-align: center; color: var(--muted); margin-bottom: 20px; font-size: 14px; }
-.tabs { display: flex; gap: 4px; margin-bottom: 20px; background: var(--bg); padding: 4px; border-radius: var(--radius-sm); }
-.tabs .tab { flex: 1; text-align: center; padding: 8px; border-radius: 6px; cursor: pointer; background: transparent; color: var(--muted); font-weight: 500; border: none; font-size: 14px; }
-.tabs .tab.active { background: var(--card); color: var(--text); box-shadow: var(--shadow); }
+/* 主送出鈕在 auth 卡內加高，手感更穩 */
+.auth-card .btn.block { padding: 11px 16px; }
+.tabs { display: flex; gap: 4px; margin-bottom: 20px; background: var(--bg); padding: 4px; border-radius: 9px; border: 1px solid var(--border); }
+.tabs .tab { flex: 1; text-align: center; padding: 8px; border-radius: 6px; cursor: pointer; background: transparent; color: var(--muted); font-weight: 500; border: none; font-size: 14px; transition: color .15s, background .15s; }
+.tabs .tab:hover { color: var(--text); }
+.tabs .tab.active { background: var(--card); color: var(--accent); box-shadow: var(--shadow); }
 .divider { display: flex; align-items: center; gap: 10px; color: var(--faint); font-size: 12px; margin: 18px 0; }
 .divider::before, .divider::after { content: ""; flex: 1; height: 1px; background: var(--border); }
 .hint { font-size: 12px; color: var(--faint); text-align: center; margin-top: 10px; }

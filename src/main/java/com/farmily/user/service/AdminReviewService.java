@@ -24,4 +24,7 @@ public interface AdminReviewService {
     // 退件 REJECTED
     FarmerReviewResponse reject(Integer reviewId, Integer adminId, String rejectReason);
 
+    // 取某輪審核的證明文件原始位元組（type = land | product | identity）
+    byte[] getCertFile(Integer reviewId, String type);
+
 }

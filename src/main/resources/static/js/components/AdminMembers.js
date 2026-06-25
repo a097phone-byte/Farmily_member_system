@@ -1,6 +1,6 @@
-// 會員管理：列表 / 搜尋 / 分頁 / 查看明細 / 變更帳號狀態。
+// 會員管理：列表 / 篩選（消費級距 + 狀態，皆可複選）/ 搜尋 / 分頁 / 查看明細 / 變更帳號狀態。
 // 串接後端（皆已存在）：
-//   GET  /api/admin/members            列表
+//   GET  /api/admin/members?tierName=…&status=…  列表（級距/狀態可複選；不帶參數＝全部）
 //   GET  /api/admin/members/{id}       單一會員
 //   PUT  /api/admin/members/{id}/status  body: { status }
 import { api } from '../api.js';
@@ -10,13 +10,18 @@ import Avatar from './Avatar.js';
 import Icon from './Icon.js';
 
 const STATUSES = ['ACTIVE', 'WARNED', 'SUSPENDED'];
+const TIERS = ['一般會員', '銅級會員', '銀級會員', '金級會員'];   // 對齊 DB spending_tier.tier_name
 const PAGE_SIZE = 10;
 
 export default {
     name: 'AdminMembers',
     components: { Modal, Avatar, Icon },
     data() {
-        return { rows: [], loading: true, q: '', sel: null, busy: false, statuses: STATUSES, page: 1 };
+        return {
+            rows: [], loading: true, q: '', sel: null, busy: false,
+            statuses: STATUSES, tiers: TIERS, page: 1,
+            tierSel: [], statusSel: [],   // 已勾選的篩選條件（送後端）
+        };
     },
     watch: { q() { this.page = 1; } },
     computed: {
@@ -37,10 +42,18 @@ export default {
     methods: {
         async load() {
             this.loading = true;
-            try { this.rows = await api.get('/admin/members'); }
+            // 把勾選的級距/狀態組成 query string（複選 = 多個同名參數）
+            const qs = new URLSearchParams();
+            this.tierSel.forEach((t) => qs.append('tierName', t));
+            this.statusSel.forEach((s) => qs.append('status', s));
+            const query = qs.toString();
+            try { this.rows = await api.get('/admin/members' + (query ? '?' + query : '')); }
             catch (e) { toast('載入會員清單失敗', 'err'); }
             finally { this.loading = false; }
         },
+        // 勾選改變 → 回第一頁並向後端重新查詢
+        onFilterChange() { this.page = 1; this.load(); },
+        clearFilter() { this.tierSel = []; this.statusSel = []; this.onFilterChange(); },
         async open(id) {
             try { this.sel = await api.get('/admin/members/' + id); }
             catch (e) { toast('讀取會員資料失敗', 'err'); }
@@ -77,6 +90,24 @@ export default {
       <div class="page-head">
         <h2>會員管理</h2>
         <div class="search"><icon name="search" size="sm"></icon><input v-model="q" placeholder="搜尋 Email / 姓名" /></div>
+      </div>
+
+      <div class="card" style="margin-bottom:12px">
+        <div style="display:flex;gap:28px;align-items:flex-start;flex-wrap:wrap">
+          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+            <span class="k" style="min-width:64px">消費級距</span>
+            <label v-for="t in tiers" :key="t" style="display:inline-flex;gap:4px;align-items:center;cursor:pointer;font-size:14px">
+              <input type="checkbox" :value="t" v-model="tierSel" @change="onFilterChange" /> {{ t }}
+            </label>
+          </div>
+          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+            <span class="k" style="min-width:64px">會員狀態</span>
+            <label v-for="s in statuses" :key="s" style="display:inline-flex;gap:4px;align-items:center;cursor:pointer;font-size:14px">
+              <input type="checkbox" :value="s" v-model="statusSel" @change="onFilterChange" /> {{ s }}
+            </label>
+          </div>
+          <button v-if="tierSel.length || statusSel.length" class="btn ghost sm" @click="clearFilter">清除篩選</button>
+        </div>
       </div>
 
       <div class="card">

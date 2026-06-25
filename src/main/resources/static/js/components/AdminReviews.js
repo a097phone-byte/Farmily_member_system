@@ -1,11 +1,14 @@
-// 小農審核：待審清單 / 查看本輪快照 + 證明文件 / 核准 / 退件 / 查歷史輪次。
-// 串接後端（皆已存在）：
-//   GET  /api/admin/reviews/pending            待審清單
+// 小農審核：待審/審核中清單 / 認領（開始審核）/ 查看本輪快照 + 證明文件 / 核准 / 退件 / 查歷史輪次。
+// 後端為「兩階段」審核流程：
+//   GET  /api/admin/reviews/pending            待審清單（PENDING）
+//   GET  /api/admin/reviews/reviewing          審核中清單（REVIEWING）
 //   GET  /api/admin/reviews/farmer/{farmerId}  某小農所有審核紀錄
-//   PUT  /api/admin/reviews/{reviewId}/approve 核准
-//   PUT  /api/admin/reviews/{reviewId}/reject  body: { rejectReason }
+//   PUT  /api/admin/reviews/{reviewId}/start    認領（PENDING → REVIEWING，記錄審核者）
+//   PUT  /api/admin/reviews/{reviewId}/approve 核准（需先認領，且只有認領者本人可操作）
+//   PUT  /api/admin/reviews/{reviewId}/reject  body: { rejectReason }（需先認領，且只有認領者本人可操作）
 // 證明文件預覽需後端新增（見專案說明）：
 //   GET  /api/admin/reviews/{reviewId}/cert/{type}   type = land | product | identity，回傳檔案 bytes
+import { store } from '../store.js';
 import { api } from '../api.js';
 import { toast, confirmDialog } from '../ui.js';
 import Modal from './Modal.js';
@@ -23,6 +26,8 @@ export default {
     components: { Modal, Avatar, Icon },
     data() {
         return {
+            store,
+            tab: 'pending',            // pending（待審）| reviewing（審核中）
             rows: [], loading: true, busy: false,
             sel: null,                 // 目前檢視的審核紀錄
             rejecting: false, rejectReason: '',
@@ -31,12 +36,23 @@ export default {
             certs: CERTS,
         };
     },
+    computed: {
+        // 目前登入管理員 email（用來判斷案件是否由本人認領）
+        myEmail() { return this.store.admin.profile ? this.store.admin.profile.adminEmail : null; },
+    },
     async mounted() { await this.load(); },
     methods: {
+        async switchTab(t) {
+            if (this.tab === t) return;
+            this.tab = t;
+            this.close();
+            await this.load();
+        },
         async load() {
             this.loading = true;
-            try { this.rows = await api.get('/admin/reviews/pending'); }
-            catch (e) { toast('載入待審清單失敗', 'err'); }
+            const path = this.tab === 'reviewing' ? '/admin/reviews/reviewing' : '/admin/reviews/pending';
+            try { this.rows = await api.get(path); }
+            catch (e) { toast('載入清單失敗', 'err'); }
             finally { this.loading = false; }
         },
         open(r) {
@@ -46,6 +62,23 @@ export default {
             this.clearCert();
         },
         close() { this.clearCert(); this.sel = null; },
+
+        // 案件是否由「我」認領（後端僅允許認領者本人核准/退件）
+        isReviewing(r) { return String(r && r.reviewStatus).toUpperCase() === 'REVIEWING'; },
+        isMine(r) { return !!(r && r.adminEmail && this.myEmail && r.adminEmail === this.myEmail); },
+
+        // 認領案件：PENDING → REVIEWING，之後才能核准/退件
+        async start() {
+            this.busy = true;
+            try {
+                const updated = await api.put('/admin/reviews/' + this.sel.reviewId + '/start');
+                toast('已認領，可開始審核');
+                this.sel = updated;        // 變成 REVIEWING 並記錄審核者（本人）
+                this.tab = 'reviewing';
+                await this.load();          // 重新載入審核中清單
+            } catch (e) { toast(e.message || '認領失敗', 'err'); }
+            finally { this.busy = false; }
+        },
 
         async approve() {
             const ok = await confirmDialog({
@@ -110,12 +143,17 @@ export default {
     <div>
       <div class="page-head"><h2>小農審核</h2></div>
 
+      <div class="tabs">
+        <button class="tab" :class="{ active: tab === 'pending' }" @click="switchTab('pending')">待審</button>
+        <button class="tab" :class="{ active: tab === 'reviewing' }" @click="switchTab('reviewing')">審核中</button>
+      </div>
+
       <div class="card">
         <div v-if="loading" class="empty">載入中…</div>
-        <div v-else-if="!rows.length" class="empty">目前沒有待審件</div>
+        <div v-else-if="!rows.length" class="empty">{{ tab === 'reviewing' ? '目前沒有審核中案件' : '目前沒有待審件' }}</div>
         <div v-else class="table-wrap">
           <table class="table">
-            <thead><tr><th>農場</th><th>輪次</th><th>狀態</th><th>送審時間</th><th></th></tr></thead>
+            <thead><tr><th>農場</th><th>輪次</th><th>狀態</th><th v-if="tab === 'reviewing'">認領者</th><th>送審時間</th><th></th></tr></thead>
             <tbody>
               <tr v-for="r in rows" :key="r.reviewId">
                 <td>
@@ -126,8 +164,9 @@ export default {
                 </td>
                 <td>第 {{ r.reviewRound }} 輪</td>
                 <td><span class="badge" :class="'s-' + String(r.reviewStatus || 'review').toLowerCase()">{{ r.reviewStatus }}</span></td>
+                <td v-if="tab === 'reviewing'">{{ r.adminName || r.adminEmail || '—' }}<span v-if="isMine(r)" class="muted">（我）</span></td>
                 <td>{{ fmt(r.submittedAt) }}</td>
-                <td><div class="row-actions"><button class="btn sm" @click="open(r)">審核</button></div></td>
+                <td><div class="row-actions"><button class="btn sm" @click="open(r)">{{ tab === 'reviewing' ? '繼續審核' : '查看 / 認領' }}</button></div></td>
               </tr>
             </tbody>
           </table>
@@ -141,6 +180,7 @@ export default {
         <div class="rw"><span class="k">本輪提交地址</span><span>{{ snapAddr(sel) }}</span></div>
         <div class="rw"><span class="k">座標</span><span>{{ sel.submittedLocLat || '—' }}, {{ sel.submittedLocLong || '—' }}</span></div>
         <div class="rw"><span class="k">送審 / 審核時間</span><span>{{ fmt(sel.submittedAt) }} / {{ fmt(sel.reviewedAt) }}</span></div>
+        <div class="rw"><span class="k">審核者</span><span>{{ sel.adminName || sel.adminEmail || '尚未認領' }}<span v-if="isMine(sel)" class="muted">（我）</span></span></div>
 
         <div class="cert-row">
           <span class="k">證明文件</span>
@@ -187,7 +227,17 @@ export default {
         </div>
 
         <template #foot>
-          <template v-if="!rejecting">
+          <!-- 尚未認領（PENDING）：先認領才能審核 -->
+          <template v-if="!isReviewing(sel)">
+            <span class="muted" style="margin-right:auto">須先認領案件才能核准／退件</span>
+            <button class="btn sm" :disabled="busy" @click="start">開始審核（認領）</button>
+          </template>
+          <!-- 審核中、且由他人認領：鎖定 -->
+          <template v-else-if="!isMine(sel)">
+            <span class="muted">此案件已由「{{ sel.adminName || sel.adminEmail }}」認領，您無法審核。</span>
+          </template>
+          <!-- 審核中、且由本人認領：可核准／退件 -->
+          <template v-else-if="!rejecting">
             <button class="btn danger sm" :disabled="busy" @click="rejecting = true">退件…</button>
             <button class="btn sm" :disabled="busy" @click="approve">核准</button>
           </template>
