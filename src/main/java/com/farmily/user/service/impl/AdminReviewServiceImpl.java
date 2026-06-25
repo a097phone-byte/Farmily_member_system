@@ -33,7 +33,6 @@ public class AdminReviewServiceImpl implements AdminReviewService {
     @Override
     @Transactional(readOnly = true)
     public List<FarmerReviewResponse> listPending() {
-
         // 撈出所有待審 (PENDING)
         List<FarmerReview> reviews = farmerReviewRepository.findByReviewStatusOrderBySubmittedAtAsc(FarmerReview.ReviewStatus.PENDING);
 
@@ -48,7 +47,6 @@ public class AdminReviewServiceImpl implements AdminReviewService {
     // 某小農的審核紀錄
     @Override
     public List<FarmerReviewResponse> listByFarmer(Integer farmerId) {
-
         List<FarmerReview> reviews = farmerReviewRepository.findByFarmer_FarmerIdOrderByReviewRoundDesc(farmerId);
 
         List<FarmerReviewResponse> result = new ArrayList<>();
@@ -58,11 +56,36 @@ public class AdminReviewServiceImpl implements AdminReviewService {
         return result;
     }
 
+    // 列出審核中清單
+    @Override
+    public List<FarmerReviewResponse> listReviewing() {
+        List<FarmerReview> reviews = farmerReviewRepository.findByReviewStatusOrderBySubmittedAtAsc(FarmerReview.ReviewStatus.REVIEWING);
+
+        List<FarmerReviewResponse> result = new ArrayList<>();
+        for(FarmerReview review : reviews){
+            result.add(FarmerReviewResponse.from(review));
+        }
+        return result;
+    }
+
+    // 開始審核 PENDING 案件
+    @Override
+    public FarmerReviewResponse reviewing(Integer reviewId, Integer adminId) {
+        FarmerReview review = findReview(reviewId);
+        if(review.getReviewStatus() != FarmerReview.ReviewStatus.PENDING){
+            throw new IllegalStateException("此案件審核中或已審核");
+        }
+        review.setReviewStatus(FarmerReview.ReviewStatus.REVIEWING);
+        review.setAdmin(findAdmin(adminId));
+
+        return FarmerReviewResponse.from(farmerReviewRepository.save(review));
+    }
+
     // 核准過審：把這一輪 submitted_XXX 寫回 Farmer，並啟用帳號
     @Override
     public FarmerReviewResponse approve(Integer reviewId, Integer adminId) {
         FarmerReview review = findReview(reviewId);
-        ensureNotDecided(review);       // 若 APPROVED/REJECTED 就擋下
+        ensureReviewing(review);       // 若 APPROVED/REJECTED 就擋下
 
         // 更新到 Farmer 核准的資料
         Farmer farmer = review.getFarmer();
@@ -86,7 +109,7 @@ public class AdminReviewServiceImpl implements AdminReviewService {
     @Override
     public FarmerReviewResponse reject(Integer reviewId, Integer adminId, String rejectReason) {
         FarmerReview review = findReview(reviewId);
-        ensureNotDecided(review);
+        ensureReviewing(review);
 
         // 同步更新 FarmerReview 拒絕的資料
         review.setReviewStatus(FarmerReview.ReviewStatus.REJECTED);
@@ -98,7 +121,7 @@ public class AdminReviewServiceImpl implements AdminReviewService {
     }
 
 
-    // ---- 私有工具 ----
+    // ---- 自訂方法 ----
     private FarmerReview findReview(Integer reviewId) {
         return farmerReviewRepository.findById(reviewId)
                 .orElseThrow(() -> new IllegalArgumentException("查無此審核案件"));
@@ -107,11 +130,11 @@ public class AdminReviewServiceImpl implements AdminReviewService {
         return adminRepository.findById(adminId)
                 .orElseThrow(() -> new IllegalArgumentException("查無此管理員"));
     }
-    // 已 APPROVED/REJECTED 不可再審
-    private void ensureNotDecided(FarmerReview review) {
+    // 確保一定要先 REVIEWING (除了 REVIEWING，擋住其他審核狀態)
+    private void ensureReviewing(FarmerReview review) {
         FarmerReview.ReviewStatus s = review.getReviewStatus();
-        if (s == FarmerReview.ReviewStatus.APPROVED || s == FarmerReview.ReviewStatus.REJECTED) {
-            throw new IllegalStateException("此申請已審核完畢，不可重複審核");
+        if (s != FarmerReview.ReviewStatus.REVIEWING) {
+            throw new IllegalStateException("請先認領案件才能進行審核");
         }
     }
 }

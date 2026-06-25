@@ -21,10 +21,16 @@ public class AdminReviewController {
         this.adminReviewService = adminReviewService;
     }
 
-    // 查待審清單
+    // 查所有 PENDING 案件清單
     @GetMapping("/pending")
     public ResponseEntity<List<FarmerReviewResponse>> listPending() {
         return ResponseEntity.ok(adminReviewService.listPending());
+    }
+
+    // 查所有 Reviewing 案件清單
+    @GetMapping("/reviewing")
+    public ResponseEntity<List<FarmerReviewResponse>> listReviewing(){
+        return ResponseEntity.ok(adminReviewService.listReviewing());
     }
 
     // 查某小農所有審核紀錄
@@ -32,6 +38,14 @@ public class AdminReviewController {
     public ResponseEntity<List<FarmerReviewResponse>> listByFarmer(
             @PathVariable Integer farmerId) {
         return ResponseEntity.ok(adminReviewService.listByFarmer(farmerId));
+    }
+
+    // 修改審核: 審核中
+    @PutMapping("/{reviewId}/start")
+    public ResponseEntity<FarmerReviewResponse> startReview(
+            @PathVariable Integer reviewId,
+            @AuthenticationPrincipal AdminUserDetails me){
+        return ResponseEntity.ok(adminReviewService.reviewing(reviewId, me.getAdminId()));
     }
 
     // 修改審核: 核准
