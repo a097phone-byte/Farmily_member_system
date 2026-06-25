@@ -42,10 +42,16 @@ public class FarmerApplicationServiceImpl implements FarmerApplicationService {
         FarmerReview latest = farmerReviewRepository.findTopByFarmer_FarmerIdOrderByReviewRoundDesc(farmer.getFarmerId());
 
         // latest 防呆（active 小農理論上至少有一筆審核
-        if(latest == null) {
+        if (latest == null) {
             throw new IllegalArgumentException("查無審核紀錄");
         }
-        return FarmerReviewResponse.from(latest);
+        FarmerReviewResponse res = FarmerReviewResponse.from(latest);
+
+        // 小農端只看到「待審」：REVIEWING 對外顯示成 PENDING（只在這個小農呼叫點轉換，不動共用 from()）
+        if ("REVIEWING".equals(res.getReviewStatus())) {
+            res.setReviewStatus("PENDING");
+        }
+        return res;
     }
 
     // 未啟用小農重新送審（只允許小農狀態 PENDING + 審核狀態為 REJECTED 才能重新送審

@@ -56,6 +56,12 @@ public class FarmerReviewResponse {
     public String getReviewStatus() {
         return reviewStatus;
     }
+
+    // 給未啟用小農審核狀態 Reviewing 仍為 Pending (前端顯示用)
+    public void setReviewStatus(String reviewStatus) {
+        this.reviewStatus = reviewStatus;
+    }
+
     public LocalDateTime getSubmittedAt() {
         return submittedAt;
     }
