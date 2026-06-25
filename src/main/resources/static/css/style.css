@@ -120,6 +120,11 @@ textarea { resize: vertical; min-height: 72px; }
 .badge.s-warned, .badge.s-reviewing, .badge.s-pending, .badge.s-review { background: var(--warn-soft); color: var(--warn); border-color: transparent; }
 .badge.s-suspended, .badge.s-rejected, .badge.s-deleted { background: var(--danger-soft); color: var(--danger); border-color: transparent; }
 .badge.info { background: var(--info-soft); color: var(--info); border-color: transparent; }
+/* 消費級距徽章（會員等級配色：一般 / 銅 / 銀 / 金）*/
+.badge.tier-normal { background: #eef0f2; color: #6b7280; border-color: transparent; }
+.badge.tier-bronze { background: #f4e7da; color: #9c5b2b; border-color: transparent; }
+.badge.tier-silver { background: #eaeef2; color: #5a6675; border-color: transparent; }
+.badge.tier-gold   { background: #fbf1cf; color: #927510; border-color: transparent; }
 .pill { display: inline-block; background: var(--bg); color: var(--muted); border: 1px solid var(--border); padding: 2px 9px; border-radius: 999px; margin: 0 5px 5px 0; font-size: 12px; }
 .pill.super { background: var(--warn-soft); color: var(--warn); border-color: transparent; }
 

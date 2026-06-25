@@ -15,4 +15,8 @@ public interface AdminMemberService {
 
     // 改會員狀態(警告/停權/恢復)
     UserProfileResponse updateStatus(Integer userId, String status);
+
+    // 篩選查詢會員條件: 消費級距、狀態
+    List<UserProfileResponse> list(String tierName, String status);
+
 }

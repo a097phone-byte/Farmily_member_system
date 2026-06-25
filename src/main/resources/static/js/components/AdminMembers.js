@@ -67,6 +67,10 @@ export default {
         },
         setPage(n) { if (n >= 1 && n <= this.totalPages) this.page = n; },
         badge(s) { return 'badge dot s-' + String(s || '').toLowerCase(); },
+        tierClass(t) {
+            const m = { '一般會員': 'tier-normal', '銅級會員': 'tier-bronze', '銀級會員': 'tier-silver', '金級會員': 'tier-gold' };
+            return 'badge ' + (m[t] || 'tier-normal');
+        },
     },
     template: `
     <div>
@@ -91,7 +95,7 @@ export default {
                     </div>
                   </td>
                   <td>{{ r.userPhoneNum || '—' }}</td>
-                  <td><span class="badge info">{{ r.spendingTier || '—' }}</span></td>
+                  <td><span :class="tierClass(r.spendingTier)">{{ r.spendingTier || '—' }}</span></td>
                   <td><span :class="badge(r.userStatus)">{{ r.userStatus }}</span></td>
                   <td><div class="row-actions"><button class="btn outline sm" @click="open(r.userId)">查看</button></div></td>
                 </tr>
@@ -114,7 +118,7 @@ export default {
         <div class="rw"><span class="k">姓名 / 暱稱</span><span>{{ sel.userName }}（{{ sel.userNickname || '—' }}）</span></div>
         <div class="rw"><span class="k">手機</span><span>{{ sel.userPhoneNum || '—' }}</span></div>
         <div class="rw"><span class="k">地址</span><span>{{ sel.cityName }}{{ sel.distName }} {{ sel.userAddress || '' }}</span></div>
-        <div class="rw"><span class="k">消費級距</span><span><span class="badge info">{{ sel.spendingTier || '—' }}</span>（本月 {{ sel.monthlySpending }} 元）</span></div>
+        <div class="rw"><span class="k">消費級距</span><span><span :class="tierClass(sel.spendingTier)">{{ sel.spendingTier || '—' }}</span>（本月 {{ sel.monthlySpending }} 元）</span></div>
         <div class="rw"><span class="k">登入方式</span><span>{{ sel.authProvider }}</span></div>
         <div class="rw"><span class="k">小農身分</span><span>{{ sel.farmerIdentity ? '是' : '否' }}</span></div>
         <div class="rw"><span class="k">目前狀態</span><span><span :class="badge(sel.userStatus)">{{ sel.userStatus }}</span></span></div>
