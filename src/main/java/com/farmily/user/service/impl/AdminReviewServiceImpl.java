@@ -11,6 +11,7 @@ import com.farmily.user.service.AdminReviewService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.nio.file.AccessDeniedException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -87,6 +88,14 @@ public class AdminReviewServiceImpl implements AdminReviewService {
         FarmerReview review = findReview(reviewId);
         ensureReviewing(review);       // 若 APPROVED/REJECTED 就擋下
 
+        if (review.getAdmin() == null || !review.getAdmin().getAdminId().equals(adminId)) {
+            try {
+                throw new AccessDeniedException("此案件由其他管理員認領，您無法審核");
+            } catch (AccessDeniedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
         // 更新到 Farmer 核准的資料
         Farmer farmer = review.getFarmer();
         farmer.setFarmName(review.getSubmittedFarmName());
@@ -110,6 +119,13 @@ public class AdminReviewServiceImpl implements AdminReviewService {
     public FarmerReviewResponse reject(Integer reviewId, Integer adminId, String rejectReason) {
         FarmerReview review = findReview(reviewId);
         ensureReviewing(review);
+        if (review.getAdmin() == null || !review.getAdmin().getAdminId().equals(adminId)) {
+            try {
+                throw new AccessDeniedException("此案件由其他管理員認領，您無法審核");
+            } catch (AccessDeniedException e) {
+                throw new RuntimeException(e);
+            }
+        }
 
         // 同步更新 FarmerReview 拒絕的資料
         review.setReviewStatus(FarmerReview.ReviewStatus.REJECTED);
@@ -130,6 +146,7 @@ public class AdminReviewServiceImpl implements AdminReviewService {
         return adminRepository.findById(adminId)
                 .orElseThrow(() -> new IllegalArgumentException("查無此管理員"));
     }
+
     // 確保一定要先 REVIEWING (除了 REVIEWING，擋住其他審核狀態)
     private void ensureReviewing(FarmerReview review) {
         FarmerReview.ReviewStatus s = review.getReviewStatus();

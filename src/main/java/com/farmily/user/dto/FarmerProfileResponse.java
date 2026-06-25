@@ -89,8 +89,14 @@ public class FarmerProfileResponse {
         dto.locLong = f.getLocLong();
         dto.farmerStatus = f.getFarmerStatus() != null ? f.getFarmerStatus().name() : null;
         if (latestReview != null) {
-            dto.reviewStatus = latestReview.getReviewStatus() != null ? latestReview.getReviewStatus().name() : null;
-            dto.reviewRound = latestReview.getReviewRound() != null ? latestReview.getReviewRound().intValue() : null;
+            FarmerReview.ReviewStatus s = latestReview.getReviewStatus();
+            // 小農端只看到「待審」：REVIEWING 對外顯示成 PENDING
+            dto.reviewStatus = (s == FarmerReview.ReviewStatus.REVIEWING)
+                    ? FarmerReview.ReviewStatus.PENDING.name()
+                    : s.name();
+            dto.reviewRound = latestReview.getReviewRound() != null
+                    ? latestReview.getReviewRound().intValue()
+                    : null;
         }
         dto.hasPassword = f.getPassword() != null;
         return dto;

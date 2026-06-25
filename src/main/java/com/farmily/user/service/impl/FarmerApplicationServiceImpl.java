@@ -40,13 +40,15 @@ public class FarmerApplicationServiceImpl implements FarmerApplicationService {
     public FarmerReviewResponse checkStatus(LoginRequest log) {
         Farmer farmer = authByCredentials(log.getEmail(), log.getPassword());
         FarmerReview latest = farmerReviewRepository.findTopByFarmer_FarmerIdOrderByReviewRoundDesc(farmer.getFarmerId());
+
+        // latest 防呆（active 小農理論上至少有一筆審核
         if(latest == null) {
             throw new IllegalArgumentException("查無審核紀錄");
         }
         return FarmerReviewResponse.from(latest);
     }
 
-    // 重新送審（只允許小農狀態 PENDING + 審核狀態為 REJECTED 才能重新送審
+    // 未啟用小農重新送審（只允許小農狀態 PENDING + 審核狀態為 REJECTED 才能重新送審
     @Override
     public FarmerReviewResponse resubmit(PublicFarmerResubmitRequest req) {
 
