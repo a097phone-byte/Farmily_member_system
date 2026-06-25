@@ -8,9 +8,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-// "How" to find Farmer ?
+// Security - "How" to find Farmer ?
 @Service
-public class FarmerUserDetailsService implements UserDetailsService {
+public class  FarmerUserDetailsService implements UserDetailsService {
 
     private final FarmerRepository farmerRepository;
 

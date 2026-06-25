@@ -52,12 +52,12 @@ public class FarmerApplicationServiceImpl implements FarmerApplicationService {
 
         Farmer farmer = authByCredentials(req.getEmail(), req.getPassword());
 
+        // 查最新審核
+        FarmerReview latest = farmerReviewRepository.findTopByFarmer_FarmerIdOrderByReviewRoundDesc(farmer.getFarmerId());
+
         if (farmer.getFarmerStatus() != Farmer.FarmerStatus.PENDING) {
             throw new IllegalStateException("此帳號已通過審核，請登入後操作");
         }
-
-        // 查最新審核
-        FarmerReview latest = farmerReviewRepository.findTopByFarmer_FarmerIdOrderByReviewRoundDesc(farmer.getFarmerId());
 
         // 僅最新一輪審核狀態為 REJECTED 才能重新送審；審核中 PENDING/REVIEWING 一律擋下
         if (latest == null || latest.getReviewStatus() != FarmerReview.ReviewStatus.REJECTED) {

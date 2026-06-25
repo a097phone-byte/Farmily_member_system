@@ -125,7 +125,7 @@ export default {
                   </div>
                 </td>
                 <td>第 {{ r.reviewRound }} 輪</td>
-                <td><span class="badge s-review">{{ r.reviewStatus }}</span></td>
+                <td><span class="badge" :class="'s-' + String(r.reviewStatus || 'review').toLowerCase()">{{ r.reviewStatus }}</span></td>
                 <td>{{ fmt(r.submittedAt) }}</td>
                 <td><div class="row-actions"><button class="btn sm" @click="open(r)">審核</button></div></td>
               </tr>
@@ -170,7 +170,7 @@ export default {
               <tbody>
                 <tr v-for="h in history" :key="h.reviewId">
                   <td>第 {{ h.reviewRound }} 輪</td>
-                  <td><span class="badge s-review">{{ h.reviewStatus }}</span></td>
+                  <td><span class="badge" :class="'s-' + String(h.reviewStatus || 'review').toLowerCase()">{{ h.reviewStatus }}</span></td>
                   <td>{{ h.adminName || '—' }}</td>
                   <td>{{ h.rejectReason || '—' }}</td>
                   <td>{{ fmt(h.reviewedAt || h.submittedAt) }}</td>

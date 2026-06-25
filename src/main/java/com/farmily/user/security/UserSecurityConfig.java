@@ -39,6 +39,7 @@ public class UserSecurityConfig {
 //                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
 //                        .csrfTokenRequestHandler(createCsrfHandler()))
 
+                // 跨域同源 (需處理前端 Vue.js 和後端不同源情況)
                 .cors(Customizer.withDefaults())
 //                .formLogin(Customizer.withDefaults())    // 關掉預設 form 登入，改自定義登入，避免背景監聽 login
 //                .httpBasic(Customizer.withDefaults());     // API call: Authorization Basic XXX

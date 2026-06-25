@@ -138,6 +138,11 @@ public class FarmerServiceImpl implements FarmerService {
         Farmer farmer = findFarmer(farmerId);
         FarmerReview latest = farmerReviewRepository.findTopByFarmer_FarmerIdOrderByReviewRoundDesc(farmerId);
 
+        // 若小農狀態為 ACTIVE 但修改需要重審資料，重審資料審核狀態為 PENDING，也需要隱藏重新上傳功能
+        if(farmer == null || latest.getReviewStatus() != FarmerReview.ReviewStatus.REJECTED){
+            throw new IllegalStateException("尚在審核中，需待退件後才能重新送審");
+        }
+
         // 計算重審次數
         int nextRound = (latest != null && latest.getReviewRound() != null)
                         ? latest.getReviewRound() + 1

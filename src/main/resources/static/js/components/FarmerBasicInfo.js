@@ -41,7 +41,7 @@ export default {
         <div class="card-body">
           <div class="rw"><span class="k">農場地址</span><span>{{ p.cityName }}{{ p.distName }} {{ p.farmAddress }}</span></div>
           <div class="rw"><span class="k">座標</span><span>{{ p.locLat || '—' }}, {{ p.locLong || '—' }}</span></div>
-          <div class="rw"><span class="k">最新審核</span><span><span class="badge s-review">{{ p.reviewStatus || '—' }}</span>（第 {{ p.reviewRound || '—' }} 輪）</span></div>
+          <div class="rw"><span class="k">最新審核</span><span><span class="badge" :class="'s-' + String(p.reviewStatus || 'review').toLowerCase()">{{ p.reviewStatus || '—' }}</span>（第 {{ p.reviewRound || '—' }} 輪）</span></div>
         </div>
       </div>
 

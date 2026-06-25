@@ -33,7 +33,7 @@ public class AdminUserDetailsService implements UserDetailsService {
         // step2. 查出他擁有的權限代碼
         List<String> codes = adminRepository.findPermissionCodesByAdminId(admin.getAdminId());
 
-        // step3. 組成 authority 清單
+        // step3. 轉換成 Spring Security 的 GrantedAuthority，組成 authority 清單
         List<GrantedAuthority> authorities = new ArrayList<>();
         authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
 

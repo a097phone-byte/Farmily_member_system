@@ -70,7 +70,8 @@ export default {
           <div class="rw"><span class="k">帳號狀態</span><span>{{ p.farmerStatus }}</span></div>
         </div>
         <div class="card-foot" style="justify-content:flex-start">
-          <button v-if="!showForm" class="btn outline" @click="openForm">重新送審 / 修改審核欄位</button>
+          <button v-if="!showForm && isRejected" class="btn outline" @click="openForm">重新送審 / 修改審核欄位</button>
+          <p v-else-if="!showForm" class="muted">審核中，請耐心等候審核結果，退件後才可重新送審。</p>
         </div>
       </div>
 

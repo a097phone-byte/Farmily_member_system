@@ -8,7 +8,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.List;
 
-// 自訂 Farmer 身分識別格式
+// Security - 自訂 Farmer 身分識別格式
 public class FarmerUserDetails implements UserDetails {
 
     private final Farmer farmer;
