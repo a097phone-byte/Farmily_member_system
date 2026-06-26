@@ -9,6 +9,7 @@ import FarmerLogin from './components/FarmerLogin.js';
 import ForgotPassword from './components/ForgotPassword.js';
 import ResetPassword from './components/ResetPassword.js';
 import ResendVerification from './components/ResendVerification.js';
+import VerifyEmail from './components/VerifyEmail.js';
 import Forbidden from './components/Forbidden.js';
 import Toast from './components/Toast.js';
 import ConfirmDialog from './components/ConfirmDialog.js';
@@ -50,7 +51,7 @@ const FARMER_NAV = [
 
 const App = {
     components: {
-        AppNav, HomeLanding, MemberLogin, FarmerLogin, ForgotPassword, ResetPassword, ResendVerification,
+        AppNav, HomeLanding, MemberLogin, FarmerLogin, ForgotPassword, ResetPassword, ResendVerification, VerifyEmail,
         Forbidden, Toast, ConfirmDialog, DashboardLayout, LoadingView,
         MemberBasicInfo, MemberPassword, MemberIntegrations,
         FarmerBasicInfo, FarmerPassword, FarmerReviewStatus,
@@ -82,6 +83,7 @@ const App = {
                 '/forgot-password': 'ForgotPassword',
                 '/reset-password': 'ResetPassword',
                 '/resend-verification': 'ResendVerification',
+                '/verify-email': 'VerifyEmail',
                 '/forbidden': 'Forbidden',
             };
             return map[path] || 'HomeLanding';

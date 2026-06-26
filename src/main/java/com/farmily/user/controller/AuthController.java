@@ -58,7 +58,7 @@ public class AuthController {
     public ResponseEntity<String> resendVerification(
             @RequestBody @Valid ResendVerificationRequest req) {
         emailVerificationService.resend(req.getEmail(), req.getAccountType());
-        return ResponseEntity.ok("若帳號存在且尚未驗證，系統已重新寄出驗證信");
+        return ResponseEntity.ok("系統已重新寄出驗證信，請至信箱確認");
     }
 
     // 忘記密碼第一步：寄重設密碼信（不論帳號是否存在都回相同訊息）
@@ -66,7 +66,7 @@ public class AuthController {
     public ResponseEntity<String> forgotPassword(
             @RequestBody @Valid ForgotPasswordRequest req) {
         passwordResetService.sendResetLink(req.getEmail(), req.getAccountType());
-        return ResponseEntity.ok("若帳號存在，系統已寄出重設密碼信");
+        return ResponseEntity.ok("系統已寄出重設密碼信，請至信箱確認");
     }
 
     // 忘記密碼第二步：帶 token + 新密碼來重設

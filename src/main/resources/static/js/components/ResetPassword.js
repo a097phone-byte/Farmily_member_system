@@ -13,6 +13,8 @@ export default {
             loading: false,
             errorMsg: '',
             okMsg: '',
+            countdown: 3,           // 重設成功後倒數秒數
+            timer: null,            // setInterval 的代號，離開頁面時要清掉
         };
     },
     // 進到這頁時，從網址 hash 把 token 取出來
@@ -44,8 +46,8 @@ export default {
                     token: this.token,
                     newPassword: this.newPassword,
                 });
-                this.okMsg = '密碼重設成功！3 秒後帶你回登入頁。';
-                setTimeout(() => navigate('/member/login'), 3000);
+                this.okMsg = '密碼重設成功！';
+                this.startCountdown();          // 開始逐秒倒數，數到 0 自動回登入頁
             } catch (e) {
                 // 後端：404=連結無效、409=連結已用過或過期
                 this.errorMsg = e.status === 409 ? '連結已使用過或已過期，請重新申請'
@@ -56,6 +58,20 @@ export default {
                 this.loading = false;
             }
         },
+        // 每秒把 countdown 減 1，數到 0 就清掉計時器並回登入頁
+        startCountdown() {
+            this.timer = setInterval(() => {
+                this.countdown -= 1;
+                if (this.countdown <= 0) {
+                    clearInterval(this.timer);
+                    navigate('/member/login');
+                }
+            }, 1000);
+        },
+    },
+    // 使用者若提早離開，把計時器清掉，避免之後又跳一次
+    beforeUnmount() {
+        if (this.timer) clearInterval(this.timer);
     },
     template: `
     <div class="auth-wrap">
@@ -66,7 +82,7 @@ export default {
         </div>
 
         <p v-if="errorMsg" class="err">{{ errorMsg }}</p>
-        <p v-if="okMsg" class="ok">{{ okMsg }}</p>
+        <p v-if="okMsg" class="ok">{{ okMsg }}{{ countdown }} 秒後帶你回登入頁。</p>
 
         <form class="form-grid" @submit.prevent="onSubmit">
           <div class="field"><label>新密碼</label><input v-model="newPassword" type="password" placeholder="至少 8 碼" required /></div>

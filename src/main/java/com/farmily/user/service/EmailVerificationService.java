@@ -43,8 +43,8 @@ public class EmailVerificationService {
         String token = tokenService.createToken(
                 email, accountType, AccountToken.TokenType.EMAIL_VERIFY, verifyTtlMinutes);
 
-        // 點這個連結會打到後端的驗證 API
-        String verifyLink = frontendBaseUrl + "/api/auth/verify-email?token=" + token;
+        // 指向前端 SPA 的驗證頁（hash 路由），頁面再帶 token 呼叫後端驗證 API、顯示結果並導回首頁
+        String verifyLink = frontendBaseUrl + "/#/verify-email?token=" + token;
 
         emailService.sendVerifyEmail(email, verifyLink);
     }

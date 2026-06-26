@@ -3,7 +3,7 @@ package com.farmily.user.dto;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
-//三身分共用的本地登入請求 (email + password)
+// 共用的本地登入請求 (email + password)
 public class LoginRequest  {
 
     @Email

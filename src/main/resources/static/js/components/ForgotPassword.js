@@ -24,7 +24,7 @@ export default {
                     accountType: this.accountType,
                 });
                 // 後端為了安全，不論帳號是否存在都回相同訊息
-                this.okMsg = '若帳號存在，我們已寄出重設密碼信，請至信箱收信（連結 30 分鐘內有效）。';
+                this.okMsg = '已寄出重設密碼信，請至信箱收信';
             } catch (e) {
                 this.errorMsg = '送出失敗，請稍後再試';
             } finally {

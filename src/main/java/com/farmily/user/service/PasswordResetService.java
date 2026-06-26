@@ -20,6 +20,7 @@ public class PasswordResetService {
     private final UserRepository userRepository;
     private final FarmerRepository farmerRepository;
     private final PasswordEncoder passwordEncoder;
+    private final SessionService sessionService;
 
     // 信件連結用的網址前綴
     @Value("${app.frontend-base-url}")
@@ -33,15 +34,17 @@ public class PasswordResetService {
                                 EmailService emailService,
                                 UserRepository userRepository,
                                 FarmerRepository farmerRepository,
-                                PasswordEncoder passwordEncoder) {
+                                PasswordEncoder passwordEncoder,
+                                SessionService sessionService) {
         this.tokenService = tokenService;
         this.emailService = emailService;
         this.userRepository = userRepository;
         this.farmerRepository = farmerRepository;
         this.passwordEncoder = passwordEncoder;
+        this.sessionService = sessionService;
     }
 
-    // 第一步：使用者輸入 email，帳號存在才寄重設信
+    // step1. 使用者輸入 email，帳號存在才寄重設信
     // 不論帳號是否存在都不報錯，避免洩漏哪些信箱有註冊
     public void sendResetLink(String email, AccountToken.AccountType accountType) {
 
@@ -73,7 +76,7 @@ public class PasswordResetService {
         emailService.sendResetPasswordEmail(email, resetLink);
     }
 
-    // 第二步：帶 token + 新密碼來重設
+    // step2. 帶 token + 新密碼來重設
     public void resetPassword(String token, String newPassword) {
 
         // 驗證 token（過期 / 用過 / 用途不符會丟例外）
@@ -98,5 +101,9 @@ public class PasswordResetService {
             farmer.setPassword(passwordEncoder.encode(newPassword));
             farmerRepository.save(farmer);
         }
+
+        // 密碼已改，把這個帳號目前所有登入中的 session 設為過期
+        // （忘記密碼時當下沒有登入中的自己，所以傳 null = 全部都踢）
+        sessionService.expireSessions(email, null);
     }
 }

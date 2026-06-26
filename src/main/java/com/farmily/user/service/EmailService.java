@@ -28,11 +28,10 @@ public class EmailService {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom(fromEmail);
         message.setTo(toEmail);
-        message.setSubject("Farmily 帳號 Email 驗證");
+        message.setSubject("Farmily 帳號 - Email 驗證");
         message.setText("您好，\n\n"
                 + "請點擊以下連結完成 Email 驗證（連結 24 小時內有效）：\n"
-                + verifyLink + "\n\n"
-                + "若您沒有註冊本平台，請忽略此信。");
+                + verifyLink);
 
         mailSender.send(message);
     }
@@ -44,11 +43,26 @@ public class EmailService {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom(fromEmail);
         message.setTo(toEmail);
-        message.setSubject("Farmily 重設密碼");
+        message.setSubject("Farmily - 重設密碼");
         message.setText("您好，\n\n"
                 + "請點擊以下連結重設您的密碼（連結 30 分鐘內有效）：\n"
-                + resetLink + "\n\n"
-                + "若您沒有申請重設密碼，請忽略此信，您的密碼不會被變更。");
+                + resetLink);
+
+        mailSender.send(message);
+    }
+
+    // 寄出「密碼已變更」通知信（純通知，不需點任何連結）
+    @Async
+    public void sendPasswordChangedNotice(String toEmail) {
+
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom(fromEmail);
+        message.setTo(toEmail);
+        message.setSubject("Farmily - 密碼已變更通知");
+        message.setText("您好，\n\n"
+                + "您的 Farmily 帳號密碼剛剛已被變更，所有裝置已被登出，請用新密碼登入。\n"
+                + "若這是您本人的操作，請忽略本信。\n"
+                + "若非本人操作，您的帳號可能有風險，請立即聯繫客服。");
 
         mailSender.send(message);
     }

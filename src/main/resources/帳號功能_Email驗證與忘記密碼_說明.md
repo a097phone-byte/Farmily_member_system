@@ -125,7 +125,8 @@ POST /api/auth/reset-password  (帶 token + newPassword)
         ▼
 PasswordResetService.resetPassword()
         │  ├─ TokenService.validateAndConsume()  → 檢查 token 並標記已使用
-        │  └─ 把新密碼 hash 後存回 USER / FARMER（不需驗證舊密碼）
+        │  ├─ 把新密碼 hash 後存回 USER / FARMER（不需驗證舊密碼）
+        │  └─ expireAllSessions()                → 把該帳號所有登入中的 session 設為過期
 ```
 
 ### 各檔案職責
@@ -167,8 +168,20 @@ PasswordResetService.resetPassword()
    因為使用者就是「忘記」了，改用「Email 收信」來證明本人，
    和登入後的「修改密碼」（要驗舊密碼）是不同流程。
 
-7. **目前尚未強制「沒驗證就不能登入」**
-   為了不卡住現有測試資料，先不擋。
+7. **改 / 重設密碼後，會讓該帳號登入中的 session 失效**
+   避免「密碼被盜改後，舊裝置仍保持登入」的風險。做法：
+   - 登入時把 session 登記到 Spring 的 `SessionRegistry`
+     （`UserController` / `FarmerController` 手動登入，需自己呼叫 `SessionService.registerSession`）。
+   - `UserSecurityConfig` 用 `maximumSessions(-1)` 掛上 `ConcurrentSessionFilter`，
+     並註冊 `SessionRegistry` 與 `HttpSessionEventPublisher` 兩個 bean。
+   - 統一由 `SessionService.expireSessions(email, keepSessionId)` 處理；被標記的 session
+     下次請求就會被擋下、需重新登入。兩個情境差別在「要不要留自己這台」：
+     - **忘記密碼**（未登入）：`PasswordResetService` 傳 `keepSessionId = null` → 全部踢掉。
+     - **修改密碼**（已登入，需驗舊密碼）：controller 傳「當前 session id」→ 只踢其他裝置，
+       保留操作者自己，並另外寄一封「密碼已變更」純通知信（`EmailService.sendPasswordChangedNotice`）。
+
+8. **目前尚未強制「沒驗證就不能登入」**
+   為了不卡住現有測試資料，先不擋（之後會綁定業務流程時再驗）。
    若要啟用，在 `UserServiceImpl.login()` / `FarmerServiceImpl.login()`
    加一段檢查 `email_verified` 即可。
 

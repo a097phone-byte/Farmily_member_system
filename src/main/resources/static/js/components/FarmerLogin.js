@@ -185,11 +185,10 @@ export default {
           <form v-if="mode==='login'" class="form-grid" @submit.prevent="onLogin">
             <div class="field"><label>Email</label><input v-model="login.email" type="email" required /></div>
             <div class="field"><label>密碼</label><password-field v-model="login.password" placeholder="密碼"></password-field></div>
-            <label class="remember"><input type="checkbox" v-model="login.rememberMe" /> 記住我（保持登入較久）</label>
+            <label class="remember"><input type="checkbox" v-model="login.rememberMe" /> 記住我</label>
             <button class="btn block" type="submit" :disabled="loading">{{ loading ? '登入中…' : '登入' }}</button>
             <p class="hint" style="text-align:center">
-              <a href="#/forgot-password">忘記密碼？</a> ·
-              <a href="#/resend-verification">重寄驗證信</a>
+              <a href="#/forgot-password">忘記密碼？</a>
             </p>
             <p class="hint">尚未通過審核或被退件無法登入</p>
           </form>

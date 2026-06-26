@@ -7,6 +7,8 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -14,6 +16,7 @@ import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.security.web.server.csrf.CookieServerCsrfTokenRepository;
+import org.springframework.security.web.session.HttpSessionEventPublisher;
 
 @Configuration
 @EnableWebSecurity
@@ -24,12 +27,29 @@ public class UserSecurityConfig {
         return new BCryptPasswordEncoder();     // Hash - Bcrypt 加密
     }
 
+    // 記錄「哪個帳號目前有哪些 session」，重設密碼時可據此把該帳號的所有 session 設為過期
+    @Bean
+    public SessionRegistry sessionRegistry() {
+        return new SessionRegistryImpl();
+    }
+
+    // session 被銷毀（登出 / 逾時）時發事件，讓 SessionRegistry 自動移除紀錄，避免一直累積
+    @Bean
+    public HttpSessionEventPublisher httpSessionEventPublisher() {
+        return new HttpSessionEventPublisher();
+    }
+
     // 三個身分共用的 session / csrf / cors / httpBasic 設定
     private HttpSecurity commonSetup(HttpSecurity http) throws Exception {
         return http
                 // 設定 Session 的創建機制 (session + cookie)
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.ALWAYS))
+                        .sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
+
+                        // maximumSessions(-1) = 不限制同時登入數，但會掛上 ConcurrentSessionFilter，
+                        // 被 expireNow() 標記過期的 session 下次請求就會被擋下 - 重設密碼後踢掉
+                        .maximumSessions(-1)
+                        .sessionRegistry(sessionRegistry()))
 
                 // 關閉 csrf 保護，可以 call POST/PUT/DELETE API
                 .csrf(csrf -> csrf.disable())
@@ -125,7 +145,7 @@ public class UserSecurityConfig {
                         // 公開：註冊/申請表單的縣市與行政區下拉要用
                         .requestMatchers("/api/city-districts", "/api/city-districts/**").permitAll()
 
-                        // 公開：Email 驗證 / 重寄驗證信 (未登入也要能用)
+                        // 公開：Email 驗證 / 忘記密碼 (未登入也要能用)
                         .requestMatchers("/api/auth/**").permitAll()
                         .anyRequest().authenticated()
                 )

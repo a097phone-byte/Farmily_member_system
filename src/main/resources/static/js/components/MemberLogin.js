@@ -92,8 +92,8 @@ export default {
     },
 
     mounted() { this.setupGoogle(); },
-    // 從註冊分頁切回登入分頁時，Google 按鈕的 div 才重新出現 → 再渲染一次
-    updated() { if (this.mode === 'login') this.setupGoogle(); },
+    // 切換分頁會觸發重新渲染，這裡再畫一次確保 Google 按鈕在兩個分頁都正常顯示
+    updated() { this.setupGoogle(); },
 
     template: `
     <div class="auth-wrap">
@@ -121,17 +121,12 @@ export default {
         <form v-if="mode==='login'" class="form-grid" @submit.prevent="onLogin">
           <div class="field"><label>Email</label><input v-model="login.email" type="email" required /></div>
           <div class="field"><label>密碼</label><password-field v-model="login.password" placeholder="密碼"></password-field></div>
-          <label class="remember"><input type="checkbox" v-model="login.rememberMe" /> 記住我（保持登入較久）</label>
+          <label class="remember"><input type="checkbox" v-model="login.rememberMe" /> 記住我</label>
           <button class="btn block" type="submit" :disabled="loading">{{ loading ? '登入中…' : '登入' }}</button>
 
           <p class="hint" style="text-align:center">
-            <a href="#/forgot-password">忘記密碼？</a> ·
-            <a href="#/resend-verification">重寄驗證信</a>
+            <a href="#/forgot-password">忘記密碼？</a>
           </p>
-
-          <div class="divider">或</div>
-          <div ref="gbtn" style="display:flex;justify-content:center"></div>
-          <p class="hint">Google 登入成功後會送 idToken 到後端驗證</p>
         </form>
 
         <!-- 註冊分頁 -->
@@ -146,6 +141,12 @@ export default {
           <div class="field"><label>生日</label><input v-model="reg.birthday" type="date" /></div>
           <button class="btn block" type="submit" :disabled="loading">{{ loading ? '送出中…' : '註冊' }}</button>
         </form>
+
+        <!-- Google 登入／註冊：兩個分頁共用、一律顯示。
+             後端 loginOrRegisterOAuth 會自動判斷「沒帳號就註冊、有帳號就登入」 -->
+        <div class="divider">或</div>
+        <div ref="gbtn" style="display:flex;justify-content:center"></div>
+        <p class="hint" style="text-align:center">使用 Google 一鍵{{ mode==='login' ? '登入' : '註冊' }}（成功後送 idToken 到後端驗證）</p>
       </div>
     </div>
   `,

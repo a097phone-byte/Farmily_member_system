@@ -4,8 +4,12 @@ import com.farmily.user.dto.*;
 import com.farmily.user.security.GoogleTokenVerifier;
 import com.farmily.user.security.MemberUserDetails;
 import com.farmily.user.security.service.MemberUserDetailsService;
+import com.farmily.user.service.EmailService;
+import com.farmily.user.service.SessionService;
 import com.farmily.user.service.UserService;
+import com.farmily.user.util.SessionCookieSupport;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -24,11 +28,15 @@ public class UserController {
     private final UserService userService;
     private final MemberUserDetailsService memberUserDetailsService;
     private final GoogleTokenVerifier googleTokenVerifier;
+    private final SessionService sessionService;
+    private final EmailService emailService;
 
-    public UserController(UserService userService, MemberUserDetailsService memberUserDetailsService, GoogleTokenVerifier googleTokenVerifier) {
+    public UserController(UserService userService, MemberUserDetailsService memberUserDetailsService, GoogleTokenVerifier googleTokenVerifier, SessionService sessionService, EmailService emailService) {
         this.userService = userService;
         this.memberUserDetailsService = memberUserDetailsService;
         this.googleTokenVerifier = googleTokenVerifier;
+        this.sessionService = sessionService;
+        this.emailService = emailService;
     }
 
     // 一般會員註冊
@@ -44,7 +52,8 @@ public class UserController {
     @PostMapping("/login")
     public ResponseEntity<UserProfileResponse> login(
             @RequestBody @Valid LoginRequest  log,
-            HttpServletRequest request) {
+            HttpServletRequest request,
+            HttpServletResponse httpResponse) {
 
         // step1: 呼叫 Service，判斷帳號狀態、比對密碼，回傳 dto
         UserProfileResponse response = userService.login(log);
@@ -60,13 +69,19 @@ public class UserController {
                 HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
                 SecurityContextHolder.getContext());
 
-        // step4: 依「記住我」設定 session 多久沒操作就過期 (單位：秒)
-        if (log.isRememberMe()) {
-            session.setMaxInactiveInterval(60 * 60 * 24 * 14);   // 勾記住我：14 天
-        } else {
-            session.setMaxInactiveInterval(60 * 30);             // 不勾：30 分鐘
-        }
+        // 把這個 session 登記進來（手動登入不會自動登記），之後改 / 重設密碼才找得到並讓它失效
+        sessionService.registerSession(session.getId(), userDetails);
 
+        // step4: 依「記住我」設定 session 多久沒操作就過期 (單位：秒)，
+        //        並決定 JSESSIONID cookie 要不要寫進硬碟 (關瀏覽器後是否保留)
+        if (log.isRememberMe()) {
+            session.setMaxInactiveInterval(60 * 60 * 24 * 14);   // 勾記住我：server session 14 天
+            // 在 getSession(true) 之後才寫，這個 Set-Cookie 會排在 Tomcat 預設那個之後，
+            // 瀏覽器採用後者 → 變成帶 Max-Age 的 persistent cookie，關掉瀏覽器仍保留
+            SessionCookieSupport.writeRememberMeCookie(session, httpResponse);
+        } else {
+            session.setMaxInactiveInterval(60 * 30);             // 不勾：30 分鐘，沿用預設 session cookie (關瀏覽器即刪)
+        }
         return ResponseEntity.ok(response);
     }
 
@@ -90,9 +105,20 @@ public class UserController {
     @PutMapping("/me/password")
     public ResponseEntity<String> changePassword(
             @AuthenticationPrincipal MemberUserDetails me,
-            @RequestBody @Valid ChangePasswordRequest pw) {
+            @RequestBody @Valid ChangePasswordRequest pw,
+            HttpServletRequest request) {
         userService.changePassword(me.getUserId(), pw);
-        return ResponseEntity.ok("密碼修改成功！請使用新密碼登入");
+
+        // 改密碼成功後：踢掉「其他裝置」的 session（保留自己這台），再寄一封通知信
+        HttpSession session = request.getSession(false);
+        String currentSessionId = null;
+        if (session != null) {
+            currentSessionId = session.getId();
+        }
+        sessionService.expireSessions(me.getUsername(), currentSessionId);
+        emailService.sendPasswordChangedNotice(me.getUsername());
+
+        return ResponseEntity.ok("密碼修改成功！");
     }
 
 
@@ -126,6 +152,9 @@ public class UserController {
         session.setAttribute(
                 HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
                 SecurityContextHolder.getContext());
+
+        // 同樣登記進來
+        sessionService.registerSession(session.getId(), userDetails);
 
         return ResponseEntity.ok(response);
     }
