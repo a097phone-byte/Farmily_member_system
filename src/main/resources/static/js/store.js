@@ -10,8 +10,8 @@ export const store = Vue.reactive({
     admin:  { profile: null, loaded: false },
 
     // ========== 會員 ==========
-    async memberLogin(email, password) {
-        this.member.profile = await api.post('/member/login', { email, password });
+    async memberLogin(email, password, rememberMe) {
+        this.member.profile = await api.post('/member/login', { email, password, rememberMe });
         this.member.loaded = true;
     },
     async memberFetchMe() {                       // 用既有 cookie 取回自己的資料（重新整理後還原登入）
@@ -31,8 +31,8 @@ export const store = Vue.reactive({
     },
 
     // ========== 小農 ==========
-    async farmerLogin(email, password) {
-        this.farmer.profile = await api.post('/farmer/login', { email, password });
+    async farmerLogin(email, password, rememberMe) {
+        this.farmer.profile = await api.post('/farmer/login', { email, password, rememberMe });
         this.farmer.loaded = true;
     },
     async farmerFetchMe() {

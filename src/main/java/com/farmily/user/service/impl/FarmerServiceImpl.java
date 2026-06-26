@@ -1,6 +1,7 @@
 package com.farmily.user.service.impl;
 
 import com.farmily.user.dto.*;
+import com.farmily.user.model.AccountToken;
 import com.farmily.user.model.CityDistrict;
 import com.farmily.user.model.Farmer;
 import com.farmily.user.model.FarmerReview;
@@ -8,6 +9,7 @@ import com.farmily.user.repository.CityDistrictRepository;
 import com.farmily.user.repository.FarmerRepository;
 import com.farmily.user.repository.FarmerReviewRepository;
 import com.farmily.user.service.EmailUniquenessChecker;
+import com.farmily.user.service.EmailVerificationService;
 import com.farmily.user.service.FarmerService;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,16 +28,18 @@ public class FarmerServiceImpl implements FarmerService {
     private final CityDistrictRepository cityDistrictRepository;
     private final EmailUniquenessChecker emailUniquenessChecker;
     private final PasswordEncoder passwordEncoder;
+    private final EmailVerificationService emailVerificationService;
 
 
     public FarmerServiceImpl(FarmerRepository farmerRepository, FarmerReviewRepository farmerReviewRepository,
                              CityDistrictRepository cityDistrictRepository, EmailUniquenessChecker emailUniquenessChecker,
-                             PasswordEncoder passwordEncoder) {
+                             PasswordEncoder passwordEncoder, EmailVerificationService emailVerificationService) {
         this.farmerRepository = farmerRepository;
         this.farmerReviewRepository = farmerReviewRepository;
         this.cityDistrictRepository = cityDistrictRepository;
         this.emailUniquenessChecker = emailUniquenessChecker;
         this.passwordEncoder = passwordEncoder;
+        this.emailVerificationService = emailVerificationService;
     }
 
     // 小農註冊申請
@@ -74,9 +78,14 @@ public class FarmerServiceImpl implements FarmerService {
         newFarmer.setFarmerStatus(Farmer.FarmerStatus.PENDING);
         newFarmer.setFarmerCreatedAt(LocalDateTime.now());
         newFarmer.setUploadedAt(LocalDateTime.now());
+        newFarmer.setEmailVerified(false);
 
         // 必須先存 farmer 拿到 farmer_id，review 的 farmer_id 外鍵才有對象可指
         Farmer savedFarmer = farmerRepository.save(newFarmer);
+
+        // 寄出 Email 驗證信
+        emailVerificationService.sendVerification(
+                savedFarmer.getEmail(), AccountToken.AccountType.FARMER);
 
         // step4: 為剛申請的小農，建立第一筆審核快照
         FarmerReview review = newReviewSnapshot(

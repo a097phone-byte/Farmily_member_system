@@ -8,6 +8,7 @@ SET FOREIGN_KEY_CHECKS = 0;
 -- ====================================================================
 -- DROP（反向相依順序：先刪子表、再刪父表）
 -- ====================================================================
+DROP TABLE IF EXISTS ACCOUNT_TOKEN;
 DROP TABLE IF EXISTS NEWS;
 DROP TABLE IF EXISTS ADMIN_PERMISSION_ROLE;
 DROP TABLE IF EXISTS FARMER_REVIEW;   -- 參照 FARMER、ADMIN
@@ -269,3 +270,18 @@ VALUES
 (1, '系統維護通知',         '平台將於 2024/04/10 凌晨 2:00 – 4:00 進行系統維護，期間暫停服務。', NULL, '2024-04-08 12:00:00', 'VISIBLE', '2024-04-08 10:00:00'),
 (3, '小農申請流程更新說明', '即日起小農申請流程新增第二階段審核，請備妥相關證明文件再行送件。', NULL, '2024-05-20 10:00:00', 'HIDDEN',  '2024-05-19 16:00:00'),
 (2, '端午節限定農產品上架', '多款端午節限定農產品即將上架，敬請期待！',                         NULL, '2024-06-05 09:00:00', 'VISIBLE', '2024-06-04 15:00:00');
+
+
+-- ====================================================================
+-- 帳號一次性 token（會員 + 小農共用；Email 驗證 / 忘記密碼）
+-- ====================================================================
+CREATE TABLE ACCOUNT_TOKEN (
+    token_id      INT          AUTO_INCREMENT PRIMARY KEY,
+    token         VARCHAR(255) NOT NULL UNIQUE,
+    account_type  ENUM('MEMBER', 'FARMER') NOT NULL,
+    account_email VARCHAR(255) NOT NULL,
+    token_type    ENUM('EMAIL_VERIFY', 'PASSWORD_RESET') NOT NULL,
+    expires_at    DATETIME     NOT NULL,
+    used          BOOLEAN      NOT NULL DEFAULT FALSE,
+    created_at    DATETIME     NOT NULL
+);

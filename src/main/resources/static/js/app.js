@@ -6,6 +6,9 @@ import AppNav from './components/AppNav.js';
 import HomeLanding from './components/HomeLanding.js';
 import MemberLogin from './components/MemberLogin.js';
 import FarmerLogin from './components/FarmerLogin.js';
+import ForgotPassword from './components/ForgotPassword.js';
+import ResetPassword from './components/ResetPassword.js';
+import ResendVerification from './components/ResendVerification.js';
 import Forbidden from './components/Forbidden.js';
 import Toast from './components/Toast.js';
 import ConfirmDialog from './components/ConfirmDialog.js';
@@ -47,7 +50,8 @@ const FARMER_NAV = [
 
 const App = {
     components: {
-        AppNav, HomeLanding, MemberLogin, FarmerLogin, Forbidden, Toast, ConfirmDialog, DashboardLayout, LoadingView,
+        AppNav, HomeLanding, MemberLogin, FarmerLogin, ForgotPassword, ResetPassword, ResendVerification,
+        Forbidden, Toast, ConfirmDialog, DashboardLayout, LoadingView,
         MemberBasicInfo, MemberPassword, MemberIntegrations,
         FarmerBasicInfo, FarmerPassword, FarmerReviewStatus,
     },
@@ -70,8 +74,17 @@ const App = {
         farmerRoute() { return FARMER_ROUTES[this.router.path] || FARMER_ROUTES['/farmer/home']; },
         // 公開頁要顯示哪個元件
         publicView() {
-            const map = { '/member/login': 'MemberLogin', '/farmer/login': 'FarmerLogin', '/forbidden': 'Forbidden' };
-            return map[this.router.path] || 'HomeLanding';
+            // 重設密碼頁網址會帶 ?token=...，比對前先把問號後面切掉
+            const path = this.router.path.split('?')[0];
+            const map = {
+                '/member/login': 'MemberLogin',
+                '/farmer/login': 'FarmerLogin',
+                '/forgot-password': 'ForgotPassword',
+                '/reset-password': 'ResetPassword',
+                '/resend-verification': 'ResendVerification',
+                '/forbidden': 'Forbidden',
+            };
+            return map[path] || 'HomeLanding';
         },
         memberName() { return this.store.member.profile ? this.store.member.profile.userName : ''; },
         farmerName() { return this.store.farmer.profile ? this.store.farmer.profile.farmName : ''; },

@@ -26,6 +26,9 @@ public class Farmer implements Serializable {
     @Column(name = "email", unique = true)
     private String email;
 
+    @Column(name = "email_verified")
+    private Boolean emailVerified;
+
     @Column(name = "password", nullable = true)
     private String password;
 
@@ -79,6 +82,14 @@ public class Farmer implements Serializable {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public Boolean getEmailVerified() {
+        return emailVerified;
+    }
+
+    public void setEmailVerified(Boolean emailVerified) {
+        this.emailVerified = emailVerified;
     }
 
     public String getPassword() {

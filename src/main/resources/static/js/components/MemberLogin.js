@@ -15,7 +15,7 @@ export default {
     data() {
         return {
             mode: 'login',                    // 'login' 或 'register'，控制顯示哪個分頁
-            login: { email: '', password: '' },
+            login: { email: '', password: '', rememberMe: false },
             reg: {                            // 欄位名對齊後端 UserRegisterRequest
                 email: '', password: '', userName: '', userNickname: '',
                 userPhoneNum: '', userAddress: '', districtId: null, birthday: null,
@@ -32,7 +32,7 @@ export default {
             this.errorMsg = ''; this.loading = true;
             try {
                 // store.memberLogin 內部登入後會再打一次 /me，確保拿到完整資料（含消費級距）
-                await store.memberLogin(this.login.email, this.login.password);
+                await store.memberLogin(this.login.email, this.login.password, this.login.rememberMe);
                 navigate('/member/me');
             } catch (e) {
                 // 後端：401=帳密錯、409=帳號狀態異常
@@ -52,7 +52,7 @@ export default {
                 // 生日空字串要轉成 null，避免後端解析失敗
                 const payload = { ...this.reg, birthday: this.reg.birthday || null };
                 await api.post('/member/register', payload);
-                this.okMsg = '註冊成功！請用剛剛的帳密登入。';
+                this.okMsg = '註冊成功！我們已寄出驗證信，請至信箱點連結完成 Email 驗證，再用帳密登入。';
                 this.login.email = this.reg.email;          // 順手帶到登入分頁
                 setTimeout(() => this.switchMode('login'), 900);
             } catch (e) {
@@ -121,7 +121,13 @@ export default {
         <form v-if="mode==='login'" class="form-grid" @submit.prevent="onLogin">
           <div class="field"><label>Email</label><input v-model="login.email" type="email" required /></div>
           <div class="field"><label>密碼</label><password-field v-model="login.password" placeholder="密碼"></password-field></div>
+          <label class="remember"><input type="checkbox" v-model="login.rememberMe" /> 記住我（保持登入較久）</label>
           <button class="btn block" type="submit" :disabled="loading">{{ loading ? '登入中…' : '登入' }}</button>
+
+          <p class="hint" style="text-align:center">
+            <a href="#/forgot-password">忘記密碼？</a> ·
+            <a href="#/resend-verification">重寄驗證信</a>
+          </p>
 
           <div class="divider">或</div>
           <div ref="gbtn" style="display:flex;justify-content:center"></div>

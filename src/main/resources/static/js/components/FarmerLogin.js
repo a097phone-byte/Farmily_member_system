@@ -22,7 +22,7 @@ export default {
         return {
             mode: 'login',
             submitted: false,                   // ← 申請成功後切到「成功畫面」
-            login: { email: '', password: '' },
+            login: { email: '', password: '', rememberMe: false },
             apply: {
                 email: '', password: '', farmName: '', farmAddress: '',
                 districtId: null, farmerPhoneNum: '', farmDesc: '', locLat: null, locLong: null,
@@ -48,7 +48,7 @@ export default {
         async onLogin() {
             this.errorMsg = ''; this.loading = true;
             try {
-                await store.farmerLogin(this.login.email, this.login.password);
+                await store.farmerLogin(this.login.email, this.login.password, this.login.rememberMe);
                 navigate('/farmer/home');
             } catch (e) {
                 this.errorMsg = e.status === 401 ? '帳號或密碼錯誤'
@@ -154,7 +154,7 @@ export default {
         <!-- 申請成功畫面：取代表單，明確告知要等審核 -->
         <div v-if="submitted" style="text-align:center">
           <h2>申請已送出</h2>
-          <p class="muted">你的小農申請已送出，請等待管理員審核。<br>審核通過後就能用 Email 與密碼登入。</p>
+          <p class="muted">你的小農申請已送出，請等待管理員審核。<br>我們也寄出了 Email 驗證信，請順手到信箱完成驗證。<br>審核通過後就能用 Email 與密碼登入。</p>
           <button class="btn block" @click="submitted=false; switchMode('track')">查詢審核進度</button>
           <button class="btn block outline" style="margin-top:8px" @click="submitted=false; switchMode('login')">回到登入</button>
           <p class="hint" style="margin-top:12px"><a href="#/">回首頁</a></p>
@@ -185,7 +185,12 @@ export default {
           <form v-if="mode==='login'" class="form-grid" @submit.prevent="onLogin">
             <div class="field"><label>Email</label><input v-model="login.email" type="email" required /></div>
             <div class="field"><label>密碼</label><password-field v-model="login.password" placeholder="密碼"></password-field></div>
+            <label class="remember"><input type="checkbox" v-model="login.rememberMe" /> 記住我（保持登入較久）</label>
             <button class="btn block" type="submit" :disabled="loading">{{ loading ? '登入中…' : '登入' }}</button>
+            <p class="hint" style="text-align:center">
+              <a href="#/forgot-password">忘記密碼？</a> ·
+              <a href="#/resend-verification">重寄驗證信</a>
+            </p>
             <p class="hint">尚未通過審核或被退件無法登入</p>
           </form>
 

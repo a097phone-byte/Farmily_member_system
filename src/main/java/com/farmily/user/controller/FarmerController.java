@@ -57,6 +57,14 @@ public class FarmerController {
         session.setAttribute(
                 HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
                 SecurityContextHolder.getContext());
+
+        // step4: 依「記住我」設定 session 多久沒操作就過期 (單位：秒)
+        if (req.isRememberMe()) {
+            session.setMaxInactiveInterval(60 * 60 * 24 * 14);   // 勾記住我：14 天
+        } else {
+            session.setMaxInactiveInterval(60 * 30);             // 不勾：30 分鐘
+        }
+
         return ResponseEntity.ok(response);
     }
 

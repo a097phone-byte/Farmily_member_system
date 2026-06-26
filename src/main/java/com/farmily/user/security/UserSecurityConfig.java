@@ -124,6 +124,9 @@ public class UserSecurityConfig {
 
                         // 公開：註冊/申請表單的縣市與行政區下拉要用
                         .requestMatchers("/api/city-districts", "/api/city-districts/**").permitAll()
+
+                        // 公開：Email 驗證 / 重寄驗證信 (未登入也要能用)
+                        .requestMatchers("/api/auth/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .build();

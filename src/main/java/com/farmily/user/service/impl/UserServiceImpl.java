@@ -1,6 +1,7 @@
 package com.farmily.user.service.impl;
 
 import com.farmily.user.dto.*;
+import com.farmily.user.model.AccountToken;
 import com.farmily.user.model.CityDistrict;
 import com.farmily.user.model.User;
 import com.farmily.user.repository.CityDistrictRepository;
@@ -8,6 +9,7 @@ import com.farmily.user.repository.SpendingTierRepository;
 import com.farmily.user.repository.UserRepository;
 
 import com.farmily.user.service.EmailUniquenessChecker;
+import com.farmily.user.service.EmailVerificationService;
 import com.farmily.user.service.UserService;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -25,17 +27,20 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final EmailUniquenessChecker emailUniquenessChecker;
     private final SpendingTierRepository spendingTierRepository;
+    private final EmailVerificationService emailVerificationService;
 
     public UserServiceImpl(UserRepository userRepository,
                            CityDistrictRepository cityDistrictRepository,
                            PasswordEncoder passwordEncoder,
                            EmailUniquenessChecker emailUniquenessChecker,
-                           SpendingTierRepository spendingTierRepository) {
+                           SpendingTierRepository spendingTierRepository,
+                           EmailVerificationService emailVerificationService) {
         this.userRepository = userRepository;
         this.cityDistrictRepository = cityDistrictRepository;
         this.passwordEncoder = passwordEncoder;
         this.emailUniquenessChecker = emailUniquenessChecker;
         this.spendingTierRepository = spendingTierRepository;
+        this.emailVerificationService = emailVerificationService;
     }
 
     // 本地註冊流程
@@ -88,8 +93,15 @@ public class UserServiceImpl implements UserService {
         newUser.setUserStatus(User.UserStatus.ACTIVE);
         newUser.setFarmerIdentity(false);
 
-        // 存進 DB 後，包裝會員資料成 dto 給 Controller
-        return UserProfileResponse.from(userRepository.save(newUser));
+        // 存進 DB
+        User savedUser = userRepository.save(newUser);
+
+        // 寄出 Email 驗證信
+        emailVerificationService.sendVerification(
+                savedUser.getEmail(), AccountToken.AccountType.MEMBER);
+
+        // 包裝會員資料成 dto 給 Controller
+        return UserProfileResponse.from(savedUser);
     }
 
     // 本地登入流程

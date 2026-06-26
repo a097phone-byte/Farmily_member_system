@@ -4,15 +4,14 @@ import com.farmily.user.model.AccountToken;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 
-// 忘記密碼第一步：輸入 email，請系統寄重設密碼信
-// 會員、小農用
-public class ForgotPasswordRequest {
+// 重寄 Email 驗證信用
+public class ResendVerificationRequest {
 
     @Email
     @NotNull
     private String email;
 
-    // 要找哪一種身分：MEMBER 或 FARMER
+    // 要重寄給哪一種身分：MEMBER 或 FARMER
     @NotNull
     private AccountToken.AccountType accountType;
 
