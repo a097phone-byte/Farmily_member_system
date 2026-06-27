@@ -166,7 +166,7 @@ export default {
                 <td><span class="badge" :class="'s-' + String(r.reviewStatus || 'review').toLowerCase()">{{ r.reviewStatus }}</span></td>
                 <td v-if="tab === 'reviewing'">{{ r.adminName || r.adminEmail || '—' }}<span v-if="isMine(r)" class="muted">（我）</span></td>
                 <td>{{ fmt(r.submittedAt) }}</td>
-                <td><div class="row-actions"><button class="btn sm" @click="open(r)">{{ tab === 'reviewing' ? '繼續審核' : '查看 / 認領' }}</button></div></td>
+                <td><div class="row-actions"><button class="btn sm" @click="open(r)">{{ tab === 'reviewing' ? (isMine(r) ? '繼續審核' : '查看') : '查看 / 認領' }}</button></div></td>
               </tr>
             </tbody>
           </table>

@@ -41,6 +41,8 @@ export default {
         reviewBadge() { return 'badge s-' + String(this.reviewInfo && this.reviewInfo.reviewStatus || 'review').toLowerCase(); },
         isApproved() { return this.reviewInfo && String(this.reviewInfo.reviewStatus).toUpperCase() === 'APPROVED'; },
         isRejected() { return this.reviewInfo && String(this.reviewInfo.reviewStatus).toUpperCase() === 'REJECTED'; },
+        // 已核准且已完成 Email 驗證 → 可直接登入；未驗證 → 需先點啟用連結
+        isVerified() { return this.reviewInfo && this.reviewInfo.emailVerified === true; },
     },
     methods: {
         switchMode(m) { this.mode = m; this.errorMsg = ''; this.okMsg = ''; },
@@ -52,7 +54,7 @@ export default {
                 navigate('/farmer/home');
             } catch (e) {
                 this.errorMsg = e.status === 401 ? '帳號或密碼錯誤'
-                    : e.status === 409 ? '帳號尚未通過審核或已停權' : '登入失敗';
+                    : e.status === 409 ? '無法登入：帳號尚未通過審核、尚未完成 Email 驗證，或已停權。通過審核後請先點擊啟用信連結完成驗證' : '登入失敗';
             } finally { this.loading = false; }
         },
 
@@ -78,6 +80,21 @@ export default {
                 this.errorMsg = e.status === 401 ? '帳號或密碼錯誤'
                     : e.status === 404 ? '查無審核紀錄'
                     : '查詢失敗，請稍後再試';
+            } finally { this.loading = false; }
+        },
+
+        // 重寄啟用信：已核准但未驗證、連結過期或沒收到時使用（沿用查詢時輸入的 email + 密碼驗身）
+        async onResendActivation() {
+            this.errorMsg = ''; this.okMsg = ''; this.loading = true;
+            try {
+                await api.post('/farmer/application/resend-activation', {
+                    email: this.track.email, password: this.track.password,
+                });
+                toast('已重寄啟用信，請至信箱點擊連結完成 Email 驗證');
+            } catch (e) {
+                this.errorMsg = e.status === 401 ? '帳號或密碼錯誤'
+                    : e.status === 409 ? '此帳號已完成驗證或尚未通過審核'
+                    : '重寄失敗，請稍後再試';
             } finally { this.loading = false; }
         },
 
@@ -154,7 +171,7 @@ export default {
         <!-- 申請成功畫面：取代表單，明確告知要等審核 -->
         <div v-if="submitted" style="text-align:center">
           <h2>申請已送出</h2>
-          <p class="muted">你的小農申請已送出，請等待管理員審核。<br>我們也寄出了 Email 驗證信，請順手到信箱完成驗證。<br>審核通過後就能用 Email 與密碼登入。</p>
+          <p class="muted">你的小農申請已送出，請等待管理員審核。<br>審核通過後，我們會寄出「啟用信」，請點擊信中連結完成 Email 驗證，<br>完成後即可用 Email 與密碼登入。</p>
           <button class="btn block" @click="submitted=false; switchMode('track')">查詢審核進度</button>
           <button class="btn block outline" style="margin-top:8px" @click="submitted=false; switchMode('login')">回到登入</button>
           <p class="hint" style="margin-top:12px"><a href="#/">回首頁</a></p>
@@ -230,8 +247,17 @@ export default {
                 <div class="rw"><span class="k">審核輪次</span><span>第 {{ reviewInfo.reviewRound || '—' }} 輪</span></div>
                 <div v-if="reviewInfo.rejectReason" class="rw"><span class="k">退件理由</span><span>{{ reviewInfo.rejectReason }}</span></div>
               </div>
-              <div class="card-foot" style="justify-content:flex-start">
-                <p v-if="isApproved" class="ok">已通過審核，請回「登入」分頁直接登入。</p>
+              <div class="card-foot" style="flex-direction:column;align-items:flex-start;gap:6px">
+                <template v-if="isApproved">
+                  <!-- 已核准且完成驗證：可直接登入 -->
+                  <p v-if="isVerified" class="ok" style="margin:0">已通過審核且完成 Email 驗證，請回「登入」分頁直接登入。</p>
+                  <!-- 已核准但尚未驗證：提示點啟用信，並提供重寄 -->
+                  <template v-else>
+                    <p class="ok" style="margin:0">已通過審核！請至信箱點擊「啟用連結」完成 Email 驗證後，再回「登入」分頁登入。</p>
+                    <button class="btn outline" :disabled="loading" @click="onResendActivation">沒收到或連結過期？重寄啟用信</button>
+                    <p class="muted" style="margin:0">若已完成 Email 驗證仍無法順利登入，請聯繫客服：supportFarmily@gmail.com</p>
+                  </template>
+                </template>
                 <button v-else-if="isRejected && !showResubmit" class="btn outline" @click="openResubmit">重新送審 / 補件</button>
                 <p v-else-if="!showResubmit" class="muted">審核中，請耐心等候審核結果，退件後才可重新送審。</p>
               </div>

@@ -35,9 +35,9 @@ export default {
                 await store.memberLogin(this.login.email, this.login.password, this.login.rememberMe);
                 navigate('/member/me');
             } catch (e) {
-                // 後端：401=帳密錯、409=帳號狀態異常
+                // 後端：401=帳密錯、409=帳號狀態異常（尚未完成 Email 驗證或已被停權）
                 this.errorMsg = e.status === 401 ? '帳號或密碼錯誤'
-                    : e.status === 409 ? '帳號狀態異常（可能已被停權）'
+                    : e.status === 409 ? '無法登入：帳號可能尚未完成 Email 驗證或已被停權。請至信箱點擊驗證連結，或點下方「重寄驗證信」'
                         : '登入失敗，請稍後再試';
             } finally { this.loading = false; }
         },
@@ -126,6 +126,8 @@ export default {
 
           <p class="hint" style="text-align:center">
             <a href="#/forgot-password">忘記密碼？</a>
+            <span style="margin:0 6px">·</span>
+            <a href="#/resend-verification">重寄驗證信</a>
           </p>
         </form>
 

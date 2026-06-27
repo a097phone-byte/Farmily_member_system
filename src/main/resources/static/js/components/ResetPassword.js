@@ -2,9 +2,11 @@
 // 對應後端：POST /api/auth/reset-password  { token, newPassword }
 import { api } from '../api.js';
 import { navigate } from '../router.js';
+import PasswordField from './PasswordField.js';      // 密碼欄（含顯示/隱藏眼睛）
 
 export default {
     name: 'ResetPassword',
+    components: { PasswordField },
     data() {
         return {
             token: '',
@@ -85,8 +87,8 @@ export default {
         <p v-if="okMsg" class="ok">{{ okMsg }}{{ countdown }} 秒後帶你回登入頁。</p>
 
         <form class="form-grid" @submit.prevent="onSubmit">
-          <div class="field"><label>新密碼</label><input v-model="newPassword" type="password" placeholder="至少 8 碼" required /></div>
-          <div class="field"><label>再次輸入新密碼</label><input v-model="confirmPassword" type="password" required /></div>
+          <div class="field"><label>新密碼</label><password-field v-model="newPassword" placeholder="至少 8 碼"></password-field></div>
+          <div class="field"><label>再次輸入新密碼</label><password-field v-model="confirmPassword" placeholder="再次輸入新密碼"></password-field></div>
           <button class="btn block" type="submit" :disabled="loading || !token">{{ loading ? '送出中…' : '確認重設' }}</button>
         </form>
 

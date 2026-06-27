@@ -30,6 +30,8 @@ public class FarmerReviewResponse {
     private Boolean hasCertLand;          // 文件只標「有沒有上傳」
     private Boolean hasCertProduct;
     private Boolean hasCertIdentity;
+    private Boolean emailVerified;        // 小農是否已完成 Email 驗證（查詢進度頁判斷是否顯示「重寄啟用信」）
+    private String farmerStatus;          // PENDING / ACTIVE / SUSPENDED
 
     // getter
     public Integer getReviewId() {
@@ -57,7 +59,7 @@ public class FarmerReviewResponse {
         return reviewStatus;
     }
 
-    // 給未啟用小農審核狀態 Reviewing 仍為 Pending (前端顯示用)
+    // 給未啟用小農審核狀態 Reviewing 設定仍為 Pending (前端顯示用)
     public void setReviewStatus(String reviewStatus) {
         this.reviewStatus = reviewStatus;
     }
@@ -97,6 +99,18 @@ public class FarmerReviewResponse {
     }
     public Boolean getHasCertIdentity() {
         return hasCertIdentity;
+    }
+    public Boolean getEmailVerified() {
+        return emailVerified;
+    }
+    public void setEmailVerified(Boolean emailVerified) {
+        this.emailVerified = emailVerified;
+    }
+    public String getFarmerStatus() {
+        return farmerStatus;
+    }
+    public void setFarmerStatus(String farmerStatus) {
+        this.farmerStatus = farmerStatus;
     }
 
     public static FarmerReviewResponse from(FarmerReview r){

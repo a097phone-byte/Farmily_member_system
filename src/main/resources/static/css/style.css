@@ -313,6 +313,9 @@ textarea { resize: vertical; min-height: 72px; }
 .pw-wrap input { padding-right: 42px; }
 .pw-toggle { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); background: transparent; border: none; padding: 6px; color: var(--faint); cursor: pointer; display: flex; }
 .pw-toggle:hover { color: var(--text); }
+/* 全域隱藏瀏覽器（Edge/IE）原生的密碼顯示/清除按鈕，避免與自訂眼睛圖示重複出現兩個 */
+input::-ms-reveal,
+input::-ms-clear { display: none; }
 
 /* ============ 拖曳上傳（FileDrop / modals-05 風）============ */
 .filedrop {

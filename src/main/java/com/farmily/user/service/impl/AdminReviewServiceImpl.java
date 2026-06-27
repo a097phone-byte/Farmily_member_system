@@ -8,6 +8,7 @@ import com.farmily.user.repository.AdminRepository;
 import com.farmily.user.repository.FarmerRepository;
 import com.farmily.user.repository.FarmerReviewRepository;
 import com.farmily.user.service.AdminReviewService;
+import com.farmily.user.service.EmailVerificationService;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,11 +24,15 @@ public class AdminReviewServiceImpl implements AdminReviewService {
     private final FarmerRepository farmerRepository;
     private final AdminRepository adminRepository;
     private final FarmerReviewRepository farmerReviewRepository;
+    private final EmailVerificationService emailVerificationService;
 
-    public AdminReviewServiceImpl(FarmerRepository farmerRepository, AdminRepository adminRepository, FarmerReviewRepository farmerReviewRepository) {
+    public AdminReviewServiceImpl(FarmerRepository farmerRepository, AdminRepository adminRepository,
+                                  FarmerReviewRepository farmerReviewRepository,
+                                  EmailVerificationService emailVerificationService) {
         this.farmerRepository = farmerRepository;
         this.adminRepository = adminRepository;
         this.farmerReviewRepository = farmerReviewRepository;
+        this.emailVerificationService = emailVerificationService;
     }
 
     // 待審清單
@@ -107,7 +112,13 @@ public class AdminReviewServiceImpl implements AdminReviewService {
         review.setReviewedAt(LocalDateTime.now());
         review.setAdmin(findAdmin(adminId));                  // 記錄是誰審的
 
-        return FarmerReviewResponse.from(farmerReviewRepository.save(review));
+        FarmerReviewResponse result = FarmerReviewResponse.from(farmerReviewRepository.save(review));
+
+        // 核准後才寄出「啟用 + Email 驗證」信：小農須點連結完成驗證才能登入。
+        // 帳號雖已設為 ACTIVE，但 email_verified 仍為 false，未點連結前無法自行登入。
+        emailVerificationService.sendFarmerActivation(farmer.getEmail());
+
+        return result;
     }
 
     // 退件重審

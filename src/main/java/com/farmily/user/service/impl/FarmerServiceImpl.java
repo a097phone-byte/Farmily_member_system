@@ -1,7 +1,6 @@
 package com.farmily.user.service.impl;
 
 import com.farmily.user.dto.*;
-import com.farmily.user.model.AccountToken;
 import com.farmily.user.model.CityDistrict;
 import com.farmily.user.model.Farmer;
 import com.farmily.user.model.FarmerReview;
@@ -83,10 +82,6 @@ public class FarmerServiceImpl implements FarmerService {
         // 必須先存 farmer 拿到 farmer_id，review 的 farmer_id 外鍵才有對象可指
         Farmer savedFarmer = farmerRepository.save(newFarmer);
 
-        // 寄出 Email 驗證信
-        emailVerificationService.sendVerification(
-                savedFarmer.getEmail(), AccountToken.AccountType.FARMER);
-
         // step4: 為剛申請的小農，建立第一筆審核快照
         FarmerReview review = newReviewSnapshot(
                 savedFarmer, 1,                 // round 1
@@ -105,16 +100,20 @@ public class FarmerServiceImpl implements FarmerService {
         Farmer farmer = farmerRepository.findByEmail(log.getEmail())
                 .orElseThrow(() -> new BadCredentialsException("帳號或密碼錯誤"));
 
-        // 檢查 hash 密碼是否相等
+        // step1. 先檢查 hash 密碼是否相等
         if(!passwordEncoder.matches(log.getPassword(), farmer.getPassword())){
             throw new BadCredentialsException("帳號或密碼錯誤");
         }
+        // step2. 再檢查小農狀態
         if (farmer.getFarmerStatus() == Farmer.FarmerStatus.PENDING) {
             throw new IllegalStateException("您的小農申請審核中，通過後才能登入");
         }
-        // 由 Admin 管制 (非審核流程)
-        if(farmer.getFarmerStatus() == Farmer.FarmerStatus.SUSPENDED){
+        if(farmer.getFarmerStatus() == Farmer.FarmerStatus.SUSPENDED){              // 由 Admin 管制 (非審核流程)
             throw new IllegalStateException("此帳號已遭停權，若有任何疑問請聯繫客服");
+        }
+        // step3. 通過審核（ACTIVE）後，仍須點啟用信連結完成 Email 驗證才能登入，未驗證不得自行直接登入
+        if (farmer.getEmailVerified() == null || !farmer.getEmailVerified()) {
+            throw new IllegalStateException("您的小農帳號已通過審核，請先點擊啟用信中的連結完成 Email 驗證後再登入");
         }
         // 內含 farmer + 查最新 review
         return toResponse(farmer);

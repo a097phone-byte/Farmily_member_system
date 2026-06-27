@@ -49,7 +49,19 @@ public class EmailVerificationService {
         emailService.sendVerifyEmail(email, verifyLink);
     }
 
-    // 使用者點連結後，驗證 token 並把帳號設為已驗證
+    // 小農審核通過後：產生驗證 token，並寄出「啟用 + Email 驗證」信。
+    // 小農須點此連結完成驗證才能登入，未點連結不得自行登入。
+    public void sendFarmerActivation(String email) {
+
+        String token = tokenService.createToken(
+                email, AccountToken.AccountType.FARMER, AccountToken.TokenType.EMAIL_VERIFY, verifyTtlMinutes);
+
+        String verifyLink = frontendBaseUrl + "/#/verify-email?token=" + token;
+
+        emailService.sendFarmerVerifyEmail(email, verifyLink);
+    }
+
+    // 使用者點連結後，驗證 token 並把帳號設為已驗證 setEmailVerified(true)
     public void verify(String token) {
 
         AccountToken accountToken =
@@ -101,7 +113,12 @@ public class EmailVerificationService {
         }
 
         if (exists && !alreadyVerified) {
-            sendVerification(email, accountType);
+            // 小農用「啟用信」文案（與審核通過寄出的內容一致）；會員用一般驗證信
+            if (accountType == AccountToken.AccountType.FARMER) {
+                sendFarmerActivation(email);
+            } else {
+                sendVerification(email, accountType);
+            }
         }
     }
 }

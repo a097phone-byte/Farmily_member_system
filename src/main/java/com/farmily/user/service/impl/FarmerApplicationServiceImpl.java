@@ -9,6 +9,7 @@ import com.farmily.user.model.FarmerReview;
 import com.farmily.user.repository.CityDistrictRepository;
 import com.farmily.user.repository.FarmerRepository;
 import com.farmily.user.repository.FarmerReviewRepository;
+import com.farmily.user.service.EmailVerificationService;
 import com.farmily.user.service.FarmerApplicationService;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -26,15 +27,19 @@ public class FarmerApplicationServiceImpl implements FarmerApplicationService {
     private final FarmerReviewRepository farmerReviewRepository;
     private final CityDistrictRepository cityDistrictRepository;
     private final PasswordEncoder passwordEncoder;
+    private final EmailVerificationService emailVerificationService;
 
-    public FarmerApplicationServiceImpl(FarmerRepository farmerRepository, FarmerReviewRepository farmerReviewRepository, CityDistrictRepository cityDistrictRepository, PasswordEncoder passwordEncoder) {
+    public FarmerApplicationServiceImpl(FarmerRepository farmerRepository, FarmerReviewRepository farmerReviewRepository,
+                                        CityDistrictRepository cityDistrictRepository, PasswordEncoder passwordEncoder,
+                                        EmailVerificationService emailVerificationService) {
         this.farmerRepository = farmerRepository;
         this.farmerReviewRepository = farmerReviewRepository;
         this.cityDistrictRepository = cityDistrictRepository;
         this.passwordEncoder = passwordEncoder;
+        this.emailVerificationService = emailVerificationService;
     }
 
-    // 查自己最新一筆審核結果 (狀態 + 退件理由)
+    // 查自己最新審核結果 (狀態 + 退件理由)
     @Override
     @Transactional(readOnly = true)
     public FarmerReviewResponse checkStatus(LoginRequest log) {
@@ -51,7 +56,26 @@ public class FarmerApplicationServiceImpl implements FarmerApplicationService {
         if ("REVIEWING".equals(res.getReviewStatus())) {
             res.setReviewStatus("PENDING");
         }
+
+        // 帶上帳號狀態與 Email 驗證狀態：前端用來分辨「已核准但未驗證（需重寄啟用信）」vs「已可登入」
+        res.setFarmerStatus(farmer.getFarmerStatus() != null ? farmer.getFarmerStatus().name() : null);
+        res.setEmailVerified(farmer.getEmailVerified() != null && farmer.getEmailVerified());
         return res;
+    }
+
+    // 重寄「啟用信」：僅限已核准 (ACTIVE) 但尚未完成 Email 驗證的小農。
+    // 以 email + 密碼驗身（同查詢進度頁的驗證模型），故可給精準回饋。
+    @Override
+    public void resendActivation(LoginRequest log) {
+        Farmer farmer = authByCredentials(log.getEmail(), log.getPassword());
+
+        if (farmer.getEmailVerified() != null && farmer.getEmailVerified()) {
+            throw new IllegalStateException("此帳號已完成 Email 驗證，請直接登入");
+        }
+        if (farmer.getFarmerStatus() != Farmer.FarmerStatus.ACTIVE) {
+            throw new IllegalStateException("帳號尚未通過審核，審核通過後才會寄出啟用信");
+        }
+        emailVerificationService.sendFarmerActivation(farmer.getEmail());
     }
 
     // 未啟用小農重新送審（只允許小農狀態 PENDING + 審核狀態為 REJECTED 才能重新送審
@@ -69,10 +93,11 @@ public class FarmerApplicationServiceImpl implements FarmerApplicationService {
 
         // 僅最新一輪審核狀態為 REJECTED 才能重新送審；審核中 PENDING/REVIEWING 一律擋下
         if (latest == null || latest.getReviewStatus() != FarmerReview.ReviewStatus.REJECTED) {
-            throw new IllegalStateException("尚在審核中，需待退件後才能重新送審");
+            throw new IllegalStateException("尚在審核中，需審核完成後才能重新送審");
         }
 
-        // 計算重審次數
+        // 審核狀態為 REJECTED:
+        // 審核次數 + 1
         int nextRound = (latest != null && latest.getReviewRound() != null)
                 ? latest.getReviewRound() + 1
                 : 1;

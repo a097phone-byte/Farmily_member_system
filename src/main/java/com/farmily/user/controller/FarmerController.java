@@ -52,7 +52,7 @@ public class FarmerController {
     @PostMapping("/login")
     public ResponseEntity<FarmerProfileResponse> login(
             @RequestBody @Valid LoginRequest req,
-            HttpServletRequest request,
+            HttpServletRequest httpRequest,
             HttpServletResponse httpResponse) {
 
         // step1: 呼叫 Service，判斷帳號狀態、比對密碼，回傳 dto
@@ -64,7 +64,7 @@ public class FarmerController {
         SecurityContextHolder.getContext().setAuthentication(authToken);
 
         // step3: 把 SecurityContext 存進 HttpSession，後續請求才能持續認得他
-        HttpSession session = request.getSession(true);
+        HttpSession session = httpRequest.getSession(true);
         session.setAttribute(
                 HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
                 SecurityContextHolder.getContext());

@@ -64,6 +64,10 @@ public class FarmerProfileResponse {
     public String getReviewStatus() {
         return reviewStatus;
     }
+    // 管理員端覆蓋用：不套用小農端 REVIEWING→PENDING 遮蔽，顯示真實審核狀態
+    public void setReviewStatus(String reviewStatus) {
+        this.reviewStatus = reviewStatus;
+    }
     public Integer getReviewRound() {
         return reviewRound;
     }
@@ -90,6 +94,7 @@ public class FarmerProfileResponse {
         dto.farmerStatus = f.getFarmerStatus() != null ? f.getFarmerStatus().name() : null;
         if (latestReview != null) {
             FarmerReview.ReviewStatus s = latestReview.getReviewStatus();
+
             // 小農端只看到「待審」：REVIEWING 對外顯示成 PENDING
             dto.reviewStatus = (s == FarmerReview.ReviewStatus.REVIEWING)
                     ? FarmerReview.ReviewStatus.PENDING.name()

@@ -33,4 +33,11 @@ public class FarmerApplicationController {
     public ResponseEntity<FarmerReviewResponse> resubmit(@RequestBody @Valid PublicFarmerResubmitRequest req) {
         return ResponseEntity.ok(farmerApplicationService.resubmit(req));
     }
+
+    // 重寄啟用信（給已核准但尚未完成 Email 驗證、無法登入的小農）
+    @PostMapping("/resend-activation")
+    public ResponseEntity<String> resendActivation(@RequestBody @Valid LoginRequest log) {
+        farmerApplicationService.resendActivation(log);
+        return ResponseEntity.ok("已重新寄出啟用信，請至信箱點擊連結完成 Email 驗證後即可登入");
+    }
 }

@@ -29,6 +29,7 @@ export default {
     computed: {
         p() { return this.store.farmer.profile || {}; },
         isRejected() { return String(this.p.reviewStatus).toUpperCase() === 'REJECTED'; },
+        isApproved() { return String(this.p.reviewStatus).toUpperCase() === 'APPROVED'; },
         badge() { return 'badge s-' + String(this.p.reviewStatus || 'review').toLowerCase(); },
     },
     methods: {
@@ -71,6 +72,7 @@ export default {
         </div>
         <div class="card-foot" style="justify-content:flex-start">
           <button v-if="!showForm && isRejected" class="btn outline" @click="openForm">重新送審 / 修改審核欄位</button>
+          <p v-else-if="!showForm && isApproved" class="ok" style="margin:0">已通過審核，帳號已啟用，可正常使用。</p>
           <p v-else-if="!showForm" class="muted">審核中，請耐心等候審核結果，退件後才可重新送審。</p>
         </div>
       </div>

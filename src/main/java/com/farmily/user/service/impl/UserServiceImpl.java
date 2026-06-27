@@ -126,6 +126,12 @@ public class UserServiceImpl implements UserService {
                 || user.getUserStatus() == User.UserStatus.DELETED) {
             throw new IllegalStateException("此帳號已遭停權或終止，有任何疑問請聯繫客服");
         }
+
+        // 本地帳號必須先完成 Email 驗證（點驗證信連結）才能登入；Google OAuth 除外
+        if (user.getAuthProvider() == User.AuthProvider.LOCAL
+                && (user.getEmailVerified() == null || !user.getEmailVerified())) {
+            throw new IllegalStateException("請先完成 Email 驗證後再登入，可至信箱點擊驗證連結");
+        }
         return UserProfileResponse.from(user);
     }
 
