@@ -1,6 +1,7 @@
 package com.farmily.user.service.impl;
 
 import com.farmily.user.dto.UserProfileResponse;
+import com.farmily.user.model.SpendingTier;
 import com.farmily.user.model.User;
 import com.farmily.user.repository.SpendingTierRepository;
 import com.farmily.user.repository.UserRepository;
@@ -24,21 +25,35 @@ public class AdminMemberServiceImpl implements AdminMemberService {
         this.spendingTierRepository = spendingTierRepository;
     }
 
-    // 列出所有會員：DB 撈出轉 DTO
+    // 列出所有會員
     @Override
     @Transactional(readOnly = true)
     public List<UserProfileResponse> listAll() {
         List<User> users = userRepository.findAll();
+
+        // 消費級距表只查 1 次，迴圈內在記憶體比對，避免每筆會員都查一次 DB (n+1)
+        List<SpendingTier> tiers = spendingTierRepository.findAll();
         List<UserProfileResponse> result = new ArrayList<>();
 
         for (User u : users) {
-            // +消費級距
             Integer amount = u.getMonthlySpending() != null ? u.getMonthlySpending() : 0;
-            String tierName = spendingTierRepository.findTierNameByAmount(amount);
+            String tierName = resolveTierName(tiers, amount);
 
             result.add(UserProfileResponse.from(u, tierName));
         }
         return result;
+    }
+
+    // 在記憶體用金額比對出級距名稱（找不到回傳 null）
+    private String resolveTierName(List<SpendingTier> tiers, int amount) {
+        for (SpendingTier tier : tiers) {
+            boolean aboveMin = tier.getMinAmount() <= amount;
+            boolean belowMax = tier.getMaxAmount() == null || amount <= tier.getMaxAmount();
+            if (aboveMin && belowMax) {
+                return tier.getTierName();
+            }
+        }
+        return null;
     }
 
     // 查單一會員
@@ -55,17 +70,19 @@ public class AdminMemberServiceImpl implements AdminMemberService {
         return UserProfileResponse.from(user, tierName);
     }
 
-    // 依條件篩選會員：tierNames（消費級距，可複選）、statuses（會員狀態，可複選），皆可為 null 或空清單（＝不限）
+    // 依條件篩選會員：消費級距、狀態（皆可複選；null 或空清單 = 不限）
     @Override
     @Transactional(readOnly = true)
     public List<UserProfileResponse> list(List<String> tierNames, List<String> statuses) {
         List<User> users = userRepository.findAll();
+
+        // 消費級距對照表只查 1 次，迴圈內在記憶體比對，避免每筆會員都查一次 DB
+        List<SpendingTier> tiers = spendingTierRepository.findAll();
         List<UserProfileResponse> result = new ArrayList<>();
 
         for (User u : users) {
-            // 先算出這位會員的消費級距名稱
             Integer amount = u.getMonthlySpending() != null ? u.getMonthlySpending() : 0;
-            String userTier = spendingTierRepository.findTierNameByAmount(amount);
+            String userTier = resolveTierName(tiers, amount);
 
             // 條件 1：消費級距（有勾選才比對；級距不在勾選清單就跳過這筆）
             if (tierNames != null && !tierNames.isEmpty() && !tierNames.contains(userTier)) {
@@ -93,7 +110,7 @@ public class AdminMemberServiceImpl implements AdminMemberService {
                 .orElseThrow(() -> new IllegalArgumentException("查無此會員"));
         User.UserStatus newStatus;
         try {
-            newStatus = User.UserStatus.valueOf(status);   // "SUSPENDED" : UserStatus.SUSPENDED
+            newStatus = User.UserStatus.valueOf(status);
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("不支援的會員狀態: " + status);
         }

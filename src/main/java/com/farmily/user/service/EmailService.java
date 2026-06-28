@@ -6,7 +6,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-// 負責實際寄信
+// 負責處理信件內容 (驗證+重設密碼)
 @Service
 public class EmailService {
 
@@ -31,6 +31,21 @@ public class EmailService {
         message.setSubject("Farmily 帳號 - Email 驗證");
         message.setText("您好，\n\n"
                 + "請點擊以下連結完成 Email 驗證（連結 24 小時內有效）：\n"
+                + verifyLink);
+
+        mailSender.send(message);
+    }
+
+    // 寄出小農啟用驗證信件
+    @Async
+    public void sendFarmerVerifyEmail(String toEmail, String verifyLink){
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom(fromEmail);
+        message.setTo(toEmail);
+        message.setSubject("Farmily 小農帳號啟用通知");
+        message.setText("您好，\n\n"
+                + "您申請的小農帳號已審核通過！\n"
+                + "請點擊以下連結，驗證並啟用小農帳號（連結 24 小時內有效）：\n"
                 + verifyLink);
 
         mailSender.send(message);
@@ -62,22 +77,6 @@ public class EmailService {
         message.setText("您好，\n\n"
                 + "您的 Farmily 帳號密碼剛剛已被變更，若為本人操作，請忽略此信。\n"
                 + "若非本人操作，您的帳號可能有風險，請立即聯繫客服：supportfarmily@gmail.com\n");
-
-        mailSender.send(message);
-    }
-
-
-    // 寄出小農啟用信件
-    @Async
-    public void sendFarmerVerifyEmail(String toEmail, String verifyLink){
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom(fromEmail);
-        message.setTo(toEmail);
-        message.setSubject("Farmily 小農帳號啟用通知");
-        message.setText("您好，\n\n"
-                + "您申請的小農帳號已審核通過！\n"
-                + "請點擊以下連結，驗證並啟用小農帳號（連結 24 小時內有效）：\n"
-                + verifyLink);
 
         mailSender.send(message);
     }

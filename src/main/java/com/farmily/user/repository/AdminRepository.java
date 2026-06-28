@@ -24,6 +24,15 @@ public interface AdminRepository extends JpaRepository<Admin, Integer> {
             nativeQuery = true)
     List<String> findPermissionCodesByAdminId(Integer adminId);
 
+    // 一次撈出所有「管理員-權限代碼」對應（每列 = [admin_id, permission_code]）
+    // 用於列出所有管理員時，避免每位管理員都查一次權限 (N+1)
+    @Query(value =
+            "SELECT admin_permission_role.admin_id, admin_role.permission_code " +
+                    "FROM admin_permission_role " +
+                    "JOIN admin_role ON admin_permission_role.permission_id = admin_role.permission_id",
+            nativeQuery = true)
+    List<Object[]> findAllAdminPermissionCodes();
+
     // 用權限代碼查出對應的 permission_id
     @Query(value = "SELECT permission_id FROM admin_role WHERE permission_code = ?1", nativeQuery = true)
     Integer findPermissionIdByCode(String permissionCode);

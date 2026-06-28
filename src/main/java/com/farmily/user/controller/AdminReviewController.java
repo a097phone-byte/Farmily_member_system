@@ -67,7 +67,6 @@ public class AdminReviewController {
         return ResponseEntity.ok(adminReviewService.reject(reviewId, me.getAdminId(), req.getRejectReason()));
     }
 
-    // 預覽 / 下載某輪審核的證明文件（type = land | product | identity）
     // 證明文件一律為圖片（png/jpg），固定回傳 image 類型，瀏覽器即可內嵌顯示
     @GetMapping("/{reviewId}/cert/{type}")
     public ResponseEntity<byte[]> getCert(

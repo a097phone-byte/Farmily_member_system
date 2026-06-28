@@ -79,13 +79,13 @@ public class PasswordResetService {
     // step2. 帶 token + 新密碼來重設
     public void resetPassword(String token, String newPassword) {
 
-        // 驗證 token（過期 / 用過 / 用途不符會丟例外）
+        // 驗證 token（過期 / 用過 / 用途不符丟例外）
         AccountToken accountToken =
                 tokenService.validateAndConsume(token, AccountToken.TokenType.PASSWORD_RESET);
 
         String email = accountToken.getAccountEmail();
 
-        // 把新密碼 hash 後存回對應的帳號（忘記密碼不需要驗證舊密碼）
+        // 把新密碼 hash 後存回對應的帳號(忘記密碼不需要驗證舊密碼)
         if (accountToken.getAccountType() == AccountToken.AccountType.MEMBER) {
             User user = userRepository.findByEmail(email).orElse(null);
             if (user == null) {
@@ -102,8 +102,7 @@ public class PasswordResetService {
             farmerRepository.save(farmer);
         }
 
-        // 密碼已改，把這個帳號目前所有登入中的 session 設為過期
-        // （忘記密碼時當下沒有登入中的自己，所以傳 null = 全部都踢）
+        // 密碼已改，把這個帳號目前所有登入中的 session 設為過期 (null = 全部都踢)
         sessionService.expireSessions(email, null);
     }
 }

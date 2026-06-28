@@ -14,18 +14,18 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class EmailVerificationService {
 
-    private final TokenService tokenService;
-    private final EmailService emailService;
-    private final UserRepository userRepository;
-    private final FarmerRepository farmerRepository;
-
     // 信件連結用的網址前綴
     @Value("${app.frontend-base-url}")
     private String frontendBaseUrl;
 
-    // 驗證 token 的有效時間（分鐘）
+    // 驗證 token 的有效時間(分鐘)
     @Value("${app.token.email-verify-ttl-min}")
     private int verifyTtlMinutes;
+
+    private final TokenService tokenService;
+    private final EmailService emailService;
+    private final UserRepository userRepository;
+    private final FarmerRepository farmerRepository;
 
     public EmailVerificationService(TokenService tokenService,
                                     EmailService emailService,
@@ -43,14 +43,13 @@ public class EmailVerificationService {
         String token = tokenService.createToken(
                 email, accountType, AccountToken.TokenType.EMAIL_VERIFY, verifyTtlMinutes);
 
-        // 指向前端 SPA 的驗證頁（hash 路由），頁面再帶 token 呼叫後端驗證 API、顯示結果並導回首頁
+        // 指向前端 SPA 的驗證頁(hash 路由)，頁面再帶 token 呼叫後端驗證 API、顯示結果並導回首頁
         String verifyLink = frontendBaseUrl + "/#/verify-email?token=" + token;
 
         emailService.sendVerifyEmail(email, verifyLink);
     }
 
-    // 小農審核通過後：產生驗證 token，並寄出「啟用 + Email 驗證」信。
-    // 小農須點此連結完成驗證才能登入，未點連結不得自行登入。
+    // 小農審核通過後：產生驗證 token，並寄出「啟用 + Email 驗證」信
     public void sendFarmerActivation(String email) {
 
         String token = tokenService.createToken(
@@ -113,7 +112,6 @@ public class EmailVerificationService {
         }
 
         if (exists && !alreadyVerified) {
-            // 小農用「啟用信」文案（與審核通過寄出的內容一致）；會員用一般驗證信
             if (accountType == AccountToken.AccountType.FARMER) {
                 sendFarmerActivation(email);
             } else {

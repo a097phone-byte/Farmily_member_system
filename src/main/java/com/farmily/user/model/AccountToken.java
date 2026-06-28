@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 // 帳號用的一次性 token（會員 + 小農共用）
-// 用於 Email 驗證 + 忘記密碼也共用這張表
+// Email 驗證 + 忘記密碼也共用這張表
 @Entity
 @Table(name = "account_token")
 public class AccountToken {

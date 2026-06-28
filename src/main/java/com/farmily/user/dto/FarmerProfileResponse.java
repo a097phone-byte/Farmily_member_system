@@ -71,6 +71,10 @@ public class FarmerProfileResponse {
     public Integer getReviewRound() {
         return reviewRound;
     }
+    // 管理員端批次組裝用：直接帶入最新一輪輪次
+    public void setReviewRound(Integer reviewRound) {
+        this.reviewRound = reviewRound;
+    }
     public Boolean getHasPassword() {
         return hasPassword;
     }

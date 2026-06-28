@@ -10,7 +10,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Transactional
@@ -29,13 +31,40 @@ public class AdminFarmerServiceImpl implements AdminFarmerService {
     @Override
     @Transactional(readOnly = true)
     public List<FarmerProfileResponse> listAll() {
+        // step1. 撈出所有小農
         List<Farmer> farmers = farmerRepository.findAll();
+
+        // step2. findAllReviewStatusRounds() 回傳每一列是 Object[]，固定 3 欄
+        List<Object[]> rows = farmerReviewRepository.findAllReviewStatusRounds();
+
+        // step3. 2 個 map 分別紀錄: 最新輪次的「狀態」和「輪次數字」，key 都是 farmerId
+        Map<Integer, String> latestStatusByFarmerId = new HashMap<>();
+        Map<Integer, Integer> latestRoundByFarmerId = new HashMap<>();
+        for (Object[] row : rows) {
+            // 取出這一列的 3 個欄位 (從 Object 轉回原本型別)
+            Integer farmerId = (Integer) row[0];
+            String status = (String) row[1];
+            Integer round = (Integer) row[2];
+
+            // 小農目前記錄到的最新輪次是多少
+            Integer currentRound = latestRoundByFarmerId.get(farmerId);
+            if (currentRound == null || round > currentRound) {
+                latestRoundByFarmerId.put(farmerId, round);
+                latestStatusByFarmerId.put(farmerId, status);
+            }
+        }
+
+        // step4. 最新審核狀態/輪次從 step3 map 用記憶體查拿，不再回資料庫 (省下 N 次查詢)
         List<FarmerProfileResponse> result = new ArrayList<>();
         for (Farmer f : farmers) {
-            result.add(toAdminResponse(f));
+            String latestStatus = latestStatusByFarmerId.get(f.getFarmerId());
+            Integer latestRound = latestRoundByFarmerId.get(f.getFarmerId());
+            result.add(toAdminResponse(f, latestStatus, latestRound));
         }
         return result;
     }
+
+
 
     // 查單一小農
     @Override
@@ -46,7 +75,7 @@ public class AdminFarmerServiceImpl implements AdminFarmerService {
         return toAdminResponse(farmer);
     }
 
-    // 停權：只有「啟用中(ACTIVE)」才能停權
+    // 停權：只有啟用中(ACTIVE)才能停權
     @Override
     public FarmerProfileResponse suspend(Integer farmerId) {
         Farmer farmer = findFarmer(farmerId);
@@ -57,7 +86,7 @@ public class AdminFarmerServiceImpl implements AdminFarmerService {
         return toAdminResponse(farmerRepository.save(farmer));
     }
 
-    // 恢復：只有「已停權(SUSPENDED)」才能恢復
+    // 恢復：只有已停權(SUSPENDED)才能恢復
     @Override
     public FarmerProfileResponse reinstate(Integer farmerId) {
         Farmer farmer = findFarmer(farmerId);
@@ -79,13 +108,28 @@ public class AdminFarmerServiceImpl implements AdminFarmerService {
         return farmerReviewRepository.findTopByFarmer_FarmerIdOrderByReviewRoundDesc(farmerId);
     }
 
-    // 包成管理員端 DTO：與小農端不同，管理員要看到真實審核狀態，
-    // 故覆蓋掉 from() 內「REVIEWING 對外顯示成 PENDING」的遮蔽
+    // 單筆版：自己查最新審核，把值取出後委派給下面的組裝方法（不重複組裝邏輯）
+    // 用於 getById / suspend / reinstate，單筆查 1 次 DB，沒有 N+1 問題
     private FarmerProfileResponse toAdminResponse(Farmer farmer) {
         FarmerReview latest = latestReview(farmer.getFarmerId());
-        FarmerProfileResponse dto = FarmerProfileResponse.from(farmer, latest);
-        if (latest != null && latest.getReviewStatus() != null) {
-            dto.setReviewStatus(latest.getReviewStatus().name());
+        if (latest == null) {
+            return toAdminResponse(farmer, null, null);
+        }
+        // enum 轉成字串（可能為 null）
+        String status = latest.getReviewStatus() != null ? latest.getReviewStatus().name() : null;
+        return toAdminResponse(farmer, status, latest.getReviewRound());
+    }
+
+    // 唯一的組裝方法：把小農 + 它最新一輪的審核狀態/輪次，組裝成管理員端 DTO
+    // 審核狀態/輪次都由呼叫端先準備好再傳進來，這裡不查 DB
+    private FarmerProfileResponse toAdminResponse(Farmer farmer, String reviewStatus, Integer reviewRound) {
+
+        // 先用 from(farmer, null) 填好小農基本資料；傳 null 代表審核欄位這裡先不填，等下面手動補
+        FarmerProfileResponse dto = FarmerProfileResponse.from(farmer, null);
+        if (reviewStatus != null) {
+            // 管理員端要看真實狀態 (含 REVIEWING)
+            dto.setReviewStatus(reviewStatus);
+            dto.setReviewRound(reviewRound);
         }
         return dto;
     }
