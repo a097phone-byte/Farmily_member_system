@@ -80,7 +80,7 @@ public class UserSecurityConfig {
                 .authorizeHttpRequests(request -> request
                         .requestMatchers("/api/admin/login").permitAll()
 
-                        // 細部權限管理 (ADMIN_ROLE) 注意有順序                        # 需補上其他組員的 API
+                        // 細部權限管理 (ADMIN_ROLE) 注意有順序
                         .requestMatchers("/api/admin/admins/**").hasAuthority("PERM_ADMIN")
 
                         .requestMatchers("/api/admin/farmers/**", "/api/admin/reviews/**")
@@ -88,6 +88,13 @@ public class UserSecurityConfig {
 
                         .requestMatchers("/api/admin/members/**")
                         .hasAnyAuthority("PERM_ADMIN", "PERM_MEMBER")
+
+
+                        // ============= 補上其他組員的 API =============
+//                        .requestMatchers("/api/admin/news/**")
+//                        .hasAnyAuthority("PERM_ADMIN", "PERM_NEWS")
+
+
 
 
                         // 其餘 ("/api/admin/me")，登入的管理員都能用

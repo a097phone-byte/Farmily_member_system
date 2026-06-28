@@ -89,6 +89,12 @@ public class AdminController {
         return ResponseEntity.ok(adminService.getById(adminId));
     }
 
+    // 列出系統所有可指派的權限 (前端動態產生勾選清單用)
+    @GetMapping("/permissions")
+    public ResponseEntity<List<PermissionResponse>> listPermissions() {
+        return ResponseEntity.ok(adminService.listPermissions());
+    }
+
     // 修改管理員
     @PutMapping("/admins/{adminId}")
     public ResponseEntity<AdminProfileResponse> updateAdmin(

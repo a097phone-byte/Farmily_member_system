@@ -2,7 +2,9 @@ package com.farmily.user.service.impl;
 
 import com.farmily.user.dto.*;
 import com.farmily.user.model.Admin;
+import com.farmily.user.model.AdminRole;
 import com.farmily.user.repository.AdminRepository;
+import com.farmily.user.repository.AdminRoleRepository;
 import com.farmily.user.service.AdminService;
 import com.farmily.user.service.EmailUniquenessChecker;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -22,11 +24,14 @@ import java.util.Map;
 public class AdminServiceImpl implements AdminService {
 
     private final AdminRepository adminRepository;
+    private final AdminRoleRepository adminRoleRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailUniquenessChecker emailUniquenessChecker;
 
-    public AdminServiceImpl(AdminRepository adminRepository, PasswordEncoder passwordEncoder, EmailUniquenessChecker emailUniquenessChecker) {
+    public AdminServiceImpl(AdminRepository adminRepository, AdminRoleRepository adminRoleRepository,
+                            PasswordEncoder passwordEncoder, EmailUniquenessChecker emailUniquenessChecker) {
         this.adminRepository = adminRepository;
+        this.adminRoleRepository = adminRoleRepository;
         this.passwordEncoder = passwordEncoder;
         this.emailUniquenessChecker = emailUniquenessChecker;
     }
@@ -107,30 +112,22 @@ public class AdminServiceImpl implements AdminService {
     // 查所有管理員（每位都要附上他擁有的權限代碼）
     @Override
     public List<AdminProfileResponse> listAll() {
-        // 步驟 1：撈出所有管理員（1 次查詢）
+        // step1. 撈出所有管理員 (查1次)
         List<Admin> admins = adminRepository.findAll();
 
-        // 步驟 2：一次撈出「所有管理員的所有權限」（1 次查詢）。
-        //   findAllAdminPermissionCodes() 回傳的每一列是一個 Object[] 陣列，固定 2 格：
-        //     row[0] = admin_id（哪位管理員）、row[1] = permission_code（一個權限代碼）
-        //   例如資料庫有：1→"ADMIN", 1→"REVIEW", 2→"REVIEW"，就會回傳 3 列。
-        //   為什麼用 Object[]？因為這筆查詢一次選了「兩個不同欄位」，
-        //   Spring 沒有對應的現成型別，只好用「一個陣列裝一列的多個欄位值」。
+        // step2. 查所有管理員的所有權限 (查1次)，findAllAdminPermissionCodes() 回傳的每一列是一個 Object[] 陣列
         List<Object[]> rows = adminRepository.findAllAdminPermissionCodes();
 
-        // 步驟 3：把上面「平鋪的列」整理成「依管理員分組」的對照表。
-        //   key = adminId、value = 該管理員的權限代碼清單。
-        //   整理完會像：{ 1 → ["ADMIN","REVIEW"], 2 → ["REVIEW"] }
+        // step3. 把上面「平鋪的列」整理成「依管理員分組」map
         Map<Integer, List<String>> codesByAdminId = new HashMap<>();
         for (Object[] row : rows) {
-            // 把這一列的兩個欄位取出來。row 裡存的是 Object，要轉回原本的型別才能用。
             Integer adminId = (Integer) row[0];
             String code = (String) row[1];
 
-            // 先看這位管理員在對照表裡有沒有清單了
+            // 先看這位管理員在對照表裡有沒有清單
             List<String> codes = codesByAdminId.get(adminId);
             if (codes == null) {
-                // 還沒有: 第一次遇到這位管理員，幫他建一個新的空清單並放進對照表
+                // 還沒有權限，幫他建一個新的空清單並放進對照表
                 codes = new ArrayList<>();
                 codesByAdminId.put(adminId, codes);
             }
@@ -138,13 +135,12 @@ public class AdminServiceImpl implements AdminService {
             codes.add(code);
         }
 
-        // 步驟 4：逐位管理員組裝回應 DTO。
-        //   權限直接從步驟 3 的對照表「用記憶體查」拿，不再回資料庫查 → 這就是省下 N 次查詢的關鍵。
+        // step4. 從 step3 查，解決 n+1
         List<AdminProfileResponse> result = new ArrayList<>();
         for (Admin a : admins) {
             List<String> codes = codesByAdminId.get(a.getAdminId());
             if (codes == null) {
-                // 這位管理員一個權限都沒有（對照表查不到）→ 給空清單，避免 null
+                // 這位管理員一個權限都沒有給空陣列
                 codes = new ArrayList<>();
             }
             result.add(AdminProfileResponse.from(a, codes));
@@ -160,6 +156,18 @@ public class AdminServiceImpl implements AdminService {
 
         List<String> codes = adminRepository.findPermissionCodesByAdminId(adminId);
         return AdminProfileResponse.from(admin, codes);
+    }
+
+    // 列出系統所有可指派的權限(前端用來動態產生勾選清單)
+    @Override
+    @Transactional(readOnly = true)
+    public List<PermissionResponse> listPermissions() {
+        List<AdminRole> roles = adminRoleRepository.findAll();
+        List<PermissionResponse> result = new ArrayList<>();
+        for (AdminRole role : roles) {
+            result.add(PermissionResponse.from(role));
+        }
+        return result;
     }
 
     // 修改其他管理員（名字、狀態、權限）

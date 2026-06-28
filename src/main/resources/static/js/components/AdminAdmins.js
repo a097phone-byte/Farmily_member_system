@@ -11,12 +11,8 @@ import { toast, confirmDialog } from '../ui.js';
 import Modal from './Modal.js';
 import Avatar from './Avatar.js';
 
-// 權限代碼對齊 store.adminHasPerm / 後端 permissionCodes
-const PERMS = [
-    { code: 'ADMIN', label: '管理員管理（最高權限）' },
-    { code: 'MEMBER', label: '會員管理' },
-    { code: 'FARMER', label: '小農與審核' },
-];
+// 權限清單改由後端動態載入（GET /api/admin/permissions，讀 admin_role 表），不再寫死。
+// 以後要新增權限，只要在 admin_role 表 INSERT 一列，這裡的勾選畫面就會自動出現。
 const STATUSES = ['ACTIVE', 'SUSPENDED'];
 
 export default {
@@ -25,7 +21,7 @@ export default {
     data() {
         return {
             store, rows: [], loading: true, busy: false,
-            perms: PERMS, statuses: STATUSES,
+            perms: [], statuses: STATUSES,   // perms 於 mounted 時向後端載入
             mode: null,                // 'create' | 'edit'
             form: {},                  // 編輯/新增共用表單
         };
@@ -33,8 +29,16 @@ export default {
     computed: {
         myId() { return this.store.admin.profile ? this.store.admin.profile.adminId : null; },
     },
-    async mounted() { await this.load(); },
+    async mounted() {
+        await this.loadPerms();   // 先載入權限清單，勾選畫面才有選項
+        await this.load();
+    },
     methods: {
+        // 向後端拿「所有可指派的權限」（取代原本寫死的 PERMS）
+        async loadPerms() {
+            try { this.perms = await api.get('/admin/permissions'); }
+            catch (e) { toast('載入權限清單失敗', 'err'); }
+        },
         async load() {
             this.loading = true;
             try { this.rows = await api.get('/admin/admins'); }
@@ -147,9 +151,9 @@ export default {
           <div class="field">
             <label>權限</label>
             <div class="perm-list">
-              <label v-for="p in perms" :key="p.code" class="perm-item">
+              <label v-for="p in perms" :key="p.code" class="perm-item" :title="p.description">
                 <input type="checkbox" :checked="form.permissionCodes.includes(p.code)"
-                       @change="togglePerm(form.permissionCodes, p.code)" /> {{ p.label }}
+                       @change="togglePerm(form.permissionCodes, p.code)" /> {{ p.name }}
               </label>
             </div>
           </div>
@@ -172,9 +176,9 @@ export default {
           <div class="field">
             <label>權限</label>
             <div class="perm-list">
-              <label v-for="p in perms" :key="p.code" class="perm-item">
+              <label v-for="p in perms" :key="p.code" class="perm-item" :title="p.description">
                 <input type="checkbox" :checked="form.updatePermissionCodes.includes(p.code)"
-                       @change="togglePerm(form.updatePermissionCodes, p.code)" /> {{ p.label }}
+                       @change="togglePerm(form.updatePermissionCodes, p.code)" /> {{ p.name }}
               </label>
             </div>
           </div>
