@@ -36,7 +36,7 @@ public class AuthController {
         // 有才拿 session
         HttpSession session = request.getSession(false);
 
-        // 整個 session 作廢
+        // 立刻釋放 session 不等 timeout
         if (session != null)
             session.invalidate();
 

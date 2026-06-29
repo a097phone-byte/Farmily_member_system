@@ -77,7 +77,7 @@ public class UserController {
         if (log.isRememberMe()) {
             session.setMaxInactiveInterval(60 * 60 * 24 * 14);   // 勾記住我：server session 14 天
             // 在 getSession(true) 之後才寫，這個 Set-Cookie 會排在 Tomcat 預設那個之後，
-            // 瀏覽器採用後者 → 變成帶 Max-Age 的 persistent cookie，關掉瀏覽器仍保留
+            // 瀏覽器採用後者，變成帶 Max-Age 的 persistent cookie，關掉瀏覽器仍保留
             SessionCookieSupport.writeRememberMeCookie(session, httpResponse);
         } else {
             session.setMaxInactiveInterval(60 * 30);             // 不勾：30 分鐘，沿用預設 session cookie (關瀏覽器即刪)
