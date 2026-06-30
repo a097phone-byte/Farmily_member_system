@@ -64,7 +64,7 @@ public class UserController {
         SecurityContextHolder.getContext().setAuthentication(authToken);
 
         // step3: 把登入狀態存進 session，並回一個 session cookie 給前端
-        HttpSession session = request.getSession(true);
+        HttpSession session = request.getSession(true);         // getSession(true) 若已有 Session 就回傳，沒有就建立一個新的
         session.setAttribute(
                 HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
                 SecurityContextHolder.getContext());

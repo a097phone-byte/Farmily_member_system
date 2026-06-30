@@ -33,7 +33,7 @@ public class AuthController {
     @PostMapping("/api/logout")
     public ResponseEntity<String> logout(HttpServletRequest request) {
 
-        // 有才拿 session
+        // 若已有 Session 就回傳，沒有則回傳 null（不會建立）
         HttpSession session = request.getSession(false);
 
         // 立刻釋放 session 不等 timeout
