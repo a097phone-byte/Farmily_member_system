@@ -9,6 +9,7 @@ import java.util.UUID;
 
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
+import org.json.JSONObject;
 
 // 負責產生與驗證 token（會員/小農共用），過期時間(TTL)自動清除，取出後即刪除
 @Service
@@ -17,6 +18,7 @@ public class TokenService {
     // key 前綴，避免和其他資料衝突
     private static final String KEY_PREFIX = "farmily:token:";
 
+    // 跟 Redis 借用連線
     private final JedisPool jedisPool;
 
     public TokenService(JedisPool jedisPool) {
@@ -24,7 +26,7 @@ public class TokenService {
     }
 
     // 組出 key，例如：farmily:token:PASSWORD_RESET:xxxx-uuid
-    // 把 tokenType 設為 key：拿驗證信 token 去重設密碼會找不到
+    // 把 tokenType 設為 key 可有效防用途不合，例如拿驗證信 token 去重設密碼會找不到
     private String buildKey(AccountToken.TokenType tokenType, String tokenValue) {
         return KEY_PREFIX + tokenType.name() + ":" + tokenValue;
     }
@@ -35,6 +37,7 @@ public class TokenService {
                               AccountToken.TokenType tokenType,
                               int ttlMinutes) {
 
+        // 用 UUID 產生亂數
         String tokenValue = UUID.randomUUID().toString();
 
         // 組成 JSON 字串
@@ -47,6 +50,7 @@ public class TokenService {
         String key = buildKey(tokenType, tokenValue);
         int ttlSeconds = ttlMinutes * 60;   // Redis 過期單位是秒
 
+        // 操作 Redis，跟連線池借連線
         Jedis jedis = jedisPool.getResource();
         try {
             // 先 set 存值，再 expire 設定過期秒數
@@ -59,13 +63,13 @@ public class TokenService {
         return tokenValue;
     }
 
-    // 驗證 token；有效就「取出並刪除」（一次性），並回傳整理好的 AccountToken
+    // 驗證 token 是否有效，並回傳整理好的 AccountToken
     public AccountToken validateAndConsume(String tokenValue, AccountToken.TokenType tokenType) {
 
         String key = buildKey(tokenType, tokenValue);
 
         String jsonStr;
-        Jedis jedis = jedisPool.getResource();
+        Jedis jedis = jedisPool.getResource();      // 借用連線
         try {
             // 先把資料讀出來
             jsonStr = jedis.get(key);
@@ -78,12 +82,13 @@ public class TokenService {
             jedis.close();
         }
 
+        // 不存在/已用過/已過期/用途不符，丟例外
         if (jsonStr == null) {
             throw new IllegalArgumentException("連結無效或已過期，請重新申請");
         }
 
         // JSON to Object: 把 JSON 字串還原回 AccountToken 物件
-        org.json.JSONObject json = new org.json.JSONObject(jsonStr);
+        JSONObject json = new JSONObject(jsonStr);
         String email = json.getString("accountEmail");
         String accountTypeStr = json.getString("accountType");
         String tokenTypeStr = json.getString("tokenType");
