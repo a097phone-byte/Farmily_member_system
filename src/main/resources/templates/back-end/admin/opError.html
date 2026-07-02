@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>操作失敗</title>
+    <th:block th:insert="~{back-end/admin/included-fragment}"></th:block>
+</head>
+<body>
+<nav class="navbar navbar-dark bg-success">
+    <a class="navbar-brand" th:href="@{/admin/dashboard}">← 回總覽</a>
+    <span class="navbar-text text-white">操作失敗</span>
+</nav>
+<div class="container mt-4" style="max-width: 560px;">
+    <div class="alert alert-danger" th:text="${errorMessage}">操作失敗</div>
+    <a class="btn btn-secondary" href="javascript:history.back()">回上一頁</a>
+    <a class="btn btn-outline-secondary" th:href="@{/admin/dashboard}">回總覽</a>
+</div>
+</body>
+</html>

@@ -30,7 +30,9 @@
             ｜
             <a th:href="@{/admin/reviews}">小農審核</a>
         </li>
-        <li sec:authorize="hasAuthority('PERM_ADMIN')">管理員管理（待建）</li>
+        <li sec:authorize="hasAuthority('PERM_ADMIN')">
+            <a th:href="@{/admin/admins}">管理員管理</a>
+        </li>
     </ul>
 </div>
 </body>

@@ -120,39 +120,9 @@ public class UserSecurityConfig {
     }
 
 
-    // ===== 管理員 SecurityFilterChain：負責處理 /api/admin/** (Vue 後台) =====
-    @Bean
-    @Order(1)
-    public SecurityFilterChain adminChain(HttpSecurity http) throws Exception {
-        return commonSetup(http)
-                .securityMatcher("/api/admin/**")
-                .authorizeHttpRequests(request -> request
-                                .requestMatchers("/api/admin/login").permitAll()
-
-                                // 細部權限管理 (ADMIN_ROLE) 注意有順序
-                                .requestMatchers("/api/admin/admins/**").hasAuthority("PERM_ADMIN")
-
-                                .requestMatchers("/api/admin/farmers/**", "/api/admin/reviews/**")
-                                .hasAnyAuthority("PERM_ADMIN", "PERM_FARMER")
-
-                                .requestMatchers("/api/admin/members/**")
-                                .hasAnyAuthority("PERM_ADMIN", "PERM_MEMBER")
-
-
-                                // ============= 補上其他組員的 API =============
-//                        .requestMatchers("/api/admin/news/**")
-//                        .hasAnyAuthority("PERM_ADMIN", "PERM_NEWS")
-
-
-                                // 其餘 ("/api/admin/me")，登入的管理員都能用
-                                .anyRequest().hasRole("ADMIN")
-                )
-                .build();
-    }
-
     // ===== 小農 SecurityFilterChain：負責處理 /api/farmer/** =====
     @Bean
-    @Order(2)
+    @Order(1)
     public SecurityFilterChain farmerChain(HttpSecurity http) throws Exception {
         return commonSetup(http)
                 .securityMatcher("/api/farmer/**")
@@ -167,7 +137,7 @@ public class UserSecurityConfig {
 
     // ===== 會員 SecurityFilterChain：負責處理 /api/member/** =====
     @Bean
-    @Order(3)
+    @Order(2)
     public SecurityFilterChain memberChain(HttpSecurity http) throws Exception {
         return commonSetup(http)
                 .securityMatcher("/api/member/**")
@@ -188,12 +158,12 @@ public class UserSecurityConfig {
 
     // ===== 其餘所有 url 需登入 =====
     @Bean
-    @Order(4)
+    @Order(3)
     public SecurityFilterChain defaultChain(HttpSecurity http) throws Exception {
         return commonSetup(http)
                 .authorizeHttpRequests(request -> request
                         // 前端靜態檔
-                        .requestMatchers("/", "/index.html", "/admin.html", "/css/**", "/js/**", "/vendors/**",  "/webjars/**","/favicon.ico").permitAll()
+                        .requestMatchers("/", "/index.html", "/css/**", "/js/**", "/vendors/**",  "/webjars/**","/favicon.ico").permitAll()
                         .requestMatchers("/oauth-test.html").permitAll()        // OAuth2.0 測試用
 
                         // 公開：註冊/申請表單的縣市與行政區下拉要用

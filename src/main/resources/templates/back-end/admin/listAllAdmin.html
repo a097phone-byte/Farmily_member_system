@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>管理員管理 - listAllAdmin.html</title>
+    <th:block th:insert="~{back-end/admin/included-fragment}"></th:block>
+</head>
+<body>
+<nav class="navbar navbar-dark bg-success">
+    <a class="navbar-brand" th:href="@{/admin/dashboard}">← 回總覽</a>
+    <span class="navbar-text text-white">管理員管理 <span th:text="${success}"></span></span>
+</nav>
+
+<div class="container mt-3">
+
+    <!-- 新增管理員 -->
+    <div class="card mb-4">
+        <div class="card-header">新增管理員</div>
+        <div class="card-body">
+            <form method="post" th:action="@{/admin/admins}">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" name="email" class="form-control" required/>
+                </div>
+                <div class="form-group">
+                    <label>密碼</label>
+                    <input type="password" name="password" class="form-control" required/>
+                </div>
+                <div class="form-group">
+                    <label>姓名</label>
+                    <input type="text" name="name" class="form-control" required/>
+                </div>
+                <div class="form-group">
+                    <label>權限</label>
+                    <div th:each="perm : ${permissionListData}" class="form-check">
+                        <!-- 多個同名 checkbox 會自動綁成 List<String> permissionCodes -->
+                        <input type="checkbox" name="permissionCodes"
+                               th:value="${perm.code}" class="form-check-input"/>
+                        <label class="form-check-label"
+                               th:text="${perm.name} + '（' + ${perm.code} + '）'"></label>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-success">新增</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 管理員清單 -->
+    <table class="table table-striped table-bordered">
+        <thead class="thead-light">
+        <tr><th>計數</th><th>編號</th><th>Email</th><th>姓名</th><th>狀態</th><th>權限</th><th>操作</th></tr>
+        </thead>
+        <tbody>
+        <tr th:each="admin, stat : ${adminListData}">
+            <td th:text="${stat.count}"></td>
+            <td th:text="${admin.adminId}"></td>
+            <td th:text="${admin.adminEmail}"></td>
+            <td th:text="${admin.adminName}"></td>
+            <td th:text="${admin.adminStatus}"></td>
+            <td th:text="${#strings.listJoin(admin.permissionCodes, ', ')}"></td>
+            <td>
+                <a class="btn btn-sm btn-outline-primary"
+                   th:href="@{/admin/admins/{id}/edit(id=${admin.adminId})}">修改</a>
+                <form method="post" class="d-inline"
+                      th:action="@{/admin/admins/{id}/delete(id=${admin.adminId})}"
+                      onsubmit="return confirm('確定刪除這位管理員？');">
+                    <button class="btn btn-sm btn-outline-danger">刪除</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>修改管理員 - updateAdminInput.html</title>
+    <th:block th:insert="~{back-end/admin/included-fragment}"></th:block>
+</head>
+<body>
+<nav class="navbar navbar-dark bg-success">
+    <a class="navbar-brand" th:href="@{/admin/admins}">← 回管理員清單</a>
+    <span class="navbar-text text-white">修改管理員</span>
+</nav>
+
+<div class="container mt-3" style="max-width: 560px;">
+    <form method="post" th:action="@{/admin/admins/{id}/update(id=${admin.adminId})}">
+        <div class="form-group">
+            <label>Email（不可改）</label>
+            <input type="text" class="form-control" th:value="${admin.adminEmail}" disabled/>
+        </div>
+        <div class="form-group">
+            <label>姓名</label>
+            <input type="text" name="updateName" class="form-control" th:value="${admin.adminName}"/>
+        </div>
+        <div class="form-group">
+            <label>狀態</label>
+            <select name="updateStatus" class="form-control">
+                <option value="ACTIVE"    th:selected="${admin.adminStatus == 'ACTIVE'}">ACTIVE</option>
+                <option value="SUSPENDED" th:selected="${admin.adminStatus == 'SUSPENDED'}">SUSPENDED</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>權限</label>
+            <div th:each="perm : ${permissionListData}" class="form-check">
+                <!-- 已擁有的權限預先打勾 -->
+                <input type="checkbox" name="updatePermissionCodes"
+                       th:value="${perm.code}" class="form-check-input"
+                       th:checked="${admin.permissionCodes.contains(perm.code)}"/>
+                <label class="form-check-label"
+                       th:text="${perm.name} + '（' + ${perm.code} + '）'"></label>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-success">儲存</button>
+    </form>
+</div>
+</body>
+</html>
