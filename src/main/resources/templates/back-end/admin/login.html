@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>管理後台登入</title>
+    <th:block th:insert="~{back-end/admin/included-fragment}"></th:block>
+</head>
+<body class="bg-light">
+<div class="container" style="max-width: 420px; margin-top: 80px;">
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h3 class="text-center mb-4">管理後台登入</h3>
+
+            <!-- 依網址參數顯示提示；?error / ?logout 由 formLogin 設定 -->
+            <div th:if="${param.error}"  class="alert alert-danger">帳號或密碼錯誤，或帳號已被停權</div>
+            <div th:if="${param.logout}" class="alert alert-success">您已登出</div>
+
+            <!-- 用 th:action 時，Thymeleaf 會自動幫這個 POST 表單加上 CSRF 隱藏欄位 -->
+            <form th:action="@{/admin/login}" method="post">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" name="email" class="form-control" required autofocus/>
+                </div>
+                <div class="form-group">
+                    <label>密碼</label>
+                    <input type="password" name="password" class="form-control" required/>
+                </div>
+                <button type="submit" class="btn btn-success btn-block">登入</button>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>

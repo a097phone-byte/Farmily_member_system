@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>管理後台 - 總覽</title>
+    <th:block th:insert="~{back-end/admin/included-fragment}"></th:block>
+</head>
+<body>
+<nav class="navbar navbar-dark bg-success">
+    <span class="navbar-brand">Farmily 管理後台</span>
+    <span class="navbar-text text-white mr-3">您好，<span th:text="${adminName}">管理員</span></span>
+    <!-- 登出也是 POST 表單，th:action 會自動帶 CSRF -->
+    <form th:action="@{/admin/logout}" method="post" class="form-inline">
+        <button class="btn btn-outline-light btn-sm" type="submit">登出</button>
+    </form>
+</nav>
+
+<div class="container mt-4">
+    <h3>總覽</h3>
+    <p>登入成功！這是後台首頁，接下來會在這裡放各管理模組的入口。</p>
+
+    <!-- 示範 sec:authorize：有對應權限才看得到（步驟 2~3 會補上真正的頁面連結）-->
+    <ul>
+        <li sec:authorize="hasAnyAuthority('PERM_ADMIN','PERM_MEMBER')">會員管理（待建）</li>
+        <li sec:authorize="hasAnyAuthority('PERM_ADMIN','PERM_FARMER')">小農管理 / 審核（待建）</li>
+        <li sec:authorize="hasAuthority('PERM_ADMIN')">管理員管理（待建）</li>
+    </ul>
+</div>
+</body>
+</html>
