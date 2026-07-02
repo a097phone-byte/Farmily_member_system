@@ -62,6 +62,20 @@
             <artifactId>spring-boot-starter-mail</artifactId>
         </dependency>
 
+        <!--   Redis 用 Jedis（存放一次性 token）  -->
+        <dependency>
+            <groupId>redis.clients</groupId>
+            <artifactId>jedis</artifactId>
+            <version>5.0.2</version>
+        </dependency>
+
+        <!--   物件 JSON 字串（org.json）  -->
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20240303</version>
+        </dependency>
+
         <!--   OAuth 2.0 用  -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
