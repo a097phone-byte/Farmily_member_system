@@ -22,8 +22,14 @@
 
     <!-- 示範 sec:authorize：有對應權限才看得到（步驟 2~3 會補上真正的頁面連結）-->
     <ul>
-        <li sec:authorize="hasAnyAuthority('PERM_ADMIN','PERM_MEMBER')">會員管理（待建）</li>
-        <li sec:authorize="hasAnyAuthority('PERM_ADMIN','PERM_FARMER')">小農管理 / 審核（待建）</li>
+        <li sec:authorize="hasAnyAuthority('PERM_ADMIN','PERM_MEMBER')">
+            <a th:href="@{/admin/members}">會員管理</a>
+        </li>
+        <li sec:authorize="hasAnyAuthority('PERM_ADMIN','PERM_FARMER')">
+            <a th:href="@{/admin/farmers}">小農管理</a>
+            ｜
+            <a th:href="@{/admin/reviews}">小農審核</a>
+        </li>
         <li sec:authorize="hasAuthority('PERM_ADMIN')">管理員管理（待建）</li>
     </ul>
 </div>

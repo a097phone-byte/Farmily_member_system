@@ -1,4 +1,4 @@
-package com.farmily.user.controller;
+package com.farmily.user.controller.view;
 
 import com.farmily.user.security.AdminUserDetails;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;

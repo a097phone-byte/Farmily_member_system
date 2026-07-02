@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>小農審核 - listReview.html</title>
+    <th:block th:insert="~{back-end/admin/included-fragment}"></th:block>
+</head>
+<body>
+<nav class="navbar navbar-dark bg-success">
+    <a class="navbar-brand" th:href="@{/admin/dashboard}">← 回總覽</a>
+    <span class="navbar-text text-white">小農審核 <span th:text="${success}"></span></span>
+</nav>
+
+<div class="container-fluid mt-3">
+
+    <!-- ===== 待審清單 ===== -->
+    <h4>待審核（PENDING）</h4>
+    <table class="table table-bordered">
+        <thead class="thead-light">
+        <tr><th>計數</th><th>審核編號</th><th>農場名稱</th><th>Email</th><th>輪次</th><th>送審時間</th><th>操作</th></tr>
+        </thead>
+        <tbody>
+        <tr th:each="r, stat : ${pendingData}">
+            <td th:text="${stat.count}"></td>
+            <td th:text="${r.reviewId}"></td>
+            <td th:text="${r.farmName}"></td>
+            <td th:text="${r.farmerEmail}"></td>
+            <td th:text="${r.reviewRound}"></td>
+            <td th:text="${r.submittedAt}"></td>
+            <td>
+                <form method="post" th:action="@{/admin/reviews/{id}/start(id=${r.reviewId})}">
+                    <button class="btn btn-sm btn-primary">開始審核</button>
+                </form>
+            </td>
+        </tr>
+        <tr th:if="${pendingData.isEmpty()}"><td colspan="7" class="text-center text-muted">目前沒有待審案件</td></tr>
+        </tbody>
+    </table>
+
+    <!-- ===== 審核中清單 ===== -->
+    <h4 class="mt-4">審核中（REVIEWING）</h4>
+    <div th:each="r : ${reviewingData}" class="card mb-3">
+        <div class="card-body">
+            <h5 class="card-title">
+                #<span th:text="${r.reviewId}"></span>　
+                <span th:text="${r.submittedFarmName}"></span>
+                （<span th:text="${r.farmerEmail}"></span>，第 <span th:text="${r.reviewRound}"></span> 輪）
+            </h5>
+            <p class="mb-1">送審地址：
+                <span th:text="${r.submittedCityName}"></span>
+                <span th:text="${r.submittedDistName}"></span>
+                <span th:text="${r.submittedFarmAddress}"></span>
+            </p>
+
+            <!-- 證明文件圖片：有上傳才顯示 -->
+            <div class="mb-2">
+                <img th:if="${r.hasCertLand}"     width="160" class="mr-2 border"
+                     th:src="@{/admin/reviews/{id}/cert/land(id=${r.reviewId})}"/>
+                <img th:if="${r.hasCertProduct}"  width="160" class="mr-2 border"
+                     th:src="@{/admin/reviews/{id}/cert/product(id=${r.reviewId})}"/>
+                <img th:if="${r.hasCertIdentity}" width="160" class="mr-2 border"
+                     th:src="@{/admin/reviews/{id}/cert/identity(id=${r.reviewId})}"/>
+            </div>
+
+            <!-- 核准 -->
+            <form method="post" class="d-inline"
+                  th:action="@{/admin/reviews/{id}/approve(id=${r.reviewId})}">
+                <button class="btn btn-success btn-sm">核准</button>
+            </form>
+
+            <!-- 退件（需填理由）-->
+            <form method="post" class="form-inline d-inline ml-2"
+                  th:action="@{/admin/reviews/{id}/reject(id=${r.reviewId})}">
+                <input type="text" name="rejectReason" class="form-control form-control-sm mr-1"
+                       placeholder="退件理由" required/>
+                <button class="btn btn-danger btn-sm">退件</button>
+            </form>
+        </div>
+    </div>
+    <p th:if="${reviewingData.isEmpty()}" class="text-muted">目前沒有審核中案件</p>
+
+</div>
+</body>
+</html>
