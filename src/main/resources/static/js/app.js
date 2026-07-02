@@ -127,7 +127,7 @@ const App = {
           <farmer-login v-else-if="zone === 'farmer-login'"></farmer-login>
           <component v-else :is="publicView"></component>
         </main>
-        <footer class="footer">© Farmily 你儂我農　·　<a href="admin.html">管理員入口</a></footer>
+        <footer class="footer">© Farmily 你儂我農　·　<a href="/admin/login">管理員入口</a></footer>
       </template>
 
       <toast></toast>

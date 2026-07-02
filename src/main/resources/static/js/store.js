@@ -45,25 +45,25 @@ export const store = Vue.reactive({
     },
 
     // ========== 管理員 ==========
-    async adminLogin(email, password) {
-        this.admin.profile = await api.post('/admin/login', { email, password });
-        this.admin.loaded = true;
-    },
-    async adminFetchMe() {
-        try { this.admin.profile = await api.get('/admin/me'); }
-        catch (e) { this.admin.profile = null; throw e; }
-        finally { this.admin.loaded = true; }
-    },
-    async adminUpdateName(name) {                 // AdminSelfUpdateRequest = { name }
-        this.admin.profile = await api.put('/admin/me', { name });
-    },
-    // 權限判斷：有 ADMIN（超級管理員）一律放行；否則需擁有指定代碼之一。
-    // 對齊後端規則：members→(ADMIN|MEMBER)、farmers/reviews→(ADMIN|FARMER)、admins→ADMIN
-    adminHasPerm(...codes) {
-        const mine = this.admin.profile ? (this.admin.profile.permissionCodes || []) : [];
-        if (mine.includes('ADMIN')) return true;
-        return codes.some((c) => mine.includes(c));
-    },
+    // async adminLogin(email, password) {
+    //     this.admin.profile = await api.post('/admin/login', { email, password });
+    //     this.admin.loaded = true;
+    // },
+    // async adminFetchMe() {
+    //     try { this.admin.profile = await api.get('/admin/me'); }
+    //     catch (e) { this.admin.profile = null; throw e; }
+    //     finally { this.admin.loaded = true; }
+    // },
+    // async adminUpdateName(name) {                 // AdminSelfUpdateRequest = { name }
+    //     this.admin.profile = await api.put('/admin/me', { name });
+    // },
+    // // 權限判斷：有 ADMIN（超級管理員）一律放行；否則需擁有指定代碼之一。
+    // // 對齊後端規則：members→(ADMIN|MEMBER)、farmers/reviews→(ADMIN|FARMER)、admins→ADMIN
+    // adminHasPerm(...codes) {
+    //     const mine = this.admin.profile ? (this.admin.profile.permissionCodes || []) : [];
+    //     if (mine.includes('ADMIN')) return true;
+    //     return codes.some((c) => mine.includes(c));
+    // },
 
     // ========== 共用登出（三身分共用 /api/logout，會讓整個 session 失效） ==========
     async logout() {
