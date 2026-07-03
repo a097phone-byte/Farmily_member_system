@@ -142,9 +142,12 @@ public class UserSecurityConfig {
         return commonSetup(http)
                 .securityMatcher("/api/member/**")
                 .authorizeHttpRequests(request -> request
-                        .requestMatchers("/api/member/register",
-                                "/api/member/login",
-                                "/api/member/oauth/**").permitAll()
+                        .requestMatchers("/api/member/register", "/api/member/login", "/api/member/oauth/**").permitAll()
+
+
+
+
+
                         .anyRequest().hasRole("USER")
                 )
                 // OAuth 2.0 社交登入 - 交給 Spring Security 處理
@@ -162,6 +165,11 @@ public class UserSecurityConfig {
     public SecurityFilterChain defaultChain(HttpSecurity http) throws Exception {
         return commonSetup(http)
                 .authorizeHttpRequests(request -> request
+
+                        // 前端靜態檔（Vue 打包輸出在 /farmily-web/ 子路徑）
+                        .requestMatchers("/farmily-web/**").permitAll()
+
+
                         // 前端靜態檔
                         .requestMatchers("/", "/index.html", "/css/**", "/js/**", "/vendors/**",  "/webjars/**","/favicon.ico").permitAll()
                         .requestMatchers("/oauth-test.html").permitAll()        // OAuth2.0 測試用
