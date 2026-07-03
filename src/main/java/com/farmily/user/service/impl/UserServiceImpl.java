@@ -91,7 +91,6 @@ public class UserServiceImpl implements UserService {
         newUser.setEmailVerified(false);
         newUser.setMonthlySpending(0);
         newUser.setUserStatus(User.UserStatus.ACTIVE);
-        newUser.setFarmerIdentity(false);
 
         // 存進 DB
         User savedUser = userRepository.save(newUser);
@@ -235,7 +234,6 @@ public class UserServiceImpl implements UserService {
             user.setUserCreatedAt(LocalDateTime.now());
             user.setMonthlySpending(0);
             user.setUserStatus(User.UserStatus.ACTIVE);
-            user.setFarmerIdentity(false);
         }
 
         // step4. 限制被停權、註銷帳號不能登入

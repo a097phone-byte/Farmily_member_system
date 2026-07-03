@@ -21,7 +21,6 @@ public class UserProfileResponse {
     private Integer monthlySpending;
     private String spendingTier;
     private Boolean emailVerified;
-    private Boolean farmerIdentity;
     private String authProvider;      // 讓前端知道這帳號是 LOCAL/GOOGLE
     private Boolean hasPassword;      // 前端可根據此決定顯示「修改密碼」還是「設定密碼」
     private LocalDateTime userCreatedAt;
@@ -67,9 +66,6 @@ public class UserProfileResponse {
     public Boolean getEmailVerified() {
         return emailVerified;
     }
-    public Boolean getFarmerIdentity() {
-        return farmerIdentity;
-    }
     public String getAuthProvider() {
         return authProvider;
     }
@@ -104,7 +100,6 @@ public class UserProfileResponse {
             dto.spendingTier = spendingTier[0];
         }
         dto.emailVerified = u.getEmailVerified();
-        dto.farmerIdentity = u.getFarmerIdentity();
         dto.authProvider = u.getAuthProvider() != null ? u.getAuthProvider().name() : null;
         dto.hasPassword = u.getPassword() != null;
         dto.userCreatedAt = u.getUserCreatedAt();

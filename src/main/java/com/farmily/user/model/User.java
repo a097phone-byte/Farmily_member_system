@@ -61,9 +61,6 @@ public class User implements Serializable {
     @Column(name = "monthly_spending")
     private Integer monthlySpending = 0;
 
-    @Column(name = "farmer_identity")
-    private Boolean farmerIdentity;
-
     @Enumerated(EnumType.STRING)
     @Column(name = "auth_provider")
     private AuthProvider authProvider;
@@ -174,14 +171,6 @@ public class User implements Serializable {
 
     public void setMonthlySpending(Integer monthlySpending) {
         this.monthlySpending = monthlySpending;
-    }
-
-    public Boolean getFarmerIdentity() {
-        return farmerIdentity;
-    }
-
-    public void setFarmerIdentity(Boolean farmerIdentity) {
-        this.farmerIdentity = farmerIdentity;
     }
 
     public AuthProvider getAuthProvider() {
